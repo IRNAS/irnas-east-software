@@ -1,0 +1,124 @@
+name: "Draft New Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version you want to release [v##.##.##]?'
+        required: true
+      release-type:
+        description: 'What kind of release is this [release,hotfix]?'
+        required: true
+        default: 'release'
+env:
+  GIT_TERMINAL_PROMPT: 0
+
+jobs:
+  draft-new-release:
+    runs-on: ubuntu-20.04
+    # runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash -l {0}  # We want to use bash shell all the time, Conda is picky
+
+    steps:
+    - name: Validate release type input
+      id: validate-release
+      run: |
+        # Check if input release-type is in correct format
+        if [[ ! ${{ github.event.inputs.release-type }} = "release" ]] && \
+           [[ ! ${{ github.event.inputs.release-type }} = "hotfix" ]]; then
+          echo "::error::Invalid input release-type: it should be either release or hotfix!"
+          exit 1
+        fi
+        # Decide from which branch to branch off, depending on release-type
+        if [[ ${{ github.event.inputs.release-type }} = "release" ]]; then
+          echo "branch_from=dev" >> $GITHUB_ENV
+        fi
+        if [[ ${{ github.event.inputs.release-type }} = "hotfix" ]]; then
+          echo "branch_from=master" >> $GITHUB_ENV
+        fi
+
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ env.branch_from }}
+        fetch-depth: 0    # Fetch history for all branches and tags
+
+    - name: Validate version input
+      id: validate-input
+      run: |
+        # Check if input version is in correct format
+        if [[ ! ${{ github.event.inputs.version }} =~ v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "::error::Invalid input version: wrong format!"
+          exit 1
+        fi
+        # Check if input version already exists as git tag
+        if [[ ! -z $(git tag | grep ${{ github.event.inputs.version }}) ]]; then
+          echo "::error::Invalid input version: it already exists!"
+          exit 1
+        fi
+
+    - name: Create release branch
+      run: git checkout -b ${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}
+
+    - name: Update Changelog
+      uses: thomaseizinger/keep-a-changelog-new-release@1.3.0
+      with:
+        tag: ${{ github.event.inputs.version }}
+
+    # In order to make a commit, we need to initialize a user.
+    - name: Commit Changelog
+      run: |
+        git config user.name "github-bot :robot:"
+        git config user.email noreply@github.com
+        git add CHANGELOG.md
+        git commit -m "Update CHANGELOG.md for Release ${{ github.event.inputs.version }}"
+
+    - name: Push new release branch
+      run: git push origin ${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}
+
+    - name: Get latest Changelog entry
+      id: changelog-reader
+      uses: mindsers/changelog-reader-action@v2
+      with:
+        path: ./CHANGELOG.md
+
+    - name: Create Pull Request to master branch
+      id: master-pr
+      if: ${{ !env.ACT }}
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: "${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}"
+        destination_branch: "master"
+        pr_title: "Release ${{ github.event.inputs.version }}"
+        pr_label: "release"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        pr_body: |
+          # :robot::package: An automated release PR
+
+          This PR was created in response to a manual trigger of the <code>draft-new-release.yaml</code> workflow here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.
+
+          The release workflow did the following things:
+          * created a <code>${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}</code> branch,
+          * updated the <code>CHANGELOG.md</code> file,
+          * committed changes,
+          * pushed <code>${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}</code> branch to remote,
+          * and opened this PR.
+
+          ## :warning: Important notes
+
+          Merging this PR to <code>master</code> will create a new version tag, perform the build release process, create a GitHub release and upload any assets created in the previous process to it.
+          PR back to <code>dev</code> branch will also be created afterwards.
+
+          Before merging this PR you can:
+          * Review and discuss code changes of this PR.
+          * Pull the created branch to local machine with: <code>git pull origin/${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}</code> and perform last-minute changes. **Do not forget to commit and push.**
+
+          After merging this PR to the <code>master</code> you **HAVE** to:
+          * Delete release branch <code>${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}</code>
+          * Merge the second PR to the <code>dev</code> branch to retain release specific changes.
+
+          ## :clipboard: Changelog
+
+          ${{ steps.changelog-reader.outputs.changes }}

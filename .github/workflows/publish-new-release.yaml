@@ -1,0 +1,85 @@
+name: "Publish New Release"
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  publish-new-release:
+    name: Publish new release
+    runs-on: ubuntu-20.04
+    # runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash -l {0}  # We want to use bash shell all the time, Conda is picky
+    # Only merged pull requests can trigger this job
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Determine release type and version from branch name
+        run: |
+          release=$(echo "${{ github.event.pull_request.head.ref }}" | cut -d / -f 1 )
+          version=$(echo "${{ github.event.pull_request.head.ref }}" | cut -d / -f 2 )
+          version_cut=$(echo $version | cut -c 2-)
+          echo "release_version=$version" >> $GITHUB_ENV
+          echo "release_version_cut=$version_cut" >> $GITHUB_ENV
+          echo "release_type=$release" >> $GITHUB_ENV
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Create new tag
+        uses: mathieudutour/github-tag-action@v6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ env.release_version_cut }}
+
+      - name: Get latest Changelog entry
+        id: changelog-reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          path: ./CHANGELOG.md
+          version: ${{ env.release_version_cut }}
+
+      - name: Publish Release
+        id: release-id
+        if: ${{ !env.ACT }}
+        uses: softprops/action-gh-release@v0.1.8
+        with:
+          target_commitish: "master"
+          tag_name: ${{ env.release_version }}
+          body: |
+            # Release notes
+
+            ${{ steps.changelog-reader.outputs.changes }}
+
+      - name: Create Pull Request to dev branch
+        id: dev-pr
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: "master"
+          destination_branch: "dev"
+          pr_reviewer: "${{ github.actor }}"  # The person who initiated this PR
+          pr_title: "Release ${{ env.release_version }}: PR for dev"
+          pr_label: "PR for dev"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_body: |
+            # :robot::package: An automated release PR
+
+            This PR was created in response to a automated trigger of the <code>publish-new-release</code> workflow here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.
+
+            ## :warning: Important notes
+
+            Merging this PR to <code>dev</code> will not trigger any automated workflows.
+
+            After merging this PR to the <code>dev</code> you **HAVE** to:
+            * Make sure that you deleted <code>${{ env.release_type }}/${{ env.release_version }}</code> branch from before.
+
+            **Important**: Please do not delete master branch below!!!!
+
+            ## :clipboard: Changelog
+
+            ${{ steps.changelog-reader.outputs.changes }}
