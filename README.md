@@ -1,4 +1,35 @@
-# irnas-projects-template
-IRNAS template to Github repository
+# East tool
 
-See https://github.com/IRNAS/irnas-core/blob/master/GITHUB_NAMING_GUIDELINES.md for naming.
+## Installation and updating
+
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install East.
+Rerun this command to check for and install  updates.
+
+```bash
+pip install east
+```
+
+## Developing
+
+For development and testing the use of `virtualenv` is suggested.
+
+Install `virtualenv`:
+```bash
+pip install virtualenv
+```
+
+Create and activate `virtualenv`, run this from project root:
+
+```bash
+virtualenv venv
+source venv/bin/activate
+```
+
+To make development of the python package more smooth you can run below command
+from the project root directory.
+Changes that you make in the source code will be automatically available
+instead of running `pip install .` all time.
+```bash
+pip install --editable .
+```
+
