@@ -1,6 +1,9 @@
-from rich.console import Console
 import os
+import sys
 import subprocess
+
+from shutil import which
+from rich.console import Console
 
 
 class EastContext:
@@ -23,7 +26,7 @@ class EastContext:
         """
         self.cwd = os.getcwd()
         self.echo = echo
-        self.console = Console()
+        self.console = Console(width=80)
 
     def print(self, *objects, **kwargs):
         """Prints to the console.
@@ -36,18 +39,30 @@ class EastContext:
         """
         self.console.print(*objects, **kwargs)
 
-    def run(self, command: str):
+    def exit(self, message: str = None):
+        """Exit program with a given message if it was given.
+
+        Args:
+            message (str):  Message string that will be printed.
+        """
+        if message:
+            self.print(message)
+        sys.exit()
+
+    def run(self, command: str) -> subprocess.CompletedProcess:
         """
         Executes given command in shell as a process. This is a blocking call, process
         needs to finish before this command can return;
 
         Args:
             command (str):  Command to execute.
+
+        Returns
         """
         if self.echo:
-            click.echo(command)
+            self.print(command)
 
-        subprocess.run(command, shell=True)
+        return subprocess.run(command, shell=True)
 
     def run_west(self, west_command: str):
         """Run wrapper which should be used when executing commands with west tool.
@@ -56,3 +71,44 @@ class EastContext:
             west_command (str):    west command to execute
         """
         self.run("west " + west_command)
+
+    def check_exe(self, exe: str, help_string: str, on_fail_exit: bool = False) -> bool:
+        """
+        Checks if the given executable can be found by the which command.
+        If it can not it prints given help string.
+
+        If on_fail_exit is true it exits the program.
+
+        Args:
+            exe (str):              executable to find
+            help_string (str):      string to print
+            on_fail_exit (bool):    If true it exists cli on exit
+
+
+        Returns:
+            True if given executable was found.
+
+        """
+        exe_path = which(exe)
+
+        if not exe_path:
+            self.print(help_string)
+
+            if on_fail_exit:
+                self.exit()
+            return False
+
+        return True
+
+    def check_version(self, exe, expected_version, version_cmd="--version"):
+        """
+        Checks for version of provided exe program and compares it against
+        provided one.
+        """
+
+        response = self.run(f"{exe} {version_cmd}")
+
+        if expected_version in response.stdout:
+            return True
+        else:
+            return False
