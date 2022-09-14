@@ -44,6 +44,21 @@ jobs:
           path: ./CHANGELOG.md
           version: ${{ env.release_version_cut }}
 
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+
+      - name: Build binary wheel and a source tarball
+        run: |
+          export EAST_VERSION=${{ env.release_version }}
+          python setup.py sdist
+
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.5.1
+        with:
+            password: ${{ secrets.PYPI_UPLOAD_TOKEN }}
+
       - name: Publish Release
         id: release-id
         if: ${{ !env.ACT }}
