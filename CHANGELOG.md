@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fix
+
+-   How version string is fetched from the build system.
+
 ### Changed
 
 -   How requirements are included at build time.
