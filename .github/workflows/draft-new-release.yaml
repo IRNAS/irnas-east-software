@@ -64,7 +64,9 @@ jobs:
     # branch' will fail.
     - name: Check if master exists
       run: |
-        if [[ "$(git branch)" != *"master"* ]]; then
+        if [[ "$(git branch -r)" != *"origin/master"* ]]; then
+          git branch -r
+          echo "pushing to master"
           git branch master
           git push origin master
         fi
