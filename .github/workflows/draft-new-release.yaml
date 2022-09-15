@@ -59,6 +59,16 @@ jobs:
           exit 1
         fi
 
+    # In first release after creating a project from our template there is no
+    # master branch, so we need to create it, otherwise step 'PR to master
+    # branch' will fail.
+    - name: Check if master exists
+      run: |
+        if [[ "$(git branch)" != *"master"* ]]; then
+          git branch master
+          git push origin master
+        fi
+
     - name: Create release branch
       run: git checkout -b ${{ github.event.inputs.release-type }}/${{ github.event.inputs.version }}
 
