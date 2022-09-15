@@ -4,15 +4,18 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open("requirements.txt") as f:
-    required = f.read().splitlines()
-
 VERSION = os.getenv("EAST_VERSION")
 
 # No version was given at package build time, probably dev build.
 if not VERSION:
     VERSION = "v0.0.0"
 
+requirements = [
+    "rich == 12.5.1",
+    "click ==  8.1.3",
+    "rich_click ==  1.5.2",
+    "requests == 2.28.1",
+]
 
 setup(
     name="east-tool",
@@ -27,7 +30,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     include_package_data=True,
-    install_requires=required,
+    install_requires=requirements,
     python_requires=">=3.8",
     entry_points={"console_scripts": ("east = east.__main__:main",)},
 )
