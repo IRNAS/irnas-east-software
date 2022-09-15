@@ -3,7 +3,6 @@
 ## Installation and updating
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install East.
-Rerun this command to check for and install  updates.
 
 ```bash
 pip install east
@@ -32,4 +31,3 @@ instead of running `pip install .` all time.
 ```bash
 pip install --editable .
 ```
-
