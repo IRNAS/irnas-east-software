@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 with open("requirements.txt") as f:
     required = f.read().splitlines()
 
-VERSION = os.getenv('EAST_VERSION')
+VERSION = os.getenv("EAST_VERSION")
 
 # No version was given at package build time, probably dev build.
 if not VERSION:
@@ -15,7 +15,7 @@ if not VERSION:
 
 
 setup(
-    name="east",
+    name="east-tool",
     version=VERSION,
     author="Marko Sagadin",
     author_email="marko.sagadin42@gmail.com",
