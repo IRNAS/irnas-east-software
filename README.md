@@ -5,7 +5,7 @@
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install East.
 
 ```bash
-pip install east
+pip install east-tool
 ```
 
 ## Developing
