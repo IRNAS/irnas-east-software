@@ -33,9 +33,11 @@ jobs:
 
       - name: Create new tag
         uses: mathieudutour/github-tag-action@v6.0
+        id: tag_version
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ env.release_version_cut }}
+          custom_tag: ${{ env.release_version }}
+          tag_prefix: ""
 
       - name: Get latest Changelog entry
         id: changelog-reader
@@ -45,14 +47,17 @@ jobs:
           version: ${{ env.release_version_cut }}
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.8"
 
       - name: Build binary wheel and a source tarball
         run: |
-          export EAST_VERSION=${{ env.release_version }}
-          python setup.py sdist
+          # Checkout correct tag first
+          git fetch --tags
+          git checkout ${{ steps.tag_version.outputs.new_tag }}
+          pip install --upgrade build
+          python -m build
 
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@v1.5.1
