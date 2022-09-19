@@ -6,13 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
-## [0.1.1] - 2022-09-15
-
-### Changed
-
--   How requirements are included at build time.
-
-## [0.1.0] - 2022-09-15
+## [0.1.0] - 2022-09-19
 
 ### Added
 
@@ -20,9 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Flash command which flashes code binary.
 -   Clean command which deletes build folder.
 -   Styling look with rich click module.
+-   Use newer pyproject.toml format for metadata specification.
+-   MIT license file.
+-   Makefile for development.
+-   Docker scripts for building and running docker containers, for development
+    purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-zephyrtool-software/compare/v0.1.1...HEAD
-
-[0.1.1]: https://github.com/IRNAS/irnas-zephyrtool-software/compare/v0.1.0...v0.1.1
+[Unreleased]: https://github.com/IRNAS/irnas-zephyrtool-software/compare/v0.1.0...HEAD
 
 [0.1.0]: https://github.com/IRNAS/irnas-zephyrtool-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.0
