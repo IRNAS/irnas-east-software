@@ -163,7 +163,7 @@ def flash(east, build_dir, runner, verify, jlink_id):
     options_metavar="[options]",
     subcommand_metavar="<command> [command options]",
 )
-@click.version_option(message="v%(version)s", package_name="east-tool")
+@click.version_option(message="%(version)s")
 @click.option(
     "--echo", is_flag=True, help="Echo each shell command before executing it."
 )
