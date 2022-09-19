@@ -51,8 +51,7 @@ jobs:
 
       - name: Build binary wheel and a source tarball
         run: |
-          export EAST_VERSION=${{ env.release_version }}
-          python setup.py sdist
+          python -m build
 
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@v1.5.1

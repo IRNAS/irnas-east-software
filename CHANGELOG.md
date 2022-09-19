@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   MIT license file.
+-   Makefile for development.
+-   Docker scripts for building and running docker containers, for development
+    purposes.
+
 ### Fix
 
 -   How version string is fetched from the build system.
@@ -13,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 -   How requirements are included at build time.
+-   Change from setup.py to python.toml metadata specification
 
 ## [0.1.0] - 2022-09-15
 
