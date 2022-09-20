@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [0.1.42] - 2022-09-20
 
+
 ### Added
 
 -   Build command which can build firmware in current directory.
