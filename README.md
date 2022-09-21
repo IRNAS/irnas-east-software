@@ -14,9 +14,9 @@ pip install --upgrade east-tool
 of documentation is avoided. Executing `east` or `east --help` in the command
 line should give you sufficient information on how to use the tool.
 
-## Developing
+## Developing East
 
-For development and testing the use of `virtualenv` is suggested.
+For development and testing of `east` the use of `virtualenv` is suggested.
 
 Install `virtualenv`:
 ```bash
