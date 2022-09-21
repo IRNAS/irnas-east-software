@@ -4,6 +4,7 @@ from .east_context import EastContext
 
 rich_click.rich_click.MAX_WIDTH = 80
 rich_click.rich_click.USE_RICH_MARKUP = True
+rich_click.rich_click.STYLE_HELPTEXT = "italic dim"
 
 
 @click.command(cls=rich_click.RichCommand, options_metavar="[options]")
@@ -31,10 +32,10 @@ def build(east, board, build_dir, target, source_dir):
     """
     Build firmware in current directory.
 
-    [italic]Internally runs [magenta bold]west build[/] command in current directory if
+    Internally runs [magenta bold]west build[/] command in current directory if
     --source-dir is set. If the --build-dir directory is not set, the default is build/
     unless the build.dir-fmt configuration variable is set. The current directory is
-    checked after that. If either is a Zephyr build directory, it is used.[/]
+    checked after that. If either is a Zephyr build directory, it is used.
     """
 
     build_cmd = "build "
@@ -81,12 +82,12 @@ def flash(east, build_dir, runner, verify, jlink_id):
     """
     Flash binary to the board's flash.
 
-    [italic]Internally runs [magenta bold]west flash[/] command. If the build directory
+    Internally runs [magenta bold]west flash[/] command. If the build directory
     is not given, the default is build/ unless the build.dir-fmt configuration variable
     is set. The current directory is checked after that. If either is a Zephyr build
     directory, it is used. If there are more than one JLinks connected to the host
     machine use --jlink-id flag to specify which one to use to avoid selection
-    prompt.[/]
+    prompt.
     """
 
     flash_cmd = "flash "
@@ -125,9 +126,9 @@ def cli(ctx, echo):
     deploying [bold cyan]nRF Connect SDK[/] projects.
 
     \b
-    \n\n[italic]Want to learn what each command does?
+    \n\nWant to learn what each command does?
 
-    Run [bold]east \[command] --help[/] to show documentation for that command.[/]
+    Run [bold]east \[command] --help[/] to show documentation for that command.
     """
 
     # EastContext object is passed to other subcommands due to the @click.pass_context
