@@ -5,8 +5,14 @@
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install East.
 
 ```bash
-pip install east-tool
+pip install --upgrade east-tool
 ```
+
+## Usage
+
+`east` intends to be fully documented inside the tool itself, so deduplication
+of documentation is avoided. Executing `east` or `east --help` in the command
+line should give you sufficient information on how to use the tool.
 
 ## Developing
 
