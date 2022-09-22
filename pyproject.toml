@@ -25,8 +25,8 @@ Homepage = "https://github.com/IRNAS/irnas-east-software"
 east = "east.__main__:main"
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-optional-dependencies.dev = {file = ["requirements-dev.txt"]}
+dependencies = {file = ["scripts/requirements.txt"]}
+optional-dependencies.dev = {file = ["scripts/requirements-dev.txt"]}
 
 [tool.setuptools_scm]
 version_scheme = "post-release"
