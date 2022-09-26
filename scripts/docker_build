@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 
-docker build --tag east-tool .
+docker build --tag east-tool \
+	--build-arg "USER=$(whoami)" \
+	--build-arg "host_uid=$(id -u)" \
+	.

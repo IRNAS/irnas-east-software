@@ -11,13 +11,22 @@ RUN apt-get -y update && \
     apt-get -y autoremove && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR .
-COPY requirements.txt .
-COPY requirements-dev.txt .
+
+ARG USER host_uid
+RUN useradd -l -m -s /bin/bash -u "$host_uid" $USER
+
+# Add to path so pip does complain later
+ENV PATH="${PATH}:/home/$USER/.local/bin"
+
+WORKDIR /home
+COPY requirements.txt /home
+COPY requirements-dev.txt /home
 
 # pip 22.2.2. supports editable installs for pyproject.toml
 RUN pip install --no-cache-dir pip==22.2.2 && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir -r requirements-dev.txt
 
-WORKDIR /home/project
+USER $USER
+
+WORKDIR /home/$USER/project
