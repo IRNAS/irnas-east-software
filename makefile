@@ -1,8 +1,11 @@
 install:
+	@pip install --editable .
+
+install-dev:
 	@pip install --editable ".[dev]"
 
 build:
-	@python -m build
+	@python3 -m build
 
 upload-test:
 	@twine upload -r testpypi dist/*
@@ -12,4 +15,4 @@ upload:
 
 version:
 	@echo "Next version will be:"
-	@python -m setuptools_scm
+	@python3 -m setuptools_scm
