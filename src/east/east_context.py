@@ -83,7 +83,7 @@ class EastContext:
             self.print(message)
         sys.exit()
 
-    def run(self, command: str) -> subprocess.CompletedProcess:
+    def run(self, command: str, exit_on_error: bool = False):
         """
         Executes given command in shell as a process. This is a blocking call, process
         needs to finish before this command can return;
@@ -91,12 +91,37 @@ class EastContext:
         Args:
             command (str):  Command to execute.
 
-        Returns
+            exit_on_error (str):    If true the program is exited if the return code of
+                                    the ran command is not 0.
         """
         if self.echo:
-            self.print(command)
+            self.console.print(
+                ":mag_right: " + command,
+                markup=True,
+                style="bold italic dim",
+                overflow="ignore",
+                crop=False,
+                highlight=False,
+                soft_wrap=False,
+                no_wrap=True,
+            )
 
-        return subprocess.run(command, shell=True)
+        proc = subprocess.Popen(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+
+        # Print stdout and stderr as cleanly as possible through Rich Console. The
+        # benefit is that we can now use spinner animations and they are not interrupted
+        # by output messages from subprocess.
+        for line in iter(lambda: proc.stdout.readline(), b""):
+            print(line.decode("utf-8"), end="")
+
+        # Exit on a command that failed
+        if exit_on_error and proc.returncode != 0:
+            self.exit()
 
     def run_west(self, west_command: str):
         """Run wrapper which should be used when executing commands with west tool.
