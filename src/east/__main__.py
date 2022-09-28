@@ -1,6 +1,7 @@
 import click
 import rich_click
 from .east_context import EastContext
+from .sys_setup import sys_setup
 
 rich_click.rich_click.MAX_WIDTH = 80
 rich_click.rich_click.USE_RICH_MARKUP = True
@@ -141,6 +142,7 @@ def cli(ctx, echo):
 cli.add_command(clean)
 cli.add_command(build)
 cli.add_command(flash)
+cli.add_command(sys_setup)
 
 
 def main():
