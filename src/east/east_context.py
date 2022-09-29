@@ -29,7 +29,7 @@ class EastContext:
             to executing it. Default: ``False``.
         """
 
-        # This init will be called on true command invokation, --help flag or similiar
+        # This init will be called on true command invocation, --help flag or similiar
         # do not count.
         self.cwd = os.getcwd()
         self.echo = echo

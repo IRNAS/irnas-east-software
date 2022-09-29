@@ -56,6 +56,9 @@ def _install_toolchain_manager(east: EastContext, exe_path: str):
     # That is octal, make it executable
     os.chmod(NRF_TOOLCHAIN_MANAGER_PATH, 0o777)
 
+    # Configure the toolchain path
+    east.run(f"{NRF_TOOLCHAIN_MANAGER_PATH} config --install-dir {EAST_DIR}")
+
 
 def _get_toolchain_download_link():
     """Just a convenience function for getting the link for the Nordic's toolchain
@@ -113,9 +116,9 @@ def sys_setup(east):
     """Perform system-wide setup for development.
 
     \b
-    \n\nCheck for below packages if they are available on the host system.
+    \n\nCheck if all required packages are available on the host system.
 
-    If the are not found, download them and then install them.
+    If not, download and install them.
 
     \b
     \n\nPackages:\n
@@ -139,6 +142,10 @@ def sys_setup(east):
         else:
             east.print(f"{package['exe']} [red]not found", highlight=False)
             urls.append(package["url"])
+
+    if all([package["installed"] == True for package in packages]):
+        east.print("\n[green]All required system packages and programs are installed.")
+        east.exit()
 
     # Download all required files, which are actually programs or installer scripts
     paths = download_files(urls, CACHE_DIR)
