@@ -17,6 +17,7 @@ RUN useradd -l -m -s /bin/bash -u "$host_uid" $USER
 
 # Add to path so pip does complain later
 ENV PATH="${PATH}:/home/$USER/.local/bin"
+ENV USER="$USER"
 
 WORKDIR /home
 COPY requirements.txt /home

@@ -1,0 +1,109 @@
+import os
+import re
+import sys
+from concurrent.futures import ThreadPoolExecutor
+from typing import List
+
+import requests
+from rich.progress import (
+    BarColumn,
+    DownloadColumn,
+    Progress,
+    TaskID,
+    TextColumn,
+    TransferSpeedColumn,
+)
+
+# Used to keep track of supported python versions
+supported_python_versions = [
+    {"major": 3, "minor": 8},
+    {"major": 3, "minor": 9},
+]
+
+progress = Progress(
+    TextColumn("[bold blue]{task.fields[filename]}"),
+    BarColumn(),
+    DownloadColumn(),
+    "•",
+    TransferSpeedColumn(),
+)
+
+
+def check_python_version(east):
+    """Checks if current python version is supported. If not it exists with an error
+    message."""
+
+    current_py_ver = {
+        "major": sys.version_info.major,
+        "minor": sys.version_info.minor,
+    }
+
+    if current_py_ver not in supported_python_versions:
+        vers = supported_python_versions
+
+        east.print(
+            f"You are running Python {sys.version.split(' ')[0]} which is not"
+            " supported.\n"
+            "Supported versions are:",
+            end="",
+        )
+
+        # Nicely print a list of supported python version in markdown
+        vers_str = [f"- v{ver['major']}.{ver['minor']}.x" for ver in vers]
+        east.print_markdown("\n".join(vers_str))
+        exit()
+
+
+def download_file(task_id: TaskID, url: str, path: str):
+    file_size = requests.head(url, allow_redirects=True).headers.get(
+        "content-length", -1
+    )
+    response = requests.get(url, stream=True)
+
+    progress.update(task_id, total=int(file_size))
+
+    with open(path, "wb") as f:
+        progress.start_task(task_id)
+        for chunk in response.iter_content(chunk_size=1024):
+            if chunk:
+                progress.update(task_id, advance=len(chunk))
+                f.write(chunk)
+
+
+def download_files(urls: List[str], dest_dir: str) -> List[str]:
+    """Download concurently multiple files from the internet to the given directory.
+
+    Function expects a list of urls that point to the files.
+
+    After all files were downloaded the function returns a list of paths to the
+    downloaded files in the same order as they were given.
+
+    Downloaded files are not renamed, they have the same name as in the url. Only
+    exception to this rule are raw files from the GitHub, they end with '?raw=true', so
+    that part is removed.
+
+    Args:
+        urls (List[strl]):      Url that points to a file to be downloaded.
+
+    Return:
+        files (List[str]):      List of paths to the downloaded files.
+    """
+
+    file_paths = []
+
+    with progress:
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            for url in urls:
+                filename = url.split("/")[-1]
+                filename = re.sub("\?raw=true$", "", filename)
+
+                if not os.path.isdir(dest_dir):
+                    os.mkdir(dest_dir)
+
+                dest_path = os.path.join(dest_dir, filename)
+                file_paths.append(dest_path)
+
+                task_id = progress.add_task("download", filename=filename, start=False)
+                pool.submit(download_file, task_id, url, dest_path)
+
+    return file_paths

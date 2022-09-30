@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   _sys-setup_ command which will install system-wide dependencies to the host
+    machine.
+-   Global _--echo_ flag which echoes every shell command before executing it.
+
 ## [0.1.42] - 2022-09-20
 
 
