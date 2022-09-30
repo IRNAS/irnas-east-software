@@ -5,15 +5,15 @@ import sys
 import click
 import rich_click
 
-from .constants import (
+from ..constants import (
     CACHE_DIR,
     CONDA_PATH,
     EAST_DIR,
     MINICONDA_DIR,
     NRF_TOOLCHAIN_MANAGER_PATH,
 )
-from .east_context import EastContext
-from .helper_functions import check_python_version, download_files
+from ..east_context import EastContext
+from ..helper_functions import check_python_version, download_files
 
 
 def _get_conda_download_link():
@@ -34,17 +34,15 @@ def _install_conda(east: EastContext, installer_path: str):
     # If we do not delete it now the installer will complain
     east.run(f"rm -fr {MINICONDA_DIR}")
 
-    with east.console.status(
-        "[bold blue]Conda processing things...", spinner_style="bold blue"
-    ):
-        # -b flag stands for '[b]e silent', hahaha....
-        east.run(f"bash {installer_path} -b ")
+    east.print("[bold blue]Started Conda installer...")
+    # -b flag stands for '[b]e silent', hahaha....
+    east.run(f"bash {installer_path} -b ")
 
-        # Conda is now installed, but not on the path yet (this will happen after
-        # sourcing .bashrc, .zshrc, .fishrc, etc..), so we talk to it with fullpath
-        # Do not activate base env.
-        east.run(f"{CONDA_PATH} config --set auto_activate_base false")
-        east.run(f"{CONDA_PATH} init")
+    # Conda is now installed, but not on the path yet (this will happen after
+    # sourcing .bashrc, .zshrc, .fishrc, etc..), so we talk to it with fullpath
+    # Do not activate base env.
+    east.run(f"{CONDA_PATH} config --set auto_activate_base false")
+    east.run(f"{CONDA_PATH} init")
 
 
 def _install_toolchain_manager(east: EastContext, exe_path: str):
@@ -91,6 +89,9 @@ toolchain_installed_msg = """
 [bold green]Nordic's Toolchain Manager install done![/]
 
 East will now smartly use Nordic's Toolechain Manager whenever it can.
+
+[bold]Note:[/] You still need to run [italic bold blue]east update toolchain[/] inside
+of a [yellow bold]West workspace[/] to get the actual toolchain.
 """
 
 
@@ -151,9 +152,10 @@ def sys_setup(east):
     paths = download_files(urls, CACHE_DIR)
 
     # Run an installation method for packages that are not installed.
-    for id, package in enumerate(packages):
+    for package in packages:
         if not package["installed"]:
-            package["install_method"](east, paths[id])
+            index = urls.index(package["url"])
+            package["install_method"](east, paths[index])
 
     # WARN: We assume that download_files will never fail. Depending on the urgency we
     # should implement better handling.
