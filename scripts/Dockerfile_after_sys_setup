@@ -1,0 +1,23 @@
+FROM east-empty
+
+ARG CONDA_LINK="https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh"
+ARG WGET_ARGS="-q --show-progress --progress=bar:force:noscroll --no-check-certificate"
+ARG CONDA_PATH="/home/$USER/miniconda3/bin/conda"
+ARG NRF_TOOLCHAIN_LINK="https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager/blob/2f24ef572b8a7182cb6838fc2f080ad1b4fee448/resources/nrfutil-toolchain-manager/linux/nrfutil-toolchain-manager.exe?raw=true"
+ARG EAST_DIR="/home/$USER/.local/share/east"
+
+RUN mkdir -p $EAST_DIR
+
+USER root
+RUN wget ${WGET_ARGS} ${CONDA_LINK} -O miniconda.sh && \
+    wget ${WGET_ARGS} ${NRF_TOOLCHAIN_LINK} && \
+    mv -f nrfutil-toolchain-manager.exe?raw=true $EAST_DIR/nrfutil-toolchain-manager.exe && \
+    chmod +x $EAST_DIR/nrfutil-toolchain-manager.exe
+
+USER $USER
+RUN bash miniconda.sh -b && \
+    ${CONDA_PATH} config --set auto_activate_base false && \
+    ${CONDA_PATH} init
+
+RUN $EAST_DIR/nrfutil-toolchain-manager.exe config --install-dir $EAST_DIR && \
+    $EAST_DIR/nrfutil-toolchain-manager.exe install v2.0.0

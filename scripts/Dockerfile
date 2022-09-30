@@ -5,7 +5,7 @@ ARG WGET_ARGS="-q --show-progress --progress=bar:force:noscroll"
 
 RUN apt-get -y update && \
     apt-get -y upgrade && \
-    apt-get install -y --no-install-recommends make git python3-dev python3-pip \
+    apt-get install -y --no-install-recommends wget make git python3-dev python3-pip \
     python3-setuptools python3-wheel python3.8-venv && \
     apt-get -y clean && \
     apt-get -y autoremove && \
