@@ -1,10 +1,13 @@
 import os
+import pathlib
 import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
+from configparser import ConfigParser
+from typing import List, Optional, Union
 
 import requests
+import yaml
 from rich.progress import (
     BarColumn,
     DownloadColumn,
@@ -13,6 +16,15 @@ from rich.progress import (
     TextColumn,
     TransferSpeedColumn,
 )
+
+# What west's APIs accept for paths.
+#
+# Here, os.PathLike objects should return str from their __fspath__
+# methods, not bytes. We could try to do something like the approach
+# taken in https://github.com/python/mypy/issues/5264 to annotate that
+# as os.PathLike[str] if TYPE_CHECKING and plain os.PathLike
+# otherwise, but it doesn't seem worth it.
+PathType = Union[str, os.PathLike]
 
 # Used to keep track of supported python versions
 supported_python_versions = [
@@ -107,3 +119,105 @@ def download_files(urls: List[str], dest_dir: str) -> List[str]:
                 pool.submit(download_file, task_id, url, dest_path)
 
     return file_paths
+
+
+class WestDirNotFound(RuntimeError):
+    """Neither the current directory nor any parent has a west workspace."""
+
+
+def west_topdir(start: Optional[PathType] = None, fall_back: bool = True) -> str:
+    """
+    Returns the path to the parent directory of the .west/
+    directory instead, where project repositories are stored.
+
+    Args:
+        start (Optional[PathType]):     Directory from where to start searching, if not
+                                        given current directory is used.
+        fall_back (bool):               Wheter to fallback to ZEPHYR_BASE variable as
+                                        start argument.
+
+    Returns:
+        Full path to parent directory of the .west/ folder.
+    """
+    cur_dir = pathlib.Path(start or os.getcwd())
+
+    while True:
+        if (cur_dir / ".west").is_dir():
+            return os.fspath(cur_dir)
+
+        parent_dir = cur_dir.parent
+        if cur_dir == parent_dir:
+            # At the root. Should we fall back?
+            if fall_back and os.environ.get("ZEPHYR_BASE"):
+                return west_topdir(os.environ["ZEPHYR_BASE"], fall_back=False)
+            else:
+                raise WestDirNotFound(
+                    "Could not find a west workspace in this or any parent directory"
+                )
+        cur_dir = parent_dir
+
+
+def get_ncs_version(west_dir_path: str) -> str:
+    """
+    Opens `west.yaml` file inside the project and reads the revision string for nrf-sdk
+    project.
+
+    To find the location of west.yaml file it first needs to open .west/config file and
+    determine the path.
+
+    Args:
+        west_dir_path (str):        Path to the parent of .west directory. It is up to
+                                    the caller to provide a correct value.
+
+    Returns:
+        Revision string of nrf-sdk project.
+    """
+
+    config = ConfigParser()
+    config.read(os.path.join(west_dir_path, ".west", "config"))
+
+    # Get path to west.yaml file
+    west_yaml = os.path.join(
+        west_dir_path, config["manifest"]["path"], config["manifest"]["file"]
+    )
+
+    with open(west_yaml, "r") as file:
+        projects = yaml.safe_load(file)["manifest"]["projects"]
+
+    ncs = list(filter(lambda project: project["repo-path"] == "sdk-nrf", projects))
+    return ncs[0]["revision"]
+
+
+no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!"
+
+To install it run:
+
+\t[italic bold blue]east sys-setup
+"""
+
+no_toolchain_msg = """Current [bold cyan] is supported but [bold red]instaled![/]
+
+To install it run:
+
+\t[italic bold blue]east update toolchain
+"""
+
+not_in_west_workspace_msg = """[bold yellow]West workspace[/] was [bold red]not found![/]
+
+This command can only be run [bold]inside[/] of a [bold yellow]West workspace[/].
+"""
+
+
+def ncs_version_not_supported_msg(east, supported_versions):
+    vers = "\n".join(
+        [f"[bold yellow]•[/] {ver}" for ver in supported_versions.strip().split("\n")]
+    )
+
+    return (
+        f"[bold]East[/] detected [bold]{east.detected_ncs_version}[/] [bold cyan]NCS[/]"
+        " version which is currently [bold red]not supported[/] by the Nordics's"
+        " Toolchain manager.\n\nSupported versions are: \n"
+        + vers
+        + "\n\nThis means that you need to manually install the [bold cyan]NCS[/]"
+        " toolchain by yourself.\n"
+    )
