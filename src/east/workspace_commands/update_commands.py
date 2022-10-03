@@ -30,7 +30,8 @@ def toolchain(east, force):
 
     Determines the version of the NCS that is being used in the current West
     workspace and downloads the correct version of the toolchain for it.
-    [bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/]
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
 
     east.pre_workspace_command_check(

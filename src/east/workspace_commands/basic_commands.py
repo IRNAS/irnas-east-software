@@ -6,7 +6,10 @@ from ..east_context import east_command_settings
 @click.command(**east_command_settings)
 @click.pass_obj
 def clean(east):
-    """Clean the build folder in current directory."""
+    """Clean the build folder in current directory.
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
     east.pre_workspace_command_check()
 
     east.run("rm -fr build")
@@ -30,10 +33,9 @@ def build(east, board, build_dir, target, source_dir):
     """
     Build firmware in current directory.
 
-    Internally runs [magenta bold]west build[/] command in current directory if
-    --source-dir is set. If the --build-dir directory is not set, the default is build/
-    unless the build.dir-fmt configuration variable is set. The current directory is
-    checked after that. If either is a Zephyr build directory, it is used.
+    Internally runs [magenta bold]west build[/] command in current directory if --source-dir is set. If the --build-dir directory is not set, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used.
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
 
     east.pre_workspace_command_check()
@@ -79,12 +81,9 @@ def flash(east, build_dir, runner, verify, jlink_id):
     """
     Flash binary to the board's flash.
 
-    Internally runs [magenta bold]west flash[/] command. If the build directory
-    is not given, the default is build/ unless the build.dir-fmt configuration variable
-    is set. The current directory is checked after that. If either is a Zephyr build
-    directory, it is used. If there are more than one JLinks connected to the host
-    machine use --jlink-id flag to specify which one to use to avoid selection
-    prompt.
+    Internally runs [magenta bold]west flash[/] command. If the build directory is not given, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used. If there are more than one JLinks connected to the host machine use --jlink-id flag to specify which one to use to avoid selection prompt.
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
 
