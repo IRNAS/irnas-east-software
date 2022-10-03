@@ -13,6 +13,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   _sys-setup_ command which will install system-wide dependencies to the host
     machine.
 -   Global _--echo_ flag which echoes every shell command before executing it.
+-   _update toolchain_ command - Command will download and install appropriate
+version of toolchain based on the detected NCS version. If NCS version is
+currently not supported it throws an error.
+
+### Changed
+-   Structure of the commands. Commands are now split into two groups: workspace
+    commands and system commands. This is reflected in the project directory
+    structure and help texts.
+-   Workspace commands will now use downloaded toolchain whenever they can.
+
 
 ## [0.1.42] - 2022-09-20
 
