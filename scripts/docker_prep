@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-cd ..
-pip install --upgrade build
-python3 -m build
-pip install --editable ".[dev]"

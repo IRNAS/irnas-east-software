@@ -9,30 +9,24 @@ enabled = true
 name = "east-tool"
 description="Tool built on top of West for managing nRF Connect SDK projects."
 readme = "README.md"
-dynamic = ["version"]
+dynamic = ["version", "dependencies", "optional-dependencies"]
 authors = [{ name = "Marko Sagadin", email = "marko.sagadin42@gmail.com" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-]
-dependencies = [
-    "rich >= 12.5.1",
-    "click >=  8.1.3",
-    "rich_click >=  1.5.2",
-    "requests >= 2.28.1",
 ]
 requires-python = ">=3.8"
 
-[project.optional-dependencies]
-dev = ["black", "flake8", "pytest", "build", "twine", "setuptools_scm"]
-
 [project.urls]
-Homepage = "https://github.com/IRNAS/irnas-easttool-software"
+Homepage = "https://github.com/IRNAS/irnas-east-software"
 
 [project.scripts]
 east = "east.__main__:main"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["scripts/requirements.txt"]}
+optional-dependencies.dev = {file = ["scripts/requirements-dev.txt"]}
 
 [tool.setuptools_scm]
 version_scheme = "post-release"
