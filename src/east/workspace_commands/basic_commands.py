@@ -71,7 +71,7 @@ def build(east, board, build_dir, target, source_dir):
 @click.option(
     "-i",
     "--jlink-id",
-    is_flag=True,
+    type=str,
     help=(
         "Identification number of a JLink programmer that should be used for flashing."
     ),

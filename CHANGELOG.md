@@ -8,8 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
--   Incorrect no toolchain message
--   --force flag was not set as flag by Click
+-   Incorrect no toolchain message.
+-   --force flag was not set as flag by Click.
+-   --jlink-id should be of type str but it was not.
 
 ## [0.2.0] - 2022-10-03
 
