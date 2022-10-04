@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Incorrect no toolchain message
+-   --force flag was not set as flag by Click
+
 ## [0.2.0] - 2022-10-03
 
 ### Added

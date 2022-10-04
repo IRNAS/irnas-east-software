@@ -317,7 +317,7 @@ class EastContext:
                 self.ncs_version_supported = False
                 return
             else:
-                self.print(no_toolchain_msg)
+                self.print(no_toolchain_msg(self))
                 self.exit()
 
         # Not supported, should we exit program or silently pass?

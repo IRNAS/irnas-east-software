@@ -21,7 +21,7 @@ You can reinstall it with [bold cyan]--force[/] flag.
 @click.option(
     "-f",
     "--force",
-    type=str,
+    is_flag=True,
     help="Reinstall the toolchain, even if it is already installed.",
 )
 @click.pass_obj

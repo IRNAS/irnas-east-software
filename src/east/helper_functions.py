@@ -195,17 +195,19 @@ To install it run:
 \t[italic bold blue]east sys-setup
 """
 
-no_toolchain_msg = """Current [bold cyan] is supported but [bold red]instaled![/]
-
-To install it run:
-
-\t[italic bold blue]east update toolchain
-"""
-
 not_in_west_workspace_msg = """[bold yellow]West workspace[/] was [bold red]not found![/]
 
 This command can only be run [bold]inside[/] of a [bold yellow]West workspace[/].
 """
+
+
+def no_toolchain_msg(east):
+    return (
+        f"Current [bold cyan]NCS[/] [bold]{east.detected_ncs_version}[/] version is "
+        "supported but toolchain is [bold red]not installed![/]"
+        "\n\nTo install it run:"
+        "\n\n\t[italic bold blue]east update toolchain\n"
+    )
 
 
 def ncs_version_not_supported_msg(east, supported_versions):
