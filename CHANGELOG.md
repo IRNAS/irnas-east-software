@@ -6,11 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   _bypass_ command, which can take any set of arguments that west command
+    supports and pass them directly to west tool.
+-   _build_ and _flash_ commands now support extra positional arguments after
+    double dash `--`. Run them with --help string to learn what do they do.
+
 ### Fixed
 
 -   Incorrect no toolchain message.
 -   --force flag was not set as flag by Click.
 -   --jlink-id should be of type str but it was not.
+-   No westdir related bug that came up in demonstration.
 
 ## [0.2.0] - 2022-10-03
 
