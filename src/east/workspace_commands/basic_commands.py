@@ -128,3 +128,29 @@ def flash(east, build_dir, runner, verify, jlink_id, extra_args):
         flash_cmd += f"\"{' '.join(extra_args)}\" "
 
     east.run_west(flash_cmd)
+
+
+@click.command(**east_command_settings)
+@click.argument("args", nargs=-1, type=str, metavar="-- [args]")
+@click.pass_obj
+def bypass(east, args):
+    """
+    Bypass any set of commands directly to the [magenta bold]west tool[/].
+
+    Passing any set of commands after double dash [bold]--[/] will pass them directly to
+    the [bold magenta]west[/] tool.
+
+    \n\nExample:
+
+    \n\nCommand [bold]east bypass -- build -b nrf52840dk_nrf52840[/]
+    \n\nbecomes [bold]west build -b nrf52840dk_nrf52840[/]
+
+
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+    east.pre_workspace_command_check()
+
+    if args:
+        cmd = f"{' '.join(args)} "
+        east.run_west(cmd)
