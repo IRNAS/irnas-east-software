@@ -111,9 +111,9 @@ class EastContext:
 
         self.print(Markdown(*objects, **markdown_kwargs), **print_kwargs)
 
-    def exit(self):
-        """Exit program"""
-        sys.exit()
+    def exit(self, return_code: int = 1):
+        """Exit program with given return_code"""
+        sys.exit(return_code)
 
     def run(
         self,
@@ -169,7 +169,7 @@ class EastContext:
                 popen.stdout.close()
                 return_code = popen.wait()
                 if exit_on_err and return_code:
-                    self.exit()
+                    self.exit(return_code)
 
             output = []
 
@@ -191,8 +191,8 @@ class EastContext:
             p.communicate()
 
             # Should we exit on the error?
-            if exit_on_error and p.returncode != 0:
-                self.exit()
+            if exit_on_error and p.returncode:
+                self.exit(p.returncode)
 
     def run_west(self, west_command: str, **kwargs) -> str:
         """Run wrapper which should be used when executing commands with west tool.

@@ -63,7 +63,7 @@ def check_python_version(east):
         # Nicely print a list of supported python version in markdown
         vers_str = [f"- v{ver['major']}.{ver['minor']}.x" for ver in vers]
         east.print_markdown("\n".join(vers_str))
-        exit()
+        east.exit()
 
 
 def download_file(task_id: TaskID, url: str, path: str):
