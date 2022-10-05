@@ -67,7 +67,7 @@ def west(east):
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
 @click.pass_obj
 def update(east):
-    """Update command with several subcommands."""
+    """Command with several subcommands related to updating things."""
     pass
 
 
