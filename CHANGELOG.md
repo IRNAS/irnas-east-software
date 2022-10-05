@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 -   _bypass_ command, which can take any set of arguments that west command
     supports and pass them directly to west tool.
+-   _util connect_ and _util rtt_ commands. With first you connect to the
+    device, with second you can observe RTT logs while connected.
 -   _build_ and _flash_ commands now support extra positional arguments after
     double dash `--`. Run them with --help string to learn what do they do.
 
