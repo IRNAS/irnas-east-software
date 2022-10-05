@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-10-05
+
 ### Added
 
 -   _bypass_ command, which can take any set of arguments that west command
@@ -18,8 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 -   Incorrect no toolchain message.
--   --force flag was not set as flag by Click.
--   --jlink-id should be of type str but it was not.
+-   \--force flag was not set as flag by Click.
+-   \--jlink-id should be of type str but it was not.
 -   No westdir related bug that came up in demonstration.
 
 ## [0.2.0] - 2022-10-03
@@ -30,15 +32,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     machine.
 -   Global _--echo_ flag which echoes every shell command before executing it.
 -   _update toolchain_ command - Command will download and install appropriate
-version of toolchain based on the detected NCS version. If NCS version is
-currently not supported it throws an error.
+    version of toolchain based on the detected NCS version. If NCS version is
+    currently not supported it throws an error.
 
 ### Changed
+
 -   Structure of the commands. Commands are now split into two groups: workspace
     commands and system commands. This is reflected in the project directory
     structure and help texts.
 -   Workspace commands will now use downloaded toolchain whenever they can.
-
 
 ## [0.1.42] - 2022-09-20
 
@@ -54,7 +56,9 @@ currently not supported it throws an error.
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...HEAD
+
+[0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
 
