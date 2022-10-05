@@ -183,7 +183,7 @@ def get_ncs_version(west_dir_path: str) -> str:
     return ncs[0]["revision"]
 
 
-no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!"
+no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!
 
 To install it run:
 

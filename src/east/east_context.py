@@ -292,12 +292,12 @@ class EastContext:
         """
         # Exit if we are not inside west workspace
         if not self.west_dir_path:
-            self.print(not_in_west_workspace_msg)
+            self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
 
         # Exit if manager is not installed
         if not self.check_exe(NRF_TOOLCHAIN_MANAGER_PATH):
-            self.print(no_toolchain_manager_msg)
+            self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
         # # Check if toolchain for detected ncs version is installed
@@ -317,7 +317,7 @@ class EastContext:
                 self.ncs_version_supported = False
                 return
             else:
-                self.print(no_toolchain_msg(self))
+                self.print(no_toolchain_msg(self), highlight=False)
                 self.exit()
 
         # Not supported, should we exit program or silently pass?
