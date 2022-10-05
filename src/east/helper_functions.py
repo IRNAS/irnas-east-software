@@ -63,7 +63,7 @@ def check_python_version(east):
         # Nicely print a list of supported python version in markdown
         vers_str = [f"- v{ver['major']}.{ver['minor']}.x" for ver in vers]
         east.print_markdown("\n".join(vers_str))
-        exit()
+        east.exit()
 
 
 def download_file(task_id: TaskID, url: str, path: str):
@@ -125,7 +125,7 @@ class WestDirNotFound(RuntimeError):
     """Neither the current directory nor any parent has a west workspace."""
 
 
-def west_topdir(start: Optional[PathType] = None, fall_back: bool = True) -> str:
+def west_topdir(start: Optional[PathType] = None) -> str:
     """
     Returns the path to the parent directory of the .west/
     directory instead, where project repositories are stored.
@@ -133,8 +133,6 @@ def west_topdir(start: Optional[PathType] = None, fall_back: bool = True) -> str
     Args:
         start (Optional[PathType]):     Directory from where to start searching, if not
                                         given current directory is used.
-        fall_back (bool):               Wheter to fallback to ZEPHYR_BASE variable as
-                                        start argument.
 
     Returns:
         Full path to parent directory of the .west/ folder.
@@ -147,13 +145,10 @@ def west_topdir(start: Optional[PathType] = None, fall_back: bool = True) -> str
 
         parent_dir = cur_dir.parent
         if cur_dir == parent_dir:
-            # At the root. Should we fall back?
-            if fall_back and os.environ.get("ZEPHYR_BASE"):
-                return west_topdir(os.environ["ZEPHYR_BASE"], fall_back=False)
-            else:
-                raise WestDirNotFound(
-                    "Could not find a west workspace in this or any parent directory"
-                )
+            # We are at top level
+            raise WestDirNotFound(
+                "Could not find a west workspace in this or any parent directory"
+            )
         cur_dir = parent_dir
 
 
@@ -188,24 +183,26 @@ def get_ncs_version(west_dir_path: str) -> str:
     return ncs[0]["revision"]
 
 
-no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!"
+no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!
 
 To install it run:
 
 \t[italic bold blue]east sys-setup
 """
 
-no_toolchain_msg = """Current [bold cyan] is supported but [bold red]instaled![/]
-
-To install it run:
-
-\t[italic bold blue]east update toolchain
-"""
-
 not_in_west_workspace_msg = """[bold yellow]West workspace[/] was [bold red]not found![/]
 
 This command can only be run [bold]inside[/] of a [bold yellow]West workspace[/].
 """
+
+
+def no_toolchain_msg(east):
+    return (
+        f"Current [bold cyan]NCS[/] [bold]{east.detected_ncs_version}[/] version is "
+        "supported but toolchain is [bold red]not installed![/]"
+        "\n\nTo install it run:"
+        "\n\n\t[italic bold blue]east update toolchain\n"
+    )
 
 
 def ncs_version_not_supported_msg(east, supported_versions):

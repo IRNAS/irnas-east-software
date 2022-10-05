@@ -2,8 +2,8 @@ import click
 import rich_click
 
 from .east_context import EastContext, east_group_settings
-from .system_commands import sys_setup
-from .workspace_commands import build, clean, flash, update
+from .system_commands import sys_setup, util
+from .workspace_commands import build, bypass, clean, flash, update
 
 rich_click.rich_click.MAX_WIDTH = 80
 rich_click.rich_click.USE_RICH_MARKUP = True
@@ -13,14 +13,15 @@ rich_click.rich_click.COMMAND_GROUPS = {
     "east": [
         {
             "name": "Workspace commands",
-            "commands": ["build", "flash", "clean", "update"],
+            "commands": ["build", "flash", "clean", "update", "bypass"],
         },
         {
             "name": "System commands",
-            "commands": ["sys-setup"],
+            "commands": ["sys-setup", "util"],
         },
     ],
     "east update": [{"name": "Subcommands", "commands": ["west", "env", "toolchain"]}],
+    "east util": [{"name": "Subcommands", "commands": ["connect", "rtt"]}],
 }
 
 
@@ -47,7 +48,7 @@ def cli(ctx, echo):
     \b
     \n\nNote that commands are split into two groups:
 
-    - [bold]Workspace:[/] Can only be run from inside of [bold yellow]West workspace[/],
+    - [bold]Workspace:[/] Can only be run from inside of [bold yellow]West workspace[/].
 
     - [bold]System:[/] Can be run from anywhere.
     """
@@ -60,10 +61,12 @@ def cli(ctx, echo):
 
 
 cli.add_command(build)
+cli.add_command(bypass)
 cli.add_command(flash)
 cli.add_command(clean)
 cli.add_command(update)
 cli.add_command(sys_setup)
+cli.add_command(util)
 
 
 def main():

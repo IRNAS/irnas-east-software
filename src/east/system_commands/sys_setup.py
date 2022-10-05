@@ -146,7 +146,7 @@ def sys_setup(east):
 
     if all([package["installed"] == True for package in packages]):
         east.print("\n[green]All required system packages and programs are installed.")
-        east.exit()
+        east.exit(0)
 
     # Download all required files, which are actually programs or installer scripts
     paths = download_files(urls, CACHE_DIR)

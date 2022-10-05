@@ -8,6 +8,8 @@ from ..east_context import east_command_settings
 def clean(east):
     """Clean the build folder in current directory.
 
+
+
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
@@ -19,6 +21,7 @@ def clean(east):
 @click.option("-b", "--board", type=str, help="West board to build for.")
 @click.option("-d", "--build-dir", type=str, help="Build directory to create or use.")
 @click.option("-t", "--target", type=str, help="Run this build system target.")
+@click.argument("cmake-args", nargs=-1, type=str, metavar="-- [cmake-args]")
 @click.option(
     "-s",
     "--source-dir",
@@ -29,11 +32,23 @@ def clean(east):
     ),
 )
 @click.pass_obj
-def build(east, board, build_dir, target, source_dir):
+def build(east, board, build_dir, target, source_dir, cmake_args):
     """
     Build firmware in current directory.
 
-    Internally runs [magenta bold]west build[/] command in current directory if --source-dir is set. If the --build-dir directory is not set, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used.
+    \b
+    \n\nInternally runs [magenta bold]west build[/] command in current directory if --source-dir is set. If the --build-dir directory is not set, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used.
+
+    \n\nTo pass additional arguments to the [bold]CMake[/] invocation performed by the [magenta
+    bold]west build[/], pass them after a [bold white]"--"[/] at the end of the command line.
+
+    \n\n[bold]Important:[/] Passing additional [bold]CMake[/] arguments like this forces [magenta
+    bold]west build[/] to re-run [bold]CMake[/], even if a build system has already been generated.
+
+    For additional info see chapter [bold]Building, Flashing and Debugging[/], section
+    [bold]One-Time CMake Arguments[/].
+
+
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -50,6 +65,8 @@ def build(east, board, build_dir, target, source_dir):
         build_cmd += f"-t {target} "
     if source_dir:
         build_cmd += f"{source_dir} "
+    if cmake_args:
+        build_cmd += f"-- \"{' '.join(cmake_args)}\" "
 
     east.run_west(build_cmd)
 
@@ -71,17 +88,24 @@ def build(east, board, build_dir, target, source_dir):
 @click.option(
     "-i",
     "--jlink-id",
-    is_flag=True,
+    type=str,
     help=(
         "Identification number of a JLink programmer that should be used for flashing."
     ),
 )
+@click.argument("extra-args", nargs=-1, type=str, metavar="-- [extra args]")
 @click.pass_obj
-def flash(east, build_dir, runner, verify, jlink_id):
+def flash(east, build_dir, runner, verify, jlink_id, extra_args):
     """
     Flash binary to the board's flash.
 
-    Internally runs [magenta bold]west flash[/] command. If the build directory is not given, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used. If there are more than one JLinks connected to the host machine use --jlink-id flag to specify which one to use to avoid selection prompt.
+    \b
+    \n\nInternally runs [magenta bold]west flash[/] command. If the build directory is not given, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used. If there are more than one JLinks connected to the host machine use --jlink-id flag to specify which one to use to avoid selection prompt.
+
+    \n\nTo pass additional arguments to the [bold cyan]runner[/] used by the [magenta
+    bold]west flash[/], pass them after a [bold white]"--"[/] at the end of the command line.
+
+
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -95,12 +119,41 @@ def flash(east, build_dir, runner, verify, jlink_id):
         flash_cmd += f"-r {runner} "
 
     # Some flags need to be passed as extra parameters to the west tool
-    if verify or jlink_id:
+    if verify or jlink_id or extra_args:
         flash_cmd += "-- "
 
     if verify:
-        flash_cmd += "--verify"
+        flash_cmd += "--verify "
     if jlink_id:
-        flash_cmd += f"-i {jlink_id}"
+        flash_cmd += f"-i {jlink_id} "
+    if extra_args:
+        flash_cmd += f"\"{' '.join(extra_args)}\" "
 
     east.run_west(flash_cmd)
+
+
+@click.command(**east_command_settings)
+@click.argument("args", nargs=-1, type=str, metavar="-- [args]")
+@click.pass_obj
+def bypass(east, args):
+    """
+    Bypass any set of commands directly to the [magenta bold]west tool[/].
+
+    \b
+    \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
+    the [bold magenta]west[/] tool.
+
+    \n\nExample:
+
+    \n\nCommand [bold]east bypass -- build -b nrf52840dk_nrf52840[/]
+    \n\nbecomes [bold]west build -b nrf52840dk_nrf52840[/]
+
+
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+    east.pre_workspace_command_check()
+
+    if args:
+        cmd = f"{' '.join(args)} "
+        east.run_west(cmd)

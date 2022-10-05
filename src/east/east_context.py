@@ -58,8 +58,11 @@ class EastContext:
         # do not count.
         self.cwd = os.getcwd()
         self.echo = echo
+
+        # Create EAST_DIR and its parents if they do not exists
+        os.makedirs(EAST_DIR, exist_ok=True)
+
         self.console = Console(width=80)
-        self.run(f"mkdir -p {EAST_DIR}")
         self.ncs_version_installed = False
         self.ncs_version_supported = False
 
@@ -108,9 +111,9 @@ class EastContext:
 
         self.print(Markdown(*objects, **markdown_kwargs), **print_kwargs)
 
-    def exit(self):
-        """Exit program"""
-        sys.exit()
+    def exit(self, return_code: int = 1):
+        """Exit program with given return_code"""
+        sys.exit(return_code)
 
     def run(
         self,
@@ -166,7 +169,7 @@ class EastContext:
                 popen.stdout.close()
                 return_code = popen.wait()
                 if exit_on_err and return_code:
-                    self.exit()
+                    self.exit(return_code)
 
             output = []
 
@@ -188,8 +191,8 @@ class EastContext:
             p.communicate()
 
             # Should we exit on the error?
-            if exit_on_error and p.returncode != 0:
-                self.exit()
+            if exit_on_error and p.returncode:
+                self.exit(p.returncode)
 
     def run_west(self, west_command: str, **kwargs) -> str:
         """Run wrapper which should be used when executing commands with west tool.
@@ -292,12 +295,12 @@ class EastContext:
         """
         # Exit if we are not inside west workspace
         if not self.west_dir_path:
-            self.print(not_in_west_workspace_msg)
+            self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
 
         # Exit if manager is not installed
         if not self.check_exe(NRF_TOOLCHAIN_MANAGER_PATH):
-            self.print(no_toolchain_manager_msg)
+            self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
         # # Check if toolchain for detected ncs version is installed
@@ -317,7 +320,7 @@ class EastContext:
                 self.ncs_version_supported = False
                 return
             else:
-                self.print(no_toolchain_msg)
+                self.print(no_toolchain_msg(self), highlight=False)
                 self.exit()
 
         # Not supported, should we exit program or silently pass?

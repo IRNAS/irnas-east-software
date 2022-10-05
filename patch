@@ -1,0 +1,73 @@
+diff --git a/src/east/east_context.py b/src/east/east_context.py
+index 30af453..54b5519 100644
+--- a/src/east/east_context.py
++++ b/src/east/east_context.py
+@@ -317,7 +317,7 @@ class EastContext:
+                 self.ncs_version_supported = False
+                 return
+             else:
+-                self.print(no_toolchain_msg)
++                self.print(no_toolchain_msg(self))
+                 self.exit()
+ 
+         # Not supported, should we exit program or silently pass?
+diff --git a/src/east/helper_functions.py b/src/east/helper_functions.py
+index 694562a..bc7a610 100644
+--- a/src/east/helper_functions.py
++++ b/src/east/helper_functions.py
+@@ -195,19 +195,21 @@ To install it run:
+ \t[italic bold blue]east sys-setup
+ """
+ 
+-no_toolchain_msg = """Current [bold cyan] is supported but [bold red]instaled![/]
+-
+-To install it run:
+-
+-\t[italic bold blue]east update toolchain
+-"""
+-
+ not_in_west_workspace_msg = """[bold yellow]West workspace[/] was [bold red]not found![/]
+ 
+ This command can only be run [bold]inside[/] of a [bold yellow]West workspace[/].
+ """
+ 
+ 
++def no_toolchain_msg(east):
++    return (
++        f"Current [bold cyan]NCS[/] [bold]{east.detected_ncs_version}[/] version is "
++        "supported but toolchain is [bold red]not installed![/]"
++        "\n\nTo install it run:"
++        "\n\n\t[italic bold blue]east update toolchain\n"
++    )
++
++
+ def ncs_version_not_supported_msg(east, supported_versions):
+     vers = "\n".join(
+         [f"[bold yellow]•[/] {ver}" for ver in supported_versions.strip().split("\n")]
+diff --git a/src/east/workspace_commands/update_commands.py b/src/east/workspace_commands/update_commands.py
+index 289a392..e9e799f 100644
+--- a/src/east/workspace_commands/update_commands.py
++++ b/src/east/workspace_commands/update_commands.py
+@@ -1,7 +1,12 @@
+ import click
+ 
+ from ..east_context import east_command_settings, east_group_settings
+-from ..helper_functions import WestDirNotFound, get_ncs_version, west_topdir
++from ..helper_functions import (
++    WestDirNotFound,
++    get_ncs_version,
++    no_toolchain_msg,
++    west_topdir,
++)
+ 
+ 
+ @click.command(**east_command_settings)
+@@ -21,7 +26,7 @@ You can reinstall it with [bold cyan]--force[/] flag.
+ @click.option(
+     "-f",
+     "--force",
+-    type=str,
++    is_flag=True,
+     help="Reinstall the toolchain, even if it is already installed.",
+ )
+ @click.pass_obj
