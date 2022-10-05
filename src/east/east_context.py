@@ -58,8 +58,11 @@ class EastContext:
         # do not count.
         self.cwd = os.getcwd()
         self.echo = echo
+
+        # Create EAST_DIR and its parents if they do not exists
+        os.makedirs(EAST_DIR, exist_ok=True)
+
         self.console = Console(width=80)
-        self.run(f"mkdir -p {EAST_DIR}")
         self.ncs_version_installed = False
         self.ncs_version_supported = False
 
