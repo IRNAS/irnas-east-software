@@ -125,7 +125,7 @@ class WestDirNotFound(RuntimeError):
     """Neither the current directory nor any parent has a west workspace."""
 
 
-def west_topdir(start: Optional[PathType] = None, fall_back: bool = True) -> str:
+def west_topdir(start: Optional[PathType] = None) -> str:
     """
     Returns the path to the parent directory of the .west/
     directory instead, where project repositories are stored.
@@ -133,8 +133,6 @@ def west_topdir(start: Optional[PathType] = None, fall_back: bool = True) -> str
     Args:
         start (Optional[PathType]):     Directory from where to start searching, if not
                                         given current directory is used.
-        fall_back (bool):               Wheter to fallback to ZEPHYR_BASE variable as
-                                        start argument.
 
     Returns:
         Full path to parent directory of the .west/ folder.
@@ -147,13 +145,10 @@ def west_topdir(start: Optional[PathType] = None, fall_back: bool = True) -> str
 
         parent_dir = cur_dir.parent
         if cur_dir == parent_dir:
-            # At the root. Should we fall back?
-            if fall_back and os.environ.get("ZEPHYR_BASE"):
-                return west_topdir(os.environ["ZEPHYR_BASE"], fall_back=False)
-            else:
-                raise WestDirNotFound(
-                    "Could not find a west workspace in this or any parent directory"
-                )
+            # We are at top level
+            raise WestDirNotFound(
+                "Could not find a west workspace in this or any parent directory"
+            )
         cur_dir = parent_dir
 
 
