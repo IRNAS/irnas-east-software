@@ -202,24 +202,26 @@ class EastContext:
         directly.
 
         Args:
-            west_command (str):    west command to execute
-            kwargs:                     Anything that is supported by .run method
+            west_command (str):     west command to execute
+            kwargs:                 Anything that is supported by .run method
 
         Returns:
             Check .run
         """
+
+        cmd = f"west {west_command}"
+
         if self.ncs_version_installed:
-            self.run_manager(
-                f"launch --ncs-version {self.detected_ncs_version} -- west"
-                f" {west_command}",
-                **kwargs,
-            )
+            # Run west command as arbitary command through manager
+            return self._run_arbi_manager(cmd, **kwargs)
         else:
-            self.run(f"west {west_command}", **kwargs)
+            return self.run(cmd, **kwargs)
 
     def run_manager(self, command, **kwargs) -> str:
-        """Run wrapper which should be used when executing commands with Nordic's
-        Toolchain manager executable.
+        """Executes a command with Nordic's Toolchain manager executable.
+
+        This is not suitable to be used with a type of a 'launch -- <command>' command.
+        For that _run_arbi_manager should be used.
 
         Args:
             manager_command (str):      Manager command to execute
@@ -228,8 +230,61 @@ class EastContext:
         Returns:
             Check .run
         """
+        cmd = f"{NRF_TOOLCHAIN_MANAGER_PATH} {command}"
 
-        return self.run(f"{NRF_TOOLCHAIN_MANAGER_PATH} " + command, **kwargs)
+        return self.run(cmd, **kwargs)
+
+    def _run_arbi_manager(self, arbitary_command: str, **kwargs):
+        """Run an arbitary command through Nordic's Toolchain Manager
+
+        This method should be used when passing any arbitary command, like west command.
+
+        To properly execute an arbitary command and propagate its return code to the
+        caller we have do a bit of a bash shell dancing, as Nordic's Toolchain Manager
+        does not do this for some commands (if west build fails then return code is not
+        propagated, but issuing non-existing command does propagate up).
+
+        What we do is that we run as a total arbitary command following:
+
+            bash -c '{arbitary_command} && touch success.txt'
+
+        if arbitary_command inside it fails, then `touch success.txt` is not executed.
+
+        So we are checking for success.txt file after every call and exit if it does not
+        exist.
+
+        We also need to be carefull what quotes are we using.
+
+        Args:
+            arbitary_command (str):
+            **kwargs:
+        """
+
+        arbitary_command = arbitary_command.replace("'", '"')
+
+        cmd = (
+            f"{NRF_TOOLCHAIN_MANAGER_PATH} launch --ncs-version"
+            f" {self.detected_ncs_version} -- bash -c '{arbitary_command} "
+            "&& touch success.txt'"
+        )
+
+        # Clean any success.txt file from before
+        try:
+            os.remove("success.txt")
+        except FileNotFoundError:
+            pass
+
+        result = self.run(cmd, **kwargs)
+
+        if not os.path.isfile("success.txt"):
+            self.exit()
+
+        try:
+            os.remove("success.txt")
+        except FileNotFoundError:
+            pass
+
+        return result
 
     def check_exe(self, exe: str, on_fail_exit: bool = False) -> bool:
         """
