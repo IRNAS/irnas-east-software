@@ -1,7 +1,6 @@
 import click
 
 from ..east_context import east_command_settings, east_group_settings
-from ..helper_functions import WestDirNotFound, get_ncs_version, west_topdir
 
 
 @click.command(**east_command_settings)
