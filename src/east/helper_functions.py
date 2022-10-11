@@ -4,7 +4,7 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 import requests
 import yaml
@@ -152,35 +152,51 @@ def west_topdir(start: Optional[PathType] = None) -> str:
         cur_dir = parent_dir
 
 
-def get_ncs_version(west_dir_path: str) -> str:
+def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     """
-    Opens `west.yaml` file inside the project and reads the revision string for nrf-sdk
-    project.
+    Returns version of nrf-sdk project and absolute path to the projects directory.
 
-    To find the location of west.yaml file it first needs to open .west/config file and
-    determine the path.
+    This is combined, so we avoid reading .west/config file twice.
 
     Args:
         west_dir_path (str):        Path to the parent of .west directory. It is up to
                                     the caller to provide a correct value.
 
     Returns:
-        Revision string of nrf-sdk project.
+        Revision string of nrf-sdk project, absolute
     """
 
     config = ConfigParser()
     config.read(os.path.join(west_dir_path, ".west", "config"))
 
     # Get path to west.yaml file
-    west_yaml = os.path.join(
-        west_dir_path, config["manifest"]["path"], config["manifest"]["file"]
+    project_path = os.path.join(west_dir_path, config["manifest"]["path"])
+    west_yaml = os.path.join(project_path, config["manifest"]["file"])
+
+    # Get ncs version
+    with open(west_yaml, "r") as file:
+        manifest = yaml.safe_load(file)["manifest"]
+
+    ncs = list(
+        filter(lambda project: project["repo-path"] == "sdk-nrf", manifest["projects"])
     )
 
-    with open(west_yaml, "r") as file:
-        projects = yaml.safe_load(file)["manifest"]["projects"]
+    return (ncs[0]["revision"], project_path)
 
-    ncs = list(filter(lambda project: project["repo-path"] == "sdk-nrf", projects))
-    return ncs[0]["revision"]
+
+def get_release_conf_from_east_yaml(east):
+    config = ConfigParser()
+    config.read(os.path.join(east.west_dir_path, ".west", "config"))
+
+    # Get path to east.yaml file
+    east_yaml = os.path.join(
+        east.west_dir_path, config["manifest"]["path"], "east.yaml"
+    )
+
+    # TODO: Validate east.yaml
+    with open(east_yaml, "r") as file:
+        release_conf = yaml.safe_load(file)["release"]
+    return release_conf
 
 
 no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!

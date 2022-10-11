@@ -12,7 +12,7 @@ from rich_click import RichCommand, RichGroup
 from .constants import EAST_DIR, NRF_TOOLCHAIN_MANAGER_PATH
 from .helper_functions import (
     WestDirNotFound,
-    get_ncs_version,
+    get_ncs_and_project_dir,
     ncs_version_not_supported_msg,
     no_toolchain_manager_msg,
     no_toolchain_msg,
@@ -68,11 +68,14 @@ class EastContext:
 
         try:
             self.west_dir_path = west_topdir()
-            self.detected_ncs_version = get_ncs_version(self.west_dir_path)
+            self.detected_ncs_version, self.project_dir = get_ncs_and_project_dir(
+                self.west_dir_path
+            )
 
         except WestDirNotFound:
             self.west_dir_path = None
             self.detected_ncs_version = None
+            self.project_dir = None
 
     def print(self, *objects, **kwargs):
         """Prints to the console.
