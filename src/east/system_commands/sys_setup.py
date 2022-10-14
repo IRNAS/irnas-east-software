@@ -3,7 +3,6 @@ import re
 import sys
 
 import click
-import rich_click
 
 from ..constants import (
     CACHE_DIR,
@@ -12,7 +11,7 @@ from ..constants import (
     MINICONDA_DIR,
     NRF_TOOLCHAIN_MANAGER_PATH,
 )
-from ..east_context import EastContext
+from ..east_context import EastContext, east_command_settings
 from ..helper_functions import check_python_version, download_files
 
 
@@ -94,7 +93,6 @@ East will now smartly use Nordic's Toolechain Manager whenever it can.
 of a [yellow bold]West workspace[/] to get the actual toolchain.
 """
 
-
 packages = [
     {
         "exe": "conda",
@@ -111,7 +109,7 @@ packages = [
 ]
 
 
-@click.command(cls=rich_click.RichCommand, options_metavar="[options]")
+@click.command(**east_command_settings)
 @click.pass_obj
 def sys_setup(east):
     """Perform system-wide setup for development.
@@ -128,7 +126,6 @@ def sys_setup(east):
     - Nordic's nRF Toolchain Manager executable
     """
 
-    # TODO: Add check that this command is run outside of East/West workspace
     check_python_version(east)
 
     # Construct a list of files that have to be downloaded.
