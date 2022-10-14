@@ -162,3 +162,9 @@ def sys_setup(east):
             east.console.rule("", style="")
             east.print(package["installed_msg"])
     east.console.rule("", style="")
+
+
+@click.command(**east_command_settings)
+@click.pass_obj
+def init(east):
+    """Creates a West workspace."""
