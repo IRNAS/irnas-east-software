@@ -37,3 +37,15 @@ instead of running `pip install .` all time.
 ```bash
 pip install --editable .
 ```
+
+### Troubleshooting
+
+If `make install` (more exactly `pip install -e .`) ever misbehaves, it is
+probably due to this: https://github.com/pypa/pip/issues/7953.
+
+Run below command once and then again `make install`, this fixed it last time:
+```bash
+python3 -m pip install --prefix=$(python3 -m site --user-base) -e .
+```
+
+
