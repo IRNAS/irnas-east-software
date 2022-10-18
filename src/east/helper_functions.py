@@ -197,9 +197,16 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     with open(west_yaml, "r") as file:
         manifest = yaml.safe_load(file)["manifest"]
 
-    ncs = list(
-        filter(lambda project: project["repo-path"] == "sdk-nrf", manifest["projects"])
-    )
+    try:
+        ncs = list(
+            filter(
+                lambda project: project["repo-path"] == "sdk-nrf", manifest["projects"]
+            )
+        )
+    except KeyError:
+        # This can happen in the case where there is no sdk-nrf repo in the west yaml
+        # file, project is probably using ordinary Zephyr.
+        return None, project_path
 
     return (ncs[0]["revision"], project_path)
 
