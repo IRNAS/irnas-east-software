@@ -4,14 +4,15 @@ import subprocess
 import sys
 from shutil import which
 
-import click
 from rich.console import Console
 from rich.markdown import Markdown
 from rich_click import RichCommand, RichGroup
 
-from .constants import EAST_DIR, NRF_TOOLCHAIN_MANAGER_PATH
+from .constants import const_paths
 from .helper_functions import (
+    WestConfigNotFound,
     WestDirNotFound,
+    WestYmlNotFound,
     get_ncs_and_project_dir,
     ncs_version_not_supported_msg,
     no_toolchain_manager_msg,
@@ -20,8 +21,11 @@ from .helper_functions import (
     west_topdir,
 )
 
+# Needs to be exposed like this so it can be set to False in tests.
+RICH_CONSOLE_ENABLE_MARKUP = True
+
 """
-Conveniece dicts for storing settings that are indentical across Click's commands and
+Convenience dicts for storing settings that are indentical across Click's commands and
 groups.
 """
 east_command_settings = {
@@ -58,11 +62,12 @@ class EastContext:
         # do not count.
         self.cwd = os.getcwd()
         self.echo = echo
+        self.consts = const_paths
 
-        # Create EAST_DIR and its parents if they do not exists
-        os.makedirs(EAST_DIR, exist_ok=True)
+        # Create EAST_DIR and its parents, if they do not exists
+        os.makedirs(self.consts["east_dir"], exist_ok=True)
 
-        self.console = Console(width=80)
+        self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
         self.ncs_version_installed = False
         self.ncs_version_supported = False
 
@@ -72,7 +77,7 @@ class EastContext:
                 self.west_dir_path
             )
 
-        except WestDirNotFound:
+        except (WestDirNotFound, WestConfigNotFound, WestYmlNotFound):
             self.west_dir_path = None
             self.detected_ncs_version = None
             self.project_dir = None
@@ -233,7 +238,7 @@ class EastContext:
         Returns:
             Check .run
         """
-        cmd = f"{NRF_TOOLCHAIN_MANAGER_PATH} {command}"
+        cmd = f"{self.consts['nrf_toolchain_manager_path']} {command}"
 
         return self.run(cmd, **kwargs)
 
@@ -266,7 +271,7 @@ class EastContext:
         arbitary_command = arbitary_command.replace("'", '"')
 
         cmd = (
-            f"{NRF_TOOLCHAIN_MANAGER_PATH} launch --ncs-version"
+            f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
             f" {self.detected_ncs_version} -- bash -c '{arbitary_command} "
             "&& touch success.txt'"
         )
@@ -357,7 +362,7 @@ class EastContext:
             self.exit()
 
         # Exit if manager is not installed
-        if not self.check_exe(NRF_TOOLCHAIN_MANAGER_PATH):
+        if not self.check_exe(self.consts["nrfutil_toolchain_manager_path"]):
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 

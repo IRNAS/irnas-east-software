@@ -4,13 +4,7 @@ import sys
 
 import click
 
-from ..constants import (
-    CACHE_DIR,
-    CONDA_PATH,
-    EAST_DIR,
-    MINICONDA_DIR,
-    NRF_TOOLCHAIN_MANAGER_PATH,
-)
+from ..constants import NRF_TOOLCHAIN_MANAGER_PATH
 from ..east_context import EastContext, east_command_settings
 from ..helper_functions import check_python_version, download_files
 
@@ -30,8 +24,8 @@ def _install_conda(east: EastContext, installer_path: str):
     """Installs Conda package manager"""
 
     # Conda is not on path, but the miniconda dir could still exist.
-    # If we do not delete it now the installer will complain
-    east.run(f"rm -fr {MINICONDA_DIR}")
+    # If we do not delete it now the installer will complain.
+    east.run(f"rm -fr {east.consts['miniconda_dir']}")
 
     east.print("[bold blue]Started Conda installer...")
     # -b flag stands for '[b]e silent', hahaha....
@@ -40,21 +34,24 @@ def _install_conda(east: EastContext, installer_path: str):
     # Conda is now installed, but not on the path yet (this will happen after
     # sourcing .bashrc, .zshrc, .fishrc, etc..), so we talk to it with fullpath
     # Do not activate base env.
-    east.run(f"{CONDA_PATH} config --set auto_activate_base false")
-    east.run(f"{CONDA_PATH} init")
+    east.run(f"{east.consts['conda_path']} config --set auto_activate_base false")
+    east.run(f"{east.consts['conda_path']} init")
 
 
 def _install_toolchain_manager(east: EastContext, exe_path: str):
     """Installs toolchain manager to a proper location"""
 
     # Move toolchain manager to its proper place
-    east.run(f"mv -f {exe_path} {EAST_DIR}")
+    east.run(f"mv -f {exe_path} {east.consts['east_dir']}")
 
     # That is octal, make it executable
-    os.chmod(NRF_TOOLCHAIN_MANAGER_PATH, 0o777)
+    os.chmod(east.consts["nrf_toolchain_manager_path"], 0o777)
 
     # Configure the toolchain path
-    east.run(f"{NRF_TOOLCHAIN_MANAGER_PATH} config --install-dir {EAST_DIR}")
+    east.run(
+        f"{east.consts['nrf_toolchain_manager_path']} config --install-dir "
+        f"{east.consts['east_dir']}"
+    )
 
 
 def _get_toolchain_download_link():
@@ -141,12 +138,12 @@ def sys_setup(east):
             east.print(f"{package['exe']} [red]not found", highlight=False)
             urls.append(package["url"])
 
-    if all([package["installed"] == True for package in packages]):
+    if all([package["installed"] is True for package in packages]):
         east.print("\n[green]All required system packages and programs are installed.")
         east.exit(0)
 
     # Download all required files, which are actually programs or installer scripts
-    paths = download_files(urls, CACHE_DIR)
+    paths = download_files(urls, east.consts["cache_dir"])
 
     # Run an installation method for packages that are not installed.
     for package in packages:
