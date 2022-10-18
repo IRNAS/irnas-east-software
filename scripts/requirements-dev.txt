@@ -5,3 +5,4 @@ pytest-mock == 3.10.0
 build == 0.8.0
 twine == 4.0.1
 setuptools_scm == 7.0.5
+tox == 3.26.0
