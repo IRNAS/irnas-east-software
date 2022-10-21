@@ -1,3 +1,5 @@
+import shutil
+
 import click
 
 from ..east_context import east_command_settings, east_group_settings
@@ -41,7 +43,9 @@ def toolchain(east, force):
     # We come to here if the detected ncs version is supported
     if east.ncs_version_installed:
         if force:
-            east.run(f"rm -fr {EAST_DIR}/toolchain/{east.detected_ncs_version}")
+            shutil.rmtree(
+                f"{east.consts['east_dir']}/toolchain/{east.detected_ncs_version}"
+            )
         else:
             east.print(ncs_installed_msg)
             east.exit()

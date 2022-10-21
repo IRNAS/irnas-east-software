@@ -10,7 +10,7 @@ pip install --upgrade east-tool
 
 ## Usage
 
-`east` intends to be fully documented inside the tool itself, so deduplication
+`east` intends to be fully documented inside the tool itself, so de-duplication
 of documentation is avoided. Executing `east` or `east --help` in the command
 line should give you sufficient information on how to use the tool.
 
@@ -19,6 +19,7 @@ line should give you sufficient information on how to use the tool.
 For development and testing of `east` the use of `virtualenv` is suggested.
 
 Install `virtualenv`:
+
 ```bash
 pip install virtualenv
 ```
@@ -30,22 +31,30 @@ virtualenv venv
 source venv/bin/activate
 ```
 
-To make development of the python package more smooth you can run below command
-from the project root directory.
-Changes that you make in the source code will be automatically available
-instead of running `pip install .` all time.
+To create and editable install of `east` run below command. Whatever change you
+make in the code it will be immediately reflected in the actual tool.
+
 ```bash
-pip install --editable .
+make install-dev
 ```
 
-### Troubleshooting
+### Running unit tests
+
+```bash
+make test
+```
+
+#### Editable install does not work
 
 If `make install` (more exactly `pip install -e .`) ever misbehaves, it is
 probably due to this: https://github.com/pypa/pip/issues/7953.
 
 Run below command once and then again `make install`, this fixed it last time:
+
 ```bash
 python3 -m pip install --prefix=$(python3 -m site --user-base) -e .
 ```
 
+#### Test for version check fails
 
+This happens if the `make install-dev` command was not run before running `make test`.
