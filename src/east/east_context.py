@@ -362,7 +362,7 @@ class EastContext:
             self.exit()
 
         # Exit if manager is not installed
-        if not self.check_exe(self.consts["nrfutil_toolchain_manager_path"]):
+        if not self.check_exe(self.consts["nrf_toolchain_manager_path"]):
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 

@@ -26,7 +26,7 @@ const_paths = {
     "home_dir": HOME_DIR,
     "cache_dir": CACHE_DIR,
     "east_dir": EAST_DIR,
-    "nrfutil_toolchain_manager_path": NRF_TOOLCHAIN_MANAGER_PATH,
+    "nrf_toolchain_manager_path": NRF_TOOLCHAIN_MANAGER_PATH,
     "miniconda_dir": MINICONDA_DIR,
     "conda_path": CONDA_PATH,
 }
