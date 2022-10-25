@@ -72,11 +72,10 @@ def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
 
     # # We pretend that
     def mocked_check_exe(self, exe):
-        if exe == self.consts["nrfutil_toolchain_manager_path"]:
+        if exe == self.consts["nrf_toolchain_manager_path"]:
             return True
 
     def mocked_run_manager(self, command, **kwargs):
-        print(command)
         if command == "list":
             return ["v2.0.0", "v2.1.0"]
 
@@ -121,8 +120,16 @@ def not_ncs_sdk_west_workplace(west_workplace_fixture):
     return project_path
 
 
-def no_west_yaml_west_workplace(west_workplace_fixture):
+@pytest.fixture()
+def west_workplace_multi_app(west_workplace_fixture):
+    project_path = west_workplace_fixture
+    helpers.create_good_west_multi_app(os.path.dirname(project_path))
+    return project_path
+
+
+@pytest.fixture()
+def no_eastyaml_west_workplace(west_workplace_fixture):
     project_path = west_workplace_fixture
 
-    os.remove(os.path.join(project_path, "west.yaml"))
+    os.remove(os.path.join(project_path, "east.yml"))
     return project_path

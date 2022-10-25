@@ -52,8 +52,87 @@ manifest:
       import: true
 """
 
+east_yaml_single_app = """
+apps:
+  - name: test_one
+    west-boards:
+      - board: custom_nrf52840dk
+      - board: nrf52840dk_nrf52840
 
-def _create_and_write(path: str, filename: str, content: str):
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+      - type: uart
+        conf-files:
+          - debug.conf
+          - uart.conf
+
+samples:
+  - name: settings
+    west-boards:
+      - board: custom_nrf52840dk
+    inherit-build-type:
+        app: test_one
+        build-type: debug
+
+  - name: dfu
+    west-boards:
+      - board: custom_nrf52840dk
+      - board: nrf52840dk_nrf52840
+    # Don't inherit, use prj.conf in the sample's folder.
+"""
+
+east_yaml_multiple_apps = """
+apps:
+  - name: test_one
+    west-boards:
+      - board: custom_nrf52840dk
+      - board: nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+      - type: uart
+        conf-files:
+          - debug.conf
+          - uart.conf
+
+  - name: test_two
+    west-boards:
+      - board: custom_nrf52840dk
+      - board: nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+      - type: rtt
+        conf-files:
+          - rtt.conf
+      - type: debug-rtt
+        conf-files:
+          - debug.conf
+          - rtt.conf
+
+samples:
+  - name: settings
+    west-boards:
+      - board: custom_nrf52840dk
+    inherit-build-type:
+        app: test_one
+        build-type: debug
+
+  - name: dfu
+    west-boards:
+      - board: custom_nrf52840dk
+      - board: nrf52840dk_nrf52840
+    # Don't inherit, use prj.conf in the sample's folder.
+"""
+
+
+def create_and_write(path: str, filename: str, content: str):
     """Create a file in the given path with the given content.
 
     Args:
@@ -92,8 +171,12 @@ def _create_good_west_workspace(west_top_dir):
     Main function, which will create correct west workspace. All other 'bad'
     functions will just delete from it.
     """
-    _create_and_write(west_top_dir, ".west/config", west_config_content)
-    _create_and_write(west_top_dir, "project/west.yml", nrfsdk_yaml_content)
+    create_and_write(west_top_dir, ".west/config", west_config_content)
+    create_and_write(west_top_dir, "project/west.yml", nrfsdk_yaml_content)
+    create_and_write(west_top_dir, "project/east.yml", east_yaml_single_app)
+    os.mkdir(os.path.join(west_top_dir, "project/app"))
+    os.mkdir(os.path.join(west_top_dir, "zephyr"))
+
     return os.path.join(west_top_dir, "project")
 
 
@@ -109,11 +192,45 @@ def create_good_west(west_top_dir):
     return _create_good_west_workspace(west_top_dir)
 
 
+def create_good_west_multi_app(west_top_dir):
+    """Creates a correct west workspace in west_top_dir, with multi app east yaml
+
+    Args:
+        west_top_dir (str): Path to west top dir.
+
+    Returns:
+        Path to the project inside west top dir.
+    """
+    create_and_write(west_top_dir, "project/east.yml", east_yaml_multiple_apps)
+    os.makedirs(os.path.join(west_top_dir, "project/apps/test_one"), exist_ok=True)
+    os.makedirs(os.path.join(west_top_dir, "project/apps/test_two"), exist_ok=True)
+
+
 def west_no_nrf_sdk_in_yaml(west_top_dir):
     """Creates a west workspace without nrf-sdk in west.yaml
 
     Args:
         west_top_dir (): Path to west top dir.
     """
-    _create_and_write(west_top_dir, ".west/config", west_config_content)
-    _create_and_write(west_top_dir, "project/west.yml", zephyrsdk_yaml_content)
+    create_and_write(west_top_dir, ".west/config", west_config_content)
+    create_and_write(west_top_dir, "project/west.yml", zephyrsdk_yaml_content)
+
+
+def assert_strings_equal(string1: str, string2: str):
+    """Helper that should be used when comparing strings that come from east's stdout
+    and east's internal hardcoded strings.
+
+    Args:
+        string1 (str):
+        string2 (str):
+
+    Returns:
+        Asserts if strings are different
+    """
+
+    def clear_rich(string):
+        """Output from runner.invoke and hard-coded messages can contain different
+        number of newlines, this is preventing comparisons in asserts."""
+        return string.replace("\n", "")
+
+    assert clear_rich(string1) == clear_rich(string2)
