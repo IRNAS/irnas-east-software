@@ -1,6 +1,5 @@
 import os
 import shutil
-from contextlib import contextmanager
 
 west_config_content = """
 [manifest]
@@ -56,8 +55,8 @@ east_yaml_single_app = """
 apps:
   - name: test_one
     west-boards:
-      - board: custom_nrf52840dk
-      - board: nrf52840dk_nrf52840
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
 
     build-types:
       - type: debug
@@ -71,15 +70,15 @@ apps:
 samples:
   - name: settings
     west-boards:
-      - board: custom_nrf52840dk
+      - custom_nrf52840dk
     inherit-build-type:
         app: test_one
         build-type: debug
 
   - name: dfu
     west-boards:
-      - board: custom_nrf52840dk
-      - board: nrf52840dk_nrf52840
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
     # Don't inherit, use prj.conf in the sample's folder.
 """
 
@@ -87,8 +86,8 @@ east_yaml_multiple_apps = """
 apps:
   - name: test_one
     west-boards:
-      - board: custom_nrf52840dk
-      - board: nrf52840dk_nrf52840
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
 
     build-types:
       - type: debug
@@ -101,8 +100,8 @@ apps:
 
   - name: test_two
     west-boards:
-      - board: custom_nrf52840dk
-      - board: nrf52840dk_nrf52840
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
 
     build-types:
       - type: debug
@@ -119,15 +118,15 @@ apps:
 samples:
   - name: settings
     west-boards:
-      - board: custom_nrf52840dk
+      - custom_nrf52840dk
     inherit-build-type:
         app: test_one
         build-type: debug
 
   - name: dfu
     west-boards:
-      - board: custom_nrf52840dk
-      - board: nrf52840dk_nrf52840
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
     # Don't inherit, use prj.conf in the sample's folder.
 """
 
@@ -166,16 +165,29 @@ def _delete_all_in(path: str):
             print("Failed to delete %s. Reason: %s" % (file_path, e))
 
 
+dummy_config = """
+CONFIG_DEBUG=y
+"""
+
+
 def _create_good_west_workspace(west_top_dir):
     """
     Main function, which will create correct west workspace. All other 'bad'
     functions will just delete from it.
     """
+    os.mkdir(os.path.join(west_top_dir, "project"))
+    os.mkdir(os.path.join(west_top_dir, "project/app"))
+    os.mkdir(os.path.join(west_top_dir, "project/samples"))
+    os.mkdir(os.path.join(west_top_dir, "project/samples/settings"))
+    os.mkdir(os.path.join(west_top_dir, "project/samples/dfu"))
+    os.mkdir(os.path.join(west_top_dir, "zephyr"))
+
     create_and_write(west_top_dir, ".west/config", west_config_content)
     create_and_write(west_top_dir, "project/west.yml", nrfsdk_yaml_content)
     create_and_write(west_top_dir, "project/east.yml", east_yaml_single_app)
-    os.mkdir(os.path.join(west_top_dir, "project/app"))
-    os.mkdir(os.path.join(west_top_dir, "zephyr"))
+    create_and_write(
+        west_top_dir, "project/app/conf/nrf52840dk_nrf52840.conf", dummy_config
+    )
 
     return os.path.join(west_top_dir, "project")
 
@@ -202,8 +214,11 @@ def create_good_west_multi_app(west_top_dir):
         Path to the project inside west top dir.
     """
     create_and_write(west_top_dir, "project/east.yml", east_yaml_multiple_apps)
-    os.makedirs(os.path.join(west_top_dir, "project/apps/test_one"), exist_ok=True)
-    os.makedirs(os.path.join(west_top_dir, "project/apps/test_two"), exist_ok=True)
+    os.makedirs(os.path.join(west_top_dir, "project/app/test_one"), exist_ok=True)
+    os.makedirs(os.path.join(west_top_dir, "project/app/test_two"), exist_ok=True)
+    create_and_write(
+        west_top_dir, "project/app/test_one/conf/nrf52840dk_nrf52840.conf", dummy_config
+    )
 
 
 def west_no_nrf_sdk_in_yaml(west_top_dir):
@@ -230,7 +245,8 @@ def assert_strings_equal(string1: str, string2: str):
 
     def clear_rich(string):
         """Output from runner.invoke and hard-coded messages can contain different
-        number of newlines, this is preventing comparisons in asserts."""
-        return string.replace("\n", "")
+        number of newlines, and indent characters, this is preventing comparisons in
+        asserts."""
+        return string.replace("\n", "").replace("\t", 8 * " ")
 
     assert clear_rich(string1) == clear_rich(string2)

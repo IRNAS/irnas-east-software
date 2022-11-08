@@ -5,7 +5,7 @@ from click.testing import CliRunner
 
 from east.__main__ import cli
 from east.east_context import EastContext
-from east.helper_functions import east_yml_not_found_msg
+from east.east_yml import east_yml_load_error_msg, format_east_yml_load_error_msg
 
 from . import helpers
 
@@ -79,4 +79,6 @@ def test_no_east_yaml_west_workplace(no_eastyaml_west_workplace, workspace_comma
     result = runner.invoke(cli, [workspace_command])
 
     assert result.exit_code == 1
-    helpers.assert_strings_equal(result.output, east_yml_not_found_msg)
+    helpers.assert_strings_equal(
+        result.output, format_east_yml_load_error_msg(east_yml_load_error_msg)
+    )

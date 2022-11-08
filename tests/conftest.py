@@ -51,9 +51,10 @@ def disable_rich_markup(monkeypatch):
     monkeypatch.setattr(east.east_context, "RICH_CONSOLE_ENABLE_MARKUP", False)
 
 
-@pytest.fixture()
-def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
-    """Main level fixture for tests.
+def west_workplace_fixture_common(west_top_dir, monkeypatch, mocker):
+    """Main level fixture for tests for app workspace.
+
+    This is split so the west_top_dir dir is created separately by the callers.
 
     Creates a west_workplace folder on the temporary path, creates inside a set of
     folders and files expected by west and east and changes to the project directory.
@@ -67,7 +68,7 @@ def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
     Returns:
         Project path
     """
-    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+
     project_path = helpers.create_good_west(west_top_dir)
 
     # # We pretend that
@@ -84,6 +85,28 @@ def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
 
     monkeypatch.chdir(project_path)
     return project_path
+
+
+@pytest.fixture()
+def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
+    """Main level fixture for tests for single app workspace.
+
+    Returns:
+        Project path
+    """
+    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+    return west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
+
+
+@pytest.fixture()
+def west_workplace_fixture_multi(tmp_path_factory, monkeypatch, mocker):
+    """Main level fixture for tests for multi app workspace.
+
+    Returns:
+        Project path
+    """
+    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+    return west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
 
 
 @pytest.fixture()
@@ -121,8 +144,8 @@ def not_ncs_sdk_west_workplace(west_workplace_fixture):
 
 
 @pytest.fixture()
-def west_workplace_multi_app(west_workplace_fixture):
-    project_path = west_workplace_fixture
+def west_workplace_multi_app(west_workplace_fixture_multi):
+    project_path = west_workplace_fixture_multi
     helpers.create_good_west_multi_app(os.path.dirname(project_path))
     return project_path
 
