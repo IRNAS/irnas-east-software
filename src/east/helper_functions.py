@@ -217,7 +217,7 @@ def return_dict_on_match(array_of_dicts, key, value):
     the given value.
     If none are found return None.
     """
-    return next((item for item in array_of_dicts if item[key] == value), None)
+    return next((item for item in array_of_dicts if item.get(key) == value), None)
 
 
 no_toolchain_manager_msg = """
