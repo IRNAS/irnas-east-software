@@ -1,5 +1,6 @@
 import os
 import re
+from typing import List
 
 from ..helper_functions import return_dict_on_match
 
@@ -24,10 +25,19 @@ def is_child_in_parent(parent, child):
 
 
 def _construct_required_cmake_args(
-    east, array_of_dicts, build_type, board, path_prefix
-):
+    conf_files: List[str], board: str, path_prefix: str
+) -> str:
     """
-    Constructs required cmake args from information that array_of_dicts holds.
+    Constructs required cmake args from conf_files. Adds board specific conf file if it
+    is found.
+    Path prefix is applied, for cases where sample inherits a list conf_files.
+
+        conf_files (List(str)):     List of conf files
+        board (str):                West board name
+        path_prefix (str):          Path prefix added to conf files
+
+    Returns:
+        Cmake args
     """
     # Determine if there is some prefix involved
     prefix = f"{path_prefix}/" if path_prefix else ""
@@ -37,22 +47,12 @@ def _construct_required_cmake_args(
     board_conf = f"{prefix}conf/{board}.conf"
 
     overlay_configs = []
-    # If a west board config file exists then add it
+    # If a west board config file exists then add it first
     if os.path.isfile(board_conf):
         overlay_configs.append(f"{board}.conf")
 
-    if build_type:
-        matched_type = return_dict_on_match(
-            array_of_dicts["build-types"], "type", build_type
-        )
-        # Given build_type does not exist, this is an user error
-        if not matched_type:
-            east.print(
-                f"\nGiven --build-type [bold]{build_type}[/] does [bold red]not"
-                " exist[/] for this app!"
-            )
-            east.exit()
-        overlay_configs += matched_type["conf-files"]
+    # Then add conf_files if there are any
+    overlay_configs += conf_files
 
     # Glue together configs
     if len(overlay_configs) > 0:
@@ -62,12 +62,22 @@ def _construct_required_cmake_args(
     return f"{cmake_args}"
 
 
-def _construct_previous_cmake_args(build_file):
+def _construct_previous_cmake_args() -> str:
     """
-    Constructs cmake args that were used in previous build.
+    Constructs previous cmake args by extracting them from the build file that was
+    created in the previous build.
+
+    Returns:
+        Cmake args
     """
-    with open(build_file, "r", encoding="utf-8") as f:
-        content = f.read()
+    build_file = "build/image_preload.cmake"
+
+    try:
+        with open(build_file, "r", encoding="utf-8") as f:
+            content = f.read()
+    except FileNotFoundError:
+        # Just return empty string in this case, this will trigger rebuild in any case.
+        return ""
 
     def extract(pattern, content):
         """
@@ -85,12 +95,19 @@ def _construct_previous_cmake_args(build_file):
     if overlay_config:
         cmake_args += f' -DOVERLAY_CONFIG="{overlay_config}"'
 
-    return f"{cmake_args}"
+    return cmake_args
 
 
 build_type_misuse_msg = """
 \nOption [bold cyan]--build-type[/] can be only given inside of the app, exiting!
 """
+
+
+def no_build_type_msg(build_type):
+    return (
+        f"\nGiven --build-type [bold]{build_type}[/] does [bold red]not"
+        " exist[/] for this app!"
+    )
 
 
 def construct_extra_cmake_arguments(east, build_type, board):
@@ -159,22 +176,23 @@ def construct_extra_cmake_arguments(east, build_type, board):
         else:
             # Get the folder name that we are in
             app = return_dict_on_match(app_array, "name", os.path.basename(east.cwd))
-        path_prefix = None
+        path_prefix = ""
+
+    # Extract a list of conf files from the app, exit if they do not exist.
+    conf_files = []
+    if build_type:
+        matched_type = return_dict_on_match(app["build-types"], "type", build_type)
+        if not matched_type:
+            east.print(no_build_type_msg(build_type))
+            east.exit()
+
+        conf_files = matched_type["conf-files"]
 
     # Construct required cmake args,
-    required_cmake_args = _construct_required_cmake_args(
-        east, app, build_type, board, path_prefix
-    )
-
-    # Check if build file exists, it will tell us about cmake args that were used
-    # previously
-    build_file = "build/image_preload.cmake"
-    if not os.path.isfile(build_file):
-        # File was not found, just return constructed string, no need to compare.
-        return required_cmake_args
+    required_cmake_args = _construct_required_cmake_args(conf_files, board, path_prefix)
 
     # If build file exists then construct previous cmake_args
-    previous_cmake_args = _construct_previous_cmake_args(build_file)
+    previous_cmake_args = _construct_previous_cmake_args()
 
     if required_cmake_args == previous_cmake_args:
         return ""
