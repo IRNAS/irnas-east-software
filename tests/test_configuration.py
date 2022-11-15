@@ -72,10 +72,12 @@ list_of_workspace_commands = [
 
 @pytest.mark.parametrize("workspace_command", list_of_workspace_commands)
 def test_no_east_yaml_west_workplace(no_eastyaml_west_workplace, workspace_command):
-    runner = CliRunner()
+    # We just need fixture for chdir and proper workplace state
+    _ = no_eastyaml_west_workplace
 
     # Detection of east.yml needs to be done in every west_workplace command, clean is
     # used here as an example
+    runner = CliRunner()
     result = runner.invoke(cli, [workspace_command])
 
     assert result.exit_code == 1
