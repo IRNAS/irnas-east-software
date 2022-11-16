@@ -77,6 +77,9 @@ def west_workplace_fixture_common(west_top_dir, monkeypatch, mocker):
             return True
 
     def mocked_run_manager(self, command, **kwargs):
+        _ = self
+        _ = kwargs
+
         if command == "list":
             return ["v2.0.0", "v2.1.0"]
 
@@ -156,3 +159,38 @@ def no_eastyaml_west_workplace(west_workplace_fixture):
 
     os.remove(os.path.join(project_path, "east.yml"))
     return project_path
+
+
+@pytest.fixture(params=["single", "multi"])
+def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
+    """Parametrized west workspace fixture for single and multi app.
+
+    By using it in the tests the tests are executed twice as many, first for the single
+    app workspace and then for multi app workspace.
+
+    The return dictionary contains all keys that the test should need.
+
+    Use this fixture when behaviour under test should be the same in both single and
+    multi app setup.
+
+        tmp_path_factory ():
+        monkeypatch ():
+        mocker ():
+        request ():
+
+    Returns:
+        Dict
+    """
+
+    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+    project_path = west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
+
+    app_path = os.path.join(project_path, "app")
+    prefix_path = "../../app/"
+
+    if request.param == "multi":
+        helpers.create_good_west_multi_app(os.path.dirname(project_path))
+        app_path = os.path.join(project_path, "app", "test_one")
+        prefix_path = "../../app/test_one/"
+
+    return {"project": project_path, "app": app_path, "prefix": prefix_path}

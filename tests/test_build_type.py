@@ -235,14 +235,13 @@ def create_image_preload_file(app_path, path_prefix="", overlay_configs=None):
     ],
 )
 def test_build_type_build_folder_behaviour_same_flags(
-    west_workplace, monkeypatch, mocker, build_type_flag, overlay_configs
+    west_workplace_parametrized, monkeypatch, mocker, build_type_flag, overlay_configs
 ):
     """
     If the build folder with same conf files with that --build-type expects exits then
     no cmake args are added to the build command to avoid cmake rebuilds.
     """
-    project_path = west_workplace
-    app_path = os.path.join(project_path, "app")
+    app_path = west_workplace_parametrized["app"]
     create_image_preload_file(app_path, overlay_configs=overlay_configs)
 
     helper_test_against_west_run(
@@ -268,14 +267,13 @@ def test_build_type_build_folder_behaviour_same_flags(
     ],
 )
 def test_build_type_build_folder_behaviour_different_flags(
-    west_workplace, monkeypatch, mocker, build_type_flag, overlay_configs
+    west_workplace_parametrized, monkeypatch, mocker, build_type_flag, overlay_configs
 ):
     """
     If the build folder exsits but it has build flags that are not expected by the east
     then rebuild is triggered.
     """
-    project_path = west_workplace
-    app_path = os.path.join(project_path, "app")
+    app_path = west_workplace_parametrized["app"]
     create_image_preload_file(app_path)
 
     helper_test_against_west_run(
@@ -290,12 +288,11 @@ def test_build_type_build_folder_behaviour_different_flags(
     )
 
 
-def test_build_type_non_existant_type(west_workplace, monkeypatch, mocker):
+def test_build_type_non_existant_type(west_workplace_parametrized, monkeypatch, mocker):
     """
     If given --build-type does not exists then east needs to exit and throw message.
     """
-    project_path = west_workplace
-    app_path = os.path.join(project_path, "app")
+    app_path = west_workplace_parametrized["app"]
 
     helper_test_against_west_run(
         monkeypatch,
@@ -306,11 +303,13 @@ def test_build_type_non_existant_type(west_workplace, monkeypatch, mocker):
     )
 
 
-def test_build_type_samples_with_build_type_option(west_workplace, monkeypatch, mocker):
+def test_build_type_samples_with_build_type_option(
+    west_workplace_parametrized, monkeypatch, mocker
+):
     """
     Running east build with --build-type inside samples should fail.
     """
-    project_path = west_workplace
+    project_path = west_workplace_parametrized["project"]
     sample_path = os.path.join(project_path, "samples", "settings")
 
     helper_test_against_west_run(
@@ -322,115 +321,98 @@ def test_build_type_samples_with_build_type_option(west_workplace, monkeypatch, 
     )
 
 
-def test_build_type_samples_inherit(
-    west_workplace, west_workplace_multi_app, monkeypatch, mocker
-):
+def test_build_type_samples_inherit(west_workplace_parametrized, monkeypatch, mocker):
     """
-    Test whether the inherit key works.
+    Test inherit key normal use.
     """
 
-    def inject(project_path, expected_west_cmd):
-        sample_path = os.path.join(project_path, "samples", "settings")
-        helper_test_against_west_run(
-            monkeypatch,
-            mocker,
-            sample_path,
-            "build",
-            expected_west_cmd=expected_west_cmd,
-            should_succed=True,
+    project_path = west_workplace_parametrized["project"]
+
+    def west_cmd_fmt(prefix):
+        return (
+            f"build -- -DCONF_FILE={prefix}conf/common.conf"
+            f' -DOVERLAY_CONFIG="{prefix}conf/debug.conf"'
         )
 
-    expected_west_cmd_single = (
-        "build -- -DCONF_FILE=../../app/conf/common.conf"
-        ' -DOVERLAY_CONFIG="../../app/conf/debug.conf"'
+    sample_path = os.path.join(project_path, "samples", "settings")
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        sample_path,
+        "build",
+        expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
+        should_succed=True,
     )
-    expected_west_cmd_multi = (
-        "build -- -DCONF_FILE=../../app/test_one/conf/common.conf"
-        ' -DOVERLAY_CONFIG="../../app/test_one/conf/debug.conf"'
-    )
-
-    inject(west_workplace, expected_west_cmd_single)
-    inject(west_workplace_multi_app, expected_west_cmd_multi)
 
 
 def test_build_type_samples_inherit_build_folder_same_flag(
-    west_workplace, west_workplace_multi_app, monkeypatch, mocker
+    west_workplace_parametrized, monkeypatch, mocker
 ):
     """
     In case where sample (with an inherit keword) has a existing build folder from
     before, no extra cmake args should be emmited.
     """
+    project_path = west_workplace_parametrized["project"]
 
-    def inject(project_path, path_prefix):
-        sample_path = os.path.join(project_path, "samples", "settings")
+    sample_path = os.path.join(project_path, "samples", "settings")
 
-        overlay_configs = "conf/debug.conf"
-        create_image_preload_file(
-            sample_path,
-            path_prefix=path_prefix,
-            overlay_configs=overlay_configs,
-        )
-        helper_test_against_west_run(
-            monkeypatch,
-            mocker,
-            sample_path,
-            "build",
-            expected_west_cmd="build",
-            should_succed=True,
-        )
-
-    inject(west_workplace, "../../app/")
-    inject(west_workplace_multi_app, "../../app/test_one/")
+    overlay_configs = "conf/debug.conf"
+    create_image_preload_file(
+        sample_path,
+        path_prefix=west_workplace_parametrized["prefix"],
+        overlay_configs=overlay_configs,
+    )
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        sample_path,
+        "build",
+        expected_west_cmd="build",
+        should_succed=True,
+    )
 
 
 def test_build_type_samples_no_inherit(
-    west_workplace, west_workplace_multi_app, monkeypatch, mocker
+    west_workplace_parametrized, monkeypatch, mocker
 ):
     """
     In case where there is no inherit we default to basic west behavior: no cmake args.
     """
 
-    def inject(project_path):
-        sample_path = os.path.join(project_path, "samples", "dfu")
+    project_path = west_workplace_parametrized["project"]
+    sample_path = os.path.join(project_path, "samples", "dfu")
 
-        helper_test_against_west_run(
-            monkeypatch,
-            mocker,
-            sample_path,
-            "build",
-            expected_west_cmd="build",
-            should_succed=True,
-        )
-
-    inject(west_workplace)
-    inject(west_workplace_multi_app)
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        sample_path,
+        "build",
+        expected_west_cmd="build",
+        should_succed=True,
+    )
 
 
 def test_build_type_samples_does_not_exist(
-    west_workplace, west_workplace_multi_app, monkeypatch, mocker
+    west_workplace_parametrized, monkeypatch, mocker
 ):
     """
     In case where sample does not exist in east.yml we default to basic west behaviour:
     no cmake args.
 
     """
+    project_path = west_workplace_parametrized["project"]
 
-    def inject(project_path):
-        sample_path = os.path.join(project_path, "samples", "super_duper_sample")
-        os.mkdir(sample_path)
+    sample_path = os.path.join(project_path, "samples", "super_duper_sample")
+    os.mkdir(sample_path)
 
-        helper_test_against_west_run(
-            monkeypatch,
-            mocker,
-            sample_path,
-            "build",
-            expected_west_cmd="build",
-            should_succed=True,
-        )
-        os.rmdir(sample_path)
-
-    inject(west_workplace)
-    inject(west_workplace_multi_app)
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        sample_path,
+        "build",
+        expected_west_cmd="build",
+        should_succed=True,
+    )
 
 
 east_yaml_non_existing_inheriting = """
@@ -455,31 +437,27 @@ samples:
 """
 
 
-def test_non_existing_inherited_app(
-    west_workplace, west_workplace_multi_app, monkeypatch, mocker
-):
+def test_non_existing_inherited_app(west_workplace_parametrized, monkeypatch, mocker):
     """
     In case where sample is inheriting from a non-existing app we exit.
 
     """
 
-    def inject(project_path):
-        helpers.create_and_write(
-            project_path,
-            "east.yml",
-            east_yaml_non_existing_inheriting,
-        )
+    project_path = west_workplace_parametrized["project"]
 
-        helper_test_against_west_run(
-            monkeypatch,
-            mocker,
-            project_path,
-            "build",
-            should_succed=False,
-        )
+    helpers.create_and_write(
+        project_path,
+        "east.yml",
+        east_yaml_non_existing_inheriting,
+    )
 
-    inject(west_workplace)
-    inject(west_workplace_multi_app)
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        "build",
+        should_succed=False,
+    )
 
 
 east_yaml_duplicated_app_names = """
@@ -664,8 +642,7 @@ def test_duplicated_names_in_east_yml(
     ],
 )
 def test_searching_for_west_board_specific_confs(
-    west_workplace,
-    west_workplace_multi_app,
+    west_workplace_parametrized,
     monkeypatch,
     mocker,
     east_cmd,
@@ -677,18 +654,13 @@ def test_searching_for_west_board_specific_confs(
     add it.
     In sample folders with inherit key it needs to do the same thing.
     """
+    project_path = west_workplace_parametrized["app"]
 
-    def inject(project_path):
-        helper_test_against_west_run(
-            monkeypatch,
-            mocker,
-            project_path,
-            east_cmd,
-            expected_west_cmd,
-            should_succed=True,
-        )
-
-    project_path = os.path.join(west_workplace, "app")
-    inject(project_path)
-    project_path = os.path.join(west_workplace_multi_app, "app", "test_one")
-    inject(project_path)
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        east_cmd,
+        expected_west_cmd,
+        should_succed=True,
+    )
