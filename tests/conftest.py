@@ -91,7 +91,7 @@ def west_workplace_fixture_common(west_top_dir, monkeypatch, mocker):
 
 
 @pytest.fixture()
-def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
+def west_workplace(tmp_path_factory, monkeypatch, mocker):
     """Main level fixture for tests for single app workspace.
 
     Returns:
@@ -102,63 +102,31 @@ def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
 
 
 @pytest.fixture()
-def west_workplace_fixture_multi(tmp_path_factory, monkeypatch, mocker):
+def west_workplace_multi_app(tmp_path_factory, monkeypatch, mocker):
     """Main level fixture for tests for multi app workspace.
 
     Returns:
         Project path
     """
     west_top_dir = tmp_path_factory.mktemp("west_workplace")
-    return west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
-
-
-@pytest.fixture()
-def west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    return project_path
-
-
-@pytest.fixture()
-def no_config_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    os.remove(os.path.join(os.path.dirname(project_path), ".west", "config"))
-    return project_path
-
-
-@pytest.fixture()
-def no_westyaml_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    os.remove(os.path.join(project_path, "west.yml"))
-    return project_path
-
-
-@pytest.fixture()
-def not_in_west_workplace(tmp_path_factory, monkeypatch):
-    path = tmp_path_factory.mktemp("not_west_workplace")
-    monkeypatch.chdir(path)
-    return str(path)
-
-
-@pytest.fixture()
-def not_ncs_sdk_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    helpers.west_no_nrf_sdk_in_yaml(os.path.dirname(project_path))
-    return project_path
-
-
-@pytest.fixture()
-def west_workplace_multi_app(west_workplace_fixture_multi):
-    project_path = west_workplace_fixture_multi
+    project_path = west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
     helpers.create_good_west_multi_app(os.path.dirname(project_path))
     return project_path
 
 
 @pytest.fixture()
-def no_eastyaml_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
+def not_in_west_workplace(tmp_path_factory, monkeypatch):
+    """Creates a temp workspace without anything and changes to it.
 
-    os.remove(os.path.join(project_path, "east.yml"))
-    return project_path
+        tmp_path_factory ():
+        monkeypatch ():
+
+    Returns:
+        Path
+    """
+    path = tmp_path_factory.mktemp("not_west_workplace")
+    monkeypatch.chdir(path)
+    return str(path)
 
 
 @pytest.fixture(params=["single", "multi"])
@@ -179,7 +147,7 @@ def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
         request ():
 
     Returns:
-        Dict
+        Dict with project, app and prefix paths for testing.
     """
 
     west_top_dir = tmp_path_factory.mktemp("west_workplace")
