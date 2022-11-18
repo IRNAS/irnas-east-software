@@ -10,9 +10,12 @@ pip install --upgrade east-tool
 
 ## Usage
 
-`east` intends to be fully documented inside the tool itself, so de-duplication
-of documentation is avoided. Executing `east` or `east --help` in the command
-line should give you sufficient information on how to use the tool.
+`east` intends to be fully documented inside the tool itself, (which is not
+yet). Executing `east` or `east --help` in the command line should give you
+sufficient information on how to use the tool in basic ways.
+
+To learn more about configuration refer to the [docs](docs) folder.
+
 
 ## Developing East
 
