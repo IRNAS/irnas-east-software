@@ -211,29 +211,25 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     return (ncs[0]["revision"], project_path)
 
 
-def get_release_conf_from_east_yaml(east):
-    config = ConfigParser()
-    config.read(os.path.join(east.west_dir_path, ".west", "config"))
-
-    # Get path to east.yaml file
-    east_yaml = os.path.join(
-        east.west_dir_path, config["manifest"]["path"], "east.yaml"
-    )
-
-    # TODO: Validate east.yaml
-    with open(east_yaml, "r") as file:
-        release_conf = yaml.safe_load(file)["release"]
-    return release_conf
+def return_dict_on_match(array_of_dicts, key, value):
+    """
+    Search through array of dicts and return the first one where the given key matches
+    the given value.
+    If none are found return None.
+    """
+    return next((item for item in array_of_dicts if item.get(key) == value), None)
 
 
-no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!
+no_toolchain_manager_msg = """
+[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!
 
 To install it run:
 
 \t[italic bold blue]east sys-setup
 """
 
-not_in_west_workspace_msg = """[bold yellow]West workspace[/] was [bold red]not found![/]
+not_in_west_workspace_msg = """
+[bold yellow]West workspace[/] was [bold red]not found![/]
 
 This command can only be run [bold]inside[/] of a [bold yellow]West workspace[/].
 """

@@ -5,7 +5,7 @@ from click.testing import CliRunner
 from east.__main__ import cli
 
 
-def test_clean_command(west_workplace_fixture):
+def test_clean_command(west_workplace_parametrized):
     runner = CliRunner()
 
     def clear_rich(string):

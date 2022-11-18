@@ -51,9 +51,10 @@ def disable_rich_markup(monkeypatch):
     monkeypatch.setattr(east.east_context, "RICH_CONSOLE_ENABLE_MARKUP", False)
 
 
-@pytest.fixture()
-def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
-    """Main level fixture for tests.
+def west_workplace_fixture_common(west_top_dir, monkeypatch, mocker):
+    """Main level fixture for tests for app workspace.
+
+    This is split so the west_top_dir dir is created separately by the callers.
 
     Creates a west_workplace folder on the temporary path, creates inside a set of
     folders and files expected by west and east and changes to the project directory.
@@ -67,16 +68,18 @@ def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
     Returns:
         Project path
     """
-    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+
     project_path = helpers.create_good_west(west_top_dir)
 
     # # We pretend that
     def mocked_check_exe(self, exe):
-        if exe == self.consts["nrfutil_toolchain_manager_path"]:
+        if exe == self.consts["nrf_toolchain_manager_path"]:
             return True
 
     def mocked_run_manager(self, command, **kwargs):
-        print(command)
+        _ = self
+        _ = kwargs
+
         if command == "list":
             return ["v2.0.0", "v2.1.0"]
 
@@ -88,41 +91,74 @@ def west_workplace_fixture(tmp_path_factory, monkeypatch, mocker):
 
 
 @pytest.fixture()
-def west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    return project_path
+def west_workplace(tmp_path_factory, monkeypatch, mocker):
+    """Main level fixture for tests for single app workspace.
+
+    Returns:
+        Project path
+    """
+    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+    return west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
 
 
 @pytest.fixture()
-def no_config_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    os.remove(os.path.join(os.path.dirname(project_path), ".west", "config"))
-    return project_path
+def west_workplace_multi_app(tmp_path_factory, monkeypatch, mocker):
+    """Main level fixture for tests for multi app workspace.
 
-
-@pytest.fixture()
-def no_westyaml_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    os.remove(os.path.join(project_path, "west.yml"))
+    Returns:
+        Project path
+    """
+    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+    project_path = west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
+    helpers.create_good_west_multi_app(os.path.dirname(project_path))
     return project_path
 
 
 @pytest.fixture()
 def not_in_west_workplace(tmp_path_factory, monkeypatch):
+    """Creates a temp workspace without anything and changes to it.
+
+        tmp_path_factory ():
+        monkeypatch ():
+
+    Returns:
+        Path
+    """
     path = tmp_path_factory.mktemp("not_west_workplace")
     monkeypatch.chdir(path)
     return str(path)
 
 
-@pytest.fixture()
-def not_ncs_sdk_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
-    helpers.west_no_nrf_sdk_in_yaml(os.path.dirname(project_path))
-    return project_path
+@pytest.fixture(params=["single", "multi"])
+def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
+    """Parametrized west workspace fixture for single and multi app.
 
+    By using it in the tests the tests are executed twice as many, first for the single
+    app workspace and then for multi app workspace.
 
-def no_west_yaml_west_workplace(west_workplace_fixture):
-    project_path = west_workplace_fixture
+    The return dictionary contains all keys that the test should need.
 
-    os.remove(os.path.join(project_path, "west.yaml"))
-    return project_path
+    Use this fixture when behaviour under test should be the same in both single and
+    multi app setup.
+
+        tmp_path_factory ():
+        monkeypatch ():
+        mocker ():
+        request ():
+
+    Returns:
+        Dict with project, app and prefix paths for testing.
+    """
+
+    west_top_dir = tmp_path_factory.mktemp("west_workplace")
+    project_path = west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
+
+    app_path = os.path.join(project_path, "app")
+    prefix_path = "../../app/"
+
+    if request.param == "multi":
+        helpers.create_good_west_multi_app(os.path.dirname(project_path))
+        app_path = os.path.join(project_path, "app", "test_one")
+        prefix_path = "../../app/test_one/"
+
+    return {"project": project_path, "app": app_path, "prefix": prefix_path}

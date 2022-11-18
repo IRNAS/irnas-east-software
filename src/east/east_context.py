@@ -9,6 +9,7 @@ from rich.markdown import Markdown
 from rich_click import RichCommand, RichGroup
 
 from .constants import const_paths
+from .east_yml import EastYmlLoadError, format_east_yml_load_error_msg, load_east_yml
 from .helper_functions import (
     WestConfigNotFound,
     WestDirNotFound,
@@ -70,6 +71,7 @@ class EastContext:
         self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
         self.ncs_version_installed = False
         self.ncs_version_supported = False
+        self.east_yml = None
 
         try:
             self.west_dir_path = west_topdir()
@@ -339,6 +341,8 @@ class EastContext:
         A list of checks that every workspace command should call before executing its
         actual command.
 
+        This command will also load the east.yml file if it is found.
+
 
         Args:
             self.(self.ontext):             self.context for printing and exiting
@@ -361,8 +365,15 @@ class EastContext:
             self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
 
+        # Exit if east.yml is not present in the project dir
+        try:
+            self.east_yml = load_east_yml(self.project_dir)
+        except EastYmlLoadError as msg:
+            self.print(format_east_yml_load_error_msg(msg), highlight=False)
+            self.exit()
+
         # Exit if manager is not installed
-        if not self.check_exe(self.consts["nrfutil_toolchain_manager_path"]):
+        if not self.check_exe(self.consts["nrf_toolchain_manager_path"]):
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
