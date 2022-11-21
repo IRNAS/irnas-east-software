@@ -62,15 +62,18 @@ def _construct_required_cmake_args(
     return f"{cmake_args}"
 
 
-def _construct_previous_cmake_args() -> str:
+def _construct_previous_cmake_args(build_dir: str) -> str:
     """
     Constructs previous cmake args by extracting them from the build file that was
     created in the previous build.
 
+        build_dir (str):    Location of the build directory.
+
     Returns:
         Cmake args
     """
-    build_file = "build/image_preload.cmake"
+    build_location = build_dir.strip("/") if build_dir else "build"
+    build_file = f"{build_location}/image_preload.cmake"
 
     try:
         with open(build_file, "r", encoding="utf-8") as f:
@@ -110,7 +113,7 @@ def no_build_type_msg(build_type):
     )
 
 
-def construct_extra_cmake_arguments(east, build_type, board):
+def construct_extra_cmake_arguments(east, build_type, board, build_dir):
     """Construct extra cmake arguments for west build command.
 
     This function will construct cmake_arguments (specifically values for OVERLAY_CONFIG
@@ -192,7 +195,7 @@ def construct_extra_cmake_arguments(east, build_type, board):
     required_cmake_args = _construct_required_cmake_args(conf_files, board, path_prefix)
 
     # If build file exists then construct previous cmake_args
-    previous_cmake_args = _construct_previous_cmake_args()
+    previous_cmake_args = _construct_previous_cmake_args(build_dir)
 
     if required_cmake_args == previous_cmake_args:
         return ""

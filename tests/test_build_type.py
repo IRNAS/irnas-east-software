@@ -200,7 +200,9 @@ def test_build_type_multi_app_behaviour(
     )
 
 
-def create_image_preload_file(app_path, path_prefix="", overlay_configs=None):
+def create_image_preload_file(
+    app_path, path_prefix="", overlay_configs=None, build_dir="build"
+):
     """create image_preload.cmake file inside build folder."""
 
     image_preload_file = (
@@ -217,7 +219,9 @@ def create_image_preload_file(app_path, path_prefix="", overlay_configs=None):
             ' child image controlled")\n'
         )
 
-    helpers.create_and_write(app_path, "build/image_preload.cmake", image_preload_file)
+    helpers.create_and_write(
+        app_path, f"{build_dir}/image_preload.cmake", image_preload_file
+    )
 
 
 @pytest.mark.parametrize(
@@ -662,5 +666,97 @@ def test_searching_for_west_board_specific_confs(
         project_path,
         east_cmd,
         expected_west_cmd,
+        should_succed=True,
+    )
+
+
+def test_different_build_dir_path_empty_dir(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """With different build dir path, but no build folder the expected west command
+    should just include the -d option and common.conf"""
+
+    project_path = west_workplace_parametrized["app"]
+
+    build_dir = "../different_build_dir"
+
+    # create_image_preload_file(
+    #     os.path.join(project_path, build_dir) ,
+    #     path_prefix=west_workplace_parametrized["prefix"],
+    #     overlay_configs=overlay_configs,
+    # )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        f"build -d {build_dir}",
+        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf",
+        should_succed=True,
+    )
+
+
+def test_different_build_dir_path_full_dir_same_build_type(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """With different build dir path and build folder that has same previous build type
+    files as current ones the west command should just include -d option and nothing
+    else.
+    """
+
+    project_path = west_workplace_parametrized["app"]
+
+    build_dir = "../different_build_dir"
+
+    # Config for uart build type
+    overlay_configs = "conf/debug.conf;conf/uart.conf"
+
+    create_image_preload_file(
+        os.path.join(project_path, build_dir),
+        path_prefix=west_workplace_parametrized["prefix"],
+        overlay_configs=overlay_configs,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        f"build -d {build_dir} --build-type uart",
+        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf"
+        f' -DOVERLAY_CONFIG="{overlay_configs}"',
+        should_succed=True,
+    )
+
+
+def test_different_build_dir_path_full_dir_different_build_type(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """With different build dir path and build folder that has different previous build
+    type files as current ones the west command should include -d option and current
+    conf files.
+    """
+
+    project_path = west_workplace_parametrized["app"]
+
+    build_dir = "../different_build_dir"
+
+    # Config for uart build type
+    old_overlay_configs = "conf/debug.conf;conf/uart.conf"
+    # Config for debug build type
+    new_overlay_configs = "conf/debug.conf"
+
+    create_image_preload_file(
+        os.path.join(project_path, build_dir),
+        path_prefix=west_workplace_parametrized["prefix"],
+        overlay_configs=old_overlay_configs,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        f"build -d {build_dir} --build-type debug",
+        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf"
+        f' -DOVERLAY_CONFIG="{new_overlay_configs}"',
         should_succed=True,
     )

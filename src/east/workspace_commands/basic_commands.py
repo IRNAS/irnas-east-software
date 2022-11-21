@@ -21,17 +21,17 @@ def clean(east):
 @click.command(**east_command_settings)
 @click.option("-b", "--board", type=str, help="West board to build for.")
 @click.option("-u", "--build-type", type=str, help="Which build type to use.")
-# @click.option(
-#     "-d",
-#     "--build-dir",
-#     type=str,
-#     help=(
-#         "Build directory to create or use. If the --build-dir directory is not set, the"
-#         " default is [bold]build[/] unless the build.dir-fmt configuration variable is"
-#         " set. The current directory is checked after that. If either is a Zephyr build"
-#         " directory, it is used. "
-#     ),
-# )
+@click.option(
+    "-d",
+    "--build-dir",
+    type=str,
+    help=(
+        "Build directory to create or use. If the --build-dir directory is not set, the"
+        " default is [bold]build[/] unless the build.dir-fmt configuration variable is"
+        " set. The current directory is checked after that. If either is a Zephyr build"
+        " directory, it is used. "
+    ),
+)
 @click.option("-t", "--target", type=str, help="Run this build system target.")
 # @click.argument("cmake-args", nargs=-1, type=str, metavar="-- [cmake-args]")
 # @click.option(
@@ -44,7 +44,7 @@ def clean(east):
 #     ),
 # )
 @click.pass_obj
-def build(east, board, target, build_type):
+def build(east, board, build_type, build_dir, target):
     """
     Build firmware in current directory.
 
@@ -74,8 +74,8 @@ def build(east, board, target, build_type):
     # TODO: Add back build_dir, source_dir and cmake_args options once you make them
     # compatible
 
-    # if build_dir:
-    #     build_cmd += f" -d {build_dir}"
+    if build_dir:
+        build_cmd += f" -d {build_dir}"
     if target:
         build_cmd += f" -t {target}"
     # with build_type flag
@@ -89,7 +89,9 @@ def build(east, board, target, build_type):
 
     # Locate east yaml
     # Get possible
-    build_type_args = construct_extra_cmake_arguments(east, build_type, board)
+    build_type_args = construct_extra_cmake_arguments(
+        east, build_type, board, build_dir
+    )
 
     if build_type_args:
         build_cmd += f" -- {build_type_args}"
