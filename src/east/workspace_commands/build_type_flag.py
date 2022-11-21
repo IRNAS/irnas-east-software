@@ -25,7 +25,7 @@ def is_child_in_parent(parent, child):
 
 
 def _construct_required_cmake_args(
-    conf_files: List[str], board: str, path_prefix: str
+    conf_files: List[str], board: str, path_prefix: str, source_dir: str
 ) -> str:
     """
     Constructs required cmake args from conf_files. Adds board specific conf file if it
@@ -44,7 +44,9 @@ def _construct_required_cmake_args(
     # We always use common.conf
     cmake_args = f"-DCONF_FILE={prefix}conf/common.conf"
 
-    board_conf = f"{prefix}conf/{board}.conf"
+    # Location of the board file depends on the source_dir and prefix
+    board_prefix = f"{source_dir}/{prefix}" if source_dir else f"{prefix}"
+    board_conf = f"{board_prefix}conf/{board}.conf"
 
     overlay_configs = []
     # If a west board config file exists then add it first
@@ -113,7 +115,7 @@ def no_build_type_msg(build_type):
     )
 
 
-def construct_extra_cmake_arguments(east, build_type, board, build_dir):
+def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_dir):
     """Construct extra cmake arguments for west build command.
 
     This function will construct cmake_arguments (specifically values for OVERLAY_CONFIG
@@ -132,13 +134,19 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir):
         east ():            East context
         build_type ():      Build type given from the east build
         board ():           Board given from the east build
+        build_dir ():       Location of build_dir, if None then "./build" is used
 
     Returns:  String that should be placed after `--`
     """
+    # Modify current working dir, if source_dir is used, rstrip is needed cause
+    # path.join adds one "/" if joning empty string.
+    source_dir = source_dir if source_dir else ""
+    cwd = os.path.join(east.cwd, source_dir).rstrip("/")
+
     # Are we inside project_dir and does the relative path contain app/apps or samples
     # string
-    inside_project_dir = is_child_in_parent(east.project_dir, east.cwd)
-    relpath = os.path.relpath(east.cwd, start=east.project_dir)
+    inside_project_dir = is_child_in_parent(east.project_dir, cwd)
+    relpath = os.path.relpath(cwd, start=east.project_dir)
     inside_app = "app" in relpath
     inside_sample = "samples" in relpath
     app_array = east.east_yml["apps"]
@@ -153,7 +161,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir):
 
     # If inside samples determine in which sample are we, get its element
     if inside_sample:
-        sample_name = os.path.basename(east.cwd)
+        sample_name = os.path.basename(cwd)
         sample_dict = return_dict_on_match(sample_array, "name", sample_name)
 
         if not sample_dict or "inherit-build-type" not in sample_dict:
@@ -165,7 +173,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir):
         inherited_app = sample_dict["inherit-build-type"]["app"]
         build_type = sample_dict["inherit-build-type"]["build-type"]
         app = return_dict_on_match(app_array, "name", inherited_app)
-        path_to_project_dir = os.path.relpath(east.project_dir, start=east.cwd)
+        path_to_project_dir = os.path.relpath(east.project_dir, start=cwd)
 
         if len(app_array) == 1:
             path_prefix = os.path.join(path_to_project_dir, "app")
@@ -178,7 +186,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir):
             app = app_array[0]
         else:
             # Get the folder name that we are in
-            app = return_dict_on_match(app_array, "name", os.path.basename(east.cwd))
+            app = return_dict_on_match(app_array, "name", os.path.basename(cwd))
         path_prefix = ""
 
     # Extract a list of conf files from the app, exit if they do not exist.
@@ -192,7 +200,9 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir):
         conf_files = matched_type["conf-files"]
 
     # Construct required cmake args,
-    required_cmake_args = _construct_required_cmake_args(conf_files, board, path_prefix)
+    required_cmake_args = _construct_required_cmake_args(
+        conf_files, board, path_prefix, source_dir
+    )
 
     # If build file exists then construct previous cmake_args
     previous_cmake_args = _construct_previous_cmake_args(build_dir)

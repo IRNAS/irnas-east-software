@@ -680,12 +680,6 @@ def test_different_build_dir_path_empty_dir(
 
     build_dir = "../different_build_dir"
 
-    # create_image_preload_file(
-    #     os.path.join(project_path, build_dir) ,
-    #     path_prefix=west_workplace_parametrized["prefix"],
-    #     overlay_configs=overlay_configs,
-    # )
-
     helper_test_against_west_run(
         monkeypatch,
         mocker,
@@ -758,5 +752,124 @@ def test_different_build_dir_path_full_dir_different_build_type(
         f"build -d {build_dir} --build-type debug",
         f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf"
         f' -DOVERLAY_CONFIG="{new_overlay_configs}"',
+        should_succed=True,
+    )
+
+
+# @pytest.mark.parametrize("app_path", [, "app/test_two"])
+@pytest.mark.parametrize(
+    "east_cmd, expected_west_cmd",
+    [
+        (
+            "build -s app/test_one",
+            "build app/test_one -- -DCONF_FILE=conf/common.conf",
+        ),
+        (
+            "build -s app/test_two",
+            "build app/test_two -- -DCONF_FILE=conf/common.conf",
+        ),
+        (
+            "build -s app/test_one --build-type debug",
+            (
+                "build app/test_one -- -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/debug.conf"'
+            ),
+        ),
+        (
+            "build -s app/test_two --build-type debug",
+            (
+                "build app/test_two -- -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/debug.conf"'
+            ),
+        ),
+        (
+            "build -s app/test_one -b nrf52840dk_nrf52840",
+            (
+                "build -b nrf52840dk_nrf52840 app/test_one --"
+                " -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+            ),
+        ),
+        (
+            "build -s app/test_one -b nrf52840dk_nrf52840 --build-type uart",
+            (
+                "build -b nrf52840dk_nrf52840 app/test_one --"
+                " -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;'
+                'conf/debug.conf;conf/uart.conf"'
+            ),
+        ),
+    ],
+)
+def test_using_different_source_dirs(
+    west_workplace_multi_app,
+    monkeypatch,
+    mocker,
+    east_cmd,
+    expected_west_cmd,
+):
+    """
+    Using a different source dir must not affect the extra args after `--`.
+    """
+    project_path = west_workplace_multi_app
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        east_cmd,
+        expected_west_cmd,
+        should_succed=True,
+    )
+
+
+def test_sample_with_inherit_and_with_source_dir(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    Test if sample with inherit key and source_dir works
+    """
+
+    project_path = west_workplace_parametrized["project"]
+
+    def west_cmd_fmt(prefix):
+        return (
+            f"build samples/settings -- -DCONF_FILE={prefix}conf/common.conf"
+            f' -DOVERLAY_CONFIG="{prefix}conf/debug.conf"'
+        )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        "build -s samples/settings",
+        expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
+        should_succed=True,
+    )
+
+
+def test_sample_with_inherit_and_with_source_dir_and_board(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    Test if sample with inherit key and source_dir works, when there is board involved.
+    """
+
+    project_path = west_workplace_parametrized["project"]
+
+    def west_cmd_fmt(prefix):
+        return (
+            "build -b nrf52840dk_nrf52840 samples/settings --"
+            f" -DCONF_FILE={prefix}conf/common.conf"
+            " -DOVERLAY_CONFIG="
+            f'"{prefix}conf/nrf52840dk_nrf52840.conf;{prefix}conf/debug.conf"'
+        )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        "build -s samples/settings -b nrf52840dk_nrf52840",
+        expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
         should_succed=True,
     )

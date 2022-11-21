@@ -34,17 +34,17 @@ def clean(east):
 )
 @click.option("-t", "--target", type=str, help="Run this build system target.")
 # @click.argument("cmake-args", nargs=-1, type=str, metavar="-- [cmake-args]")
-# @click.option(
-#     "-s",
-#     "--source-dir",
-#     type=str,
-#     help=(
-#         "Relative path to a directory that should be used as source instead of the"
-#         " current one."
-#     ),
-# )
+@click.option(
+    "-s",
+    "--source-dir",
+    type=str,
+    help=(
+        "Relative path to a directory that should be used as application source"
+        " directory."
+    ),
+)
 @click.pass_obj
-def build(east, board, build_type, build_dir, target):
+def build(east, board, build_type, build_dir, target, source_dir):
     """
     Build firmware in current directory.
 
@@ -78,9 +78,8 @@ def build(east, board, build_type, build_dir, target):
         build_cmd += f" -d {build_dir}"
     if target:
         build_cmd += f" -t {target}"
-    # with build_type flag
-    # if source_dir:
-    #     build_cmd += f" {source_dir}"
+    if source_dir:
+        build_cmd += f" {source_dir}"
 
     # WARN: cmake args are making some problems in this form.
 
@@ -90,7 +89,11 @@ def build(east, board, build_type, build_dir, target):
     # Locate east yaml
     # Get possible
     build_type_args = construct_extra_cmake_arguments(
-        east, build_type, board, build_dir
+        east,
+        build_type,
+        board,
+        build_dir,
+        source_dir,
     )
 
     if build_type_args:
