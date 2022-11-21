@@ -4,7 +4,7 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 import requests
 import yaml
@@ -39,6 +39,18 @@ progress = Progress(
     "•",
     TransferSpeedColumn(),
 )
+
+
+class WestDirNotFound(RuntimeError):
+    """Neither the current directory nor any parent has a west workspace."""
+
+
+class WestConfigNotFound(RuntimeError):
+    """.west/config file does not exist."""
+
+
+class WestYmlNotFound(RuntimeError):
+    """west.yml file does not exist."""
 
 
 def check_python_version(east):
@@ -83,7 +95,7 @@ def download_file(task_id: TaskID, url: str, path: str):
 
 
 def download_files(urls: List[str], dest_dir: str) -> List[str]:
-    """Download concurently multiple files from the internet to the given directory.
+    """Download concurrently multiple files from the internet to the given directory.
 
     Function expects a list of urls that point to the files.
 
@@ -121,10 +133,6 @@ def download_files(urls: List[str], dest_dir: str) -> List[str]:
     return file_paths
 
 
-class WestDirNotFound(RuntimeError):
-    """Neither the current directory nor any parent has a west workspace."""
-
-
 def west_topdir(start: Optional[PathType] = None) -> str:
     """
     Returns the path to the parent directory of the .west/
@@ -152,45 +160,76 @@ def west_topdir(start: Optional[PathType] = None) -> str:
         cur_dir = parent_dir
 
 
-def get_ncs_version(west_dir_path: str) -> str:
+def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     """
-    Opens `west.yaml` file inside the project and reads the revision string for nrf-sdk
-    project.
+    Returns version of nrf-sdk project and absolute path to the projects directory.
 
-    To find the location of west.yaml file it first needs to open .west/config file and
-    determine the path.
+    This is combined, so we avoid reading .west/config file twice.
 
     Args:
         west_dir_path (str):        Path to the parent of .west directory. It is up to
                                     the caller to provide a correct value.
 
     Returns:
-        Revision string of nrf-sdk project.
+        Revision string of nrf-sdk project, absolute
+
+    Raises
+        WestConfigNotFound or WestYamlNotFound
     """
 
     config = ConfigParser()
-    config.read(os.path.join(west_dir_path, ".west", "config"))
+    config_path = os.path.join(west_dir_path, ".west", "config")
+
+    # ".west/config file could not exist, in that case we should raise an exception"
+    if not os.path.isfile(config_path):
+        raise WestConfigNotFound(".west/conifg file does not exists.")
+
+    config.read(config_path)
 
     # Get path to west.yaml file
-    west_yaml = os.path.join(
-        west_dir_path, config["manifest"]["path"], config["manifest"]["file"]
-    )
+    project_path = os.path.join(west_dir_path, config["manifest"]["path"])
+    west_yaml = os.path.join(project_path, config["manifest"]["file"])
 
+    if not os.path.isfile(west_yaml):
+        raise WestYmlNotFound("No west.yml was found ")
+
+    # Get ncs version
     with open(west_yaml, "r") as file:
-        projects = yaml.safe_load(file)["manifest"]["projects"]
+        manifest = yaml.safe_load(file)["manifest"]
 
-    ncs = list(filter(lambda project: project["repo-path"] == "sdk-nrf", projects))
-    return ncs[0]["revision"]
+    try:
+        ncs = list(
+            filter(
+                lambda project: project["repo-path"] == "sdk-nrf", manifest["projects"]
+            )
+        )
+    except KeyError:
+        # This can happen in the case where there is no sdk-nrf repo in the west yaml
+        # file, project is probably using ordinary Zephyr.
+        return None, project_path
+
+    return (ncs[0]["revision"], project_path)
 
 
-no_toolchain_manager_msg = """[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!
+def return_dict_on_match(array_of_dicts, key, value):
+    """
+    Search through array of dicts and return the first one where the given key matches
+    the given value.
+    If none are found return None.
+    """
+    return next((item for item in array_of_dicts if item.get(key) == value), None)
+
+
+no_toolchain_manager_msg = """
+[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!
 
 To install it run:
 
 \t[italic bold blue]east sys-setup
 """
 
-not_in_west_workspace_msg = """[bold yellow]West workspace[/] was [bold red]not found![/]
+not_in_west_workspace_msg = """
+[bold yellow]West workspace[/] was [bold red]not found![/]
 
 This command can only be run [bold]inside[/] of a [bold yellow]West workspace[/].
 """
@@ -212,7 +251,7 @@ def ncs_version_not_supported_msg(east, supported_versions):
 
     return (
         f"[bold]East[/] detected [bold]{east.detected_ncs_version}[/] [bold cyan]NCS[/]"
-        " version which is currently [bold red]not supported[/] by the Nordics's"
+        " version which is currently [bold red]not supported[/] by the Nordic's"
         " Toolchain manager.\n\nSupported versions are: \n"
         + vers
         + "\n\nThis means that you need to manually install the [bold cyan]NCS[/]"

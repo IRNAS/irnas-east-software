@@ -6,14 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.4.0] - 2022-11-21
+
+### Added
+
+-   Support for --build-type option for build command. The use of this option is
+    documented in detail in "docs/configuration.md". --build-type option was
+    tested exhaustively with unit tests and various test fixtures with pytest. The
+    tests can be found in tests folder.
+-   Projects using east tool from now on need east.yml file in the root directory.
+    See above mentioned document.
+
+### Fixed
+
+-   Error code propagation through Nordic's Toolchain Manager.
+
 ## [0.3.0] - 2022-10-05
 
 ### Added
 
 -   _bypass_ command, which can take any set of arguments that west command
     supports and pass them directly to west tool.
--   _util connect_ and _util rtt_ commands. With first you connect to the
-    device, with second you can observe RTT logs while connected.
+-   _util connect_ and _util rtt_ commands. With first you connect to the device,
+    with second you can observe RTT logs while connected.
 -   _build_ and _flash_ commands now support extra positional arguments after
     double dash `--`. Run them with --help string to learn what do they do.
 
@@ -56,7 +71,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.4.0...HEAD
+
+[0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 

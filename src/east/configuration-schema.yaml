@@ -1,0 +1,60 @@
+type: map
+mapping:
+  apps:
+    # app key is required, it needs to be a sequence
+    required: true
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          name:
+            required: true
+            type: str
+
+          west-boards:
+            required: true
+            type: seq
+            sequence:
+              - type: str
+
+          build-types:
+            required: true
+            type: seq
+            sequence:
+              - type: map
+                mapping:
+                  # This `type` is actual key in the east.yaml
+                  type:
+                    type: str
+                  conf-files:
+                    required: false
+                    type: seq
+                    sequence:
+                      - type: str
+
+  samples:
+    # samples key is optional, but it needs to be a sequence
+    required: false
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          name:
+            required: true
+            type: str
+
+          west-boards:
+            required: true
+            type: seq
+            sequence:
+              - type: str
+
+          inherit-build-type:
+            required: false
+            type: map
+            mapping:
+              app:
+                type: str
+              build-type:
+                type: str
+

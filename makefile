@@ -4,6 +4,11 @@ install:
 install-dev:
 	@pip install --editable ".[dev]"
 
+# With -s option the printf's are actually printed, otherwise they are
+# sileneced.
+test:
+	pytest -s
+
 build:
 	@python3 -m build
 

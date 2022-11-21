@@ -4,15 +4,17 @@ import subprocess
 import sys
 from shutil import which
 
-import click
 from rich.console import Console
 from rich.markdown import Markdown
 from rich_click import RichCommand, RichGroup
 
-from .constants import EAST_DIR, NRF_TOOLCHAIN_MANAGER_PATH
+from .constants import const_paths
+from .east_yml import EastYmlLoadError, format_east_yml_load_error_msg, load_east_yml
 from .helper_functions import (
+    WestConfigNotFound,
     WestDirNotFound,
-    get_ncs_version,
+    WestYmlNotFound,
+    get_ncs_and_project_dir,
     ncs_version_not_supported_msg,
     no_toolchain_manager_msg,
     no_toolchain_msg,
@@ -20,8 +22,11 @@ from .helper_functions import (
     west_topdir,
 )
 
+# Needs to be exposed like this so it can be set to False in tests.
+RICH_CONSOLE_ENABLE_MARKUP = True
+
 """
-Conveniece dicts for storing settings that are indentical across Click's commands and
+Convenience dicts for storing settings that are indentical across Click's commands and
 groups.
 """
 east_command_settings = {
@@ -58,21 +63,26 @@ class EastContext:
         # do not count.
         self.cwd = os.getcwd()
         self.echo = echo
+        self.consts = const_paths
 
-        # Create EAST_DIR and its parents if they do not exists
-        os.makedirs(EAST_DIR, exist_ok=True)
+        # Create EAST_DIR and its parents, if they do not exists
+        os.makedirs(self.consts["east_dir"], exist_ok=True)
 
-        self.console = Console(width=80)
+        self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
         self.ncs_version_installed = False
         self.ncs_version_supported = False
+        self.east_yml = None
 
         try:
             self.west_dir_path = west_topdir()
-            self.detected_ncs_version = get_ncs_version(self.west_dir_path)
+            self.detected_ncs_version, self.project_dir = get_ncs_and_project_dir(
+                self.west_dir_path
+            )
 
-        except WestDirNotFound:
+        except (WestDirNotFound, WestConfigNotFound, WestYmlNotFound):
             self.west_dir_path = None
             self.detected_ncs_version = None
+            self.project_dir = None
 
     def print(self, *objects, **kwargs):
         """Prints to the console.
@@ -202,24 +212,26 @@ class EastContext:
         directly.
 
         Args:
-            west_command (str):    west command to execute
-            kwargs:                     Anything that is supported by .run method
+            west_command (str):     west command to execute
+            kwargs:                 Anything that is supported by .run method
 
         Returns:
             Check .run
         """
+
+        cmd = f"west {west_command}"
+
         if self.ncs_version_installed:
-            self.run_manager(
-                f"launch --ncs-version {self.detected_ncs_version} -- west"
-                f" {west_command}",
-                **kwargs,
-            )
+            # Run west command as arbitary command through manager
+            return self._run_arbi_manager(cmd, **kwargs)
         else:
-            self.run(f"west {west_command}", **kwargs)
+            return self.run(cmd, **kwargs)
 
     def run_manager(self, command, **kwargs) -> str:
-        """Run wrapper which should be used when executing commands with Nordic's
-        Toolchain manager executable.
+        """Executes a command with Nordic's Toolchain manager executable.
+
+        This is not suitable to be used with a type of a 'launch -- <command>' command.
+        For that _run_arbi_manager should be used.
 
         Args:
             manager_command (str):      Manager command to execute
@@ -228,8 +240,61 @@ class EastContext:
         Returns:
             Check .run
         """
+        cmd = f"{self.consts['nrf_toolchain_manager_path']} {command}"
 
-        return self.run(f"{NRF_TOOLCHAIN_MANAGER_PATH} " + command, **kwargs)
+        return self.run(cmd, **kwargs)
+
+    def _run_arbi_manager(self, arbitary_command: str, **kwargs):
+        """Run an arbitary command through Nordic's Toolchain Manager
+
+        This method should be used when passing any arbitary command, like west command.
+
+        To properly execute an arbitary command and propagate its return code to the
+        caller we have do a bit of a bash shell dancing, as Nordic's Toolchain Manager
+        does not do this for some commands (if west build fails then return code is not
+        propagated, but issuing non-existing command does propagate up).
+
+        What we do is that we run as a total arbitary command following:
+
+            bash -c '{arbitary_command} && touch success.txt'
+
+        if arbitary_command inside it fails, then `touch success.txt` is not executed.
+
+        So we are checking for success.txt file after every call and exit if it does not
+        exist.
+
+        We also need to be carefull what quotes are we using.
+
+        Args:
+            arbitary_command (str):
+            **kwargs:
+        """
+
+        arbitary_command = arbitary_command.replace("'", '"')
+
+        cmd = (
+            f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
+            f" {self.detected_ncs_version} -- bash -c '{arbitary_command} "
+            "&& touch success.txt'"
+        )
+
+        # Clean any success.txt file from before
+        try:
+            os.remove("success.txt")
+        except FileNotFoundError:
+            pass
+
+        result = self.run(cmd, **kwargs)
+
+        if not os.path.isfile("success.txt"):
+            self.exit()
+
+        try:
+            os.remove("success.txt")
+        except FileNotFoundError:
+            pass
+
+        return result
 
     def check_exe(self, exe: str, on_fail_exit: bool = False) -> bool:
         """
@@ -276,6 +341,8 @@ class EastContext:
         A list of checks that every workspace command should call before executing its
         actual command.
 
+        This command will also load the east.yml file if it is found.
+
 
         Args:
             self.(self.ontext):             self.context for printing and exiting
@@ -298,8 +365,15 @@ class EastContext:
             self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
 
+        # Exit if east.yml is not present in the project dir
+        try:
+            self.east_yml = load_east_yml(self.project_dir)
+        except EastYmlLoadError as msg:
+            self.print(format_east_yml_load_error_msg(msg), highlight=False)
+            self.exit()
+
         # Exit if manager is not installed
-        if not self.check_exe(NRF_TOOLCHAIN_MANAGER_PATH):
+        if not self.check_exe(self.consts["nrf_toolchain_manager_path"]):
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
