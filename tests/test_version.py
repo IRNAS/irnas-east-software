@@ -9,4 +9,7 @@ def test_version():
     result = runner.invoke(cli, ["--version"])
     assert result.exit_code == 0
 
-    assert get_version(version_scheme="post-release") in result.output
+    assert (
+        get_version(version_scheme="post-release", local_scheme="no-local-version")
+        in result.output
+    )
