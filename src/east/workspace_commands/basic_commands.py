@@ -186,6 +186,17 @@ def bypass(east, args):
     """
     east.pre_workspace_command_check()
 
-    if args:
-        cmd = f"{' '.join(args)} "
-        east.run_west(cmd)
+    if not args:
+        east.exit()
+
+    # Click argument automatically strips double quotes from anything that is given
+    # after "--". Double quotes are needed if specifying define values (-D) to the cmake
+    # args, below list comprehension adds them back.
+    def add_back_double_quotes(arg):
+        splited = arg.split("=")
+        return f'{splited[0]}="{splited[1]}"'
+
+    args = [add_back_double_quotes(arg) if "=" in arg else arg for arg in args]
+
+    cmd = f"{' '.join(args)} "
+    east.run_west(cmd)
