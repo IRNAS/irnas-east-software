@@ -79,6 +79,24 @@ def helper_test_against_west_run1(
     print(result.output)
 
 
+def test_build_type_with_no_east_yml(west_workplace_parametrized, monkeypatch):
+    """
+    --build-type option can not be used if east.yml is not found in the project root.
+    East needs to exit with error and message.
+    """
+
+    os.remove("east.yml")
+
+    monkeypatch.chdir(west_workplace_parametrized["app"])
+    runner = CliRunner()
+
+    east_cmd = "build --build-type debug".split(" ")
+
+    # Call from the project root
+    result = runner.invoke(cli, east_cmd)
+    assert result.exit_code == 1
+
+
 # if in project but not in app or samples then --build-type should not be given,
 # we are assuming that user might be trying to run build on tests or zephyr's samples or
 # something else

@@ -20,7 +20,15 @@ def clean(east):
 
 @click.command(**east_command_settings)
 @click.option("-b", "--board", type=str, help="West board to build for.")
-@click.option("-u", "--build-type", type=str, help="Which build type to use.")
+@click.option(
+    "-u",
+    "--build-type",
+    type=str,
+    help=(
+        "Which build type (a group of [bold]Kconfig[/] fragment files) to use. Requires"
+        " [bold yellow]east.yml[/] with possible build types."
+    ),
+)
 @click.option(
     "-d",
     "--build-dir",
@@ -71,9 +79,6 @@ def build(east, board, build_type, build_dir, target, source_dir):
 
     if board:
         build_cmd += f" -b {board}"
-    # TODO: Add back build_dir, source_dir and cmake_args options once you make them
-    # compatible
-
     if build_dir:
         build_cmd += f" -d {build_dir}"
     if target:

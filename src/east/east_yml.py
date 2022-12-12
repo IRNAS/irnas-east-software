@@ -10,15 +10,6 @@ class EastYmlLoadError(RuntimeError):
     """Some error happened when trying to load east.yml."""
 
 
-east_yml_load_error_msg = """
-[bold yellow]east.yml[/] was [bold red]not found[/] in the project's root directory!
-
-See documentation on how to create it.
-"""
-# TODO: Provide a better help string, by recommending east help config command, when it
-# is implemented
-
-
 def format_east_yml_load_error_msg(exception_msg):
     """Use this to format error messages that happen when trying to load east.yml"""
     return (
@@ -28,10 +19,19 @@ def format_east_yml_load_error_msg(exception_msg):
 
 
 def load_east_yml(project_dir: str):
+    """Try to load east.yml. If that succeds validate it.
+
+        project_dir (str): Path to project directory, where east.yml should be located.
+
+    Returns:
+        dict with east.yml contents if east.yml is found and correctly validated. If it
+        can not be found it returns None.
+
+    """
     east_yml = os.path.join(project_dir, "east.yml")
 
     if not os.path.isfile(east_yml):
-        raise EastYmlLoadError(east_yml_load_error_msg)
+        return None
 
     # Validate yaml
     schema_yml = os.path.join(os.path.dirname(__file__), "configuration-schema.yaml")

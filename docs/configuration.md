@@ -2,7 +2,7 @@
 
 The `east` tool provides a way to specify the project-specific configuration.
 The configuration is done with an `east.yml` file, which needs to be placed in
-the _root directory_ of the repo.
+the _root directory_ of the repository.
 
 Currently, the configuration is required for:
 
@@ -10,8 +10,12 @@ Currently, the configuration is required for:
   through `--build-type` option which can be given to the `east build` command,
 - specifying binary assets that will be created with the `east release` command.
 
-This document describes the required fields of the `east.yml` file, how to use
-_build-types_ and how to set up the project using the `east release` command.
+`east.yml file` is optional; Users do not need to create to use `east`, however
+it that case the above two mentioned functionalities will not work.
+
+This document describes the expected contents of the `east.yml` file, what are
+_build-types_, how to use them and how to specify binary assets for the
+`east release` command.
 
 ## General structure of the configuration file
 
@@ -22,8 +26,8 @@ _build-types_ and how to set up the project using the `east release` command.
 - `samples` - lists **one** or **more** samples which can inherit configurations
   from applications.
 
-Below is an example file with comments that can be copied into a project and
-modified:
+Below is an example of `east.yml` with comments that can be copied into a
+project and modified:
 
 ```yaml
 apps:

@@ -103,9 +103,12 @@ def _construct_previous_cmake_args(build_dir: str) -> str:
     return cmake_args
 
 
+build_type_misuse_no_east_yml_msg = """
+[bold yellow]east.yml[/] not found in project's root directory, option [bold
+cyan]-/u--build-type[/] needs it to determine [bold]Kconfig[/] overlay files, exiting!"""
+
 build_type_misuse_msg = """
-\nOption [bold cyan]--build-type[/] can be only given inside of the app, exiting!
-"""
+Option [bold cyan]--build-type[/] can only be used inside of the application folder, exiting!"""
 
 
 def no_build_type_msg(build_type):
@@ -138,6 +141,16 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
 
     Returns:  String that should be placed after `--`
     """
+    try:
+        app_array = east.east_yml["apps"]
+        sample_array = east.east_yml["samples"]
+    except TypeError:
+        if not build_type:
+            return ""
+        else:
+            east.print(build_type_misuse_no_east_yml_msg)
+            east.exit()
+
     # Modify current working dir, if source_dir is used, rstrip is needed cause
     # path.join adds one "/" if joning empty string.
     source_dir = source_dir if source_dir else ""
@@ -149,8 +162,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     relpath = os.path.relpath(cwd, start=east.project_dir)
     inside_app = "app" in relpath
     inside_sample = "samples" in relpath
-    app_array = east.east_yml["apps"]
-    sample_array = east.east_yml["samples"]
+
     if board:
         # Sanitize the board input, user might give hv version
         board = board.split("@")[0]
