@@ -1,3 +1,6 @@
+import os
+import shutil as sh
+
 import click
 
 from ..east_context import east_command_settings
@@ -68,7 +71,7 @@ def build(east, board, build_type, build_dir, target, source_dir):
     For additional info see chapter [bold]Building, Flashing and Debugging[/], section
     [bold]One-Time CMake Arguments[/].
 
-
+    \n\n[bold]Note:[/] This command will, after build step, copy [bold]compile_commands.json[/], if found, from the build directory to the project directory. This makes job of locating this file easier for [bold yellow]clangd[/].
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -106,6 +109,12 @@ def build(east, board, build_type, build_dir, target, source_dir):
 
     # Determine conf files depending on the build type
     east.run_west(build_cmd)
+
+    compile_file = os.path.join("build", "compile_commands.json")
+    if os.path.isfile(compile_file):
+        sh.copyfile(
+            compile_file, os.path.join(east.project_dir, "compile_commands.json")
+        )
 
 
 @click.command(**east_command_settings)
