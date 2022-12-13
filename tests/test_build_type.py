@@ -79,6 +79,24 @@ def helper_test_against_west_run1(
     print(result.output)
 
 
+def test_build_type_with_no_east_yml(west_workplace_parametrized, monkeypatch):
+    """
+    --build-type option can not be used if east.yml is not found in the project root.
+    East needs to exit with error and message.
+    """
+
+    os.remove("east.yml")
+
+    monkeypatch.chdir(west_workplace_parametrized["app"])
+    runner = CliRunner()
+
+    east_cmd = "build --build-type debug".split(" ")
+
+    # Call from the project root
+    result = runner.invoke(cli, east_cmd)
+    assert result.exit_code == 1
+
+
 # if in project but not in app or samples then --build-type should not be given,
 # we are assuming that user might be trying to run build on tests or zephyr's samples or
 # something else
@@ -756,7 +774,6 @@ def test_different_build_dir_path_full_dir_different_build_type(
     )
 
 
-# @pytest.mark.parametrize("app_path", [, "app/test_two"])
 @pytest.mark.parametrize(
     "east_cmd, expected_west_cmd",
     [
@@ -871,5 +888,170 @@ def test_sample_with_inherit_and_with_source_dir_and_board(
         project_path,
         "build -s samples/settings -b nrf52840dk_nrf52840",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
+        should_succed=True,
+    )
+
+
+east_yaml_no_apps_key = """
+samples:
+  - name: settings
+    west-boards:
+      - custom_nrf52840dk
+"""
+
+
+def test_no_apps_key_in_east_yml_build_type(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    Apps key is optional.
+    Running east build with no apps key in east.yml should fail if --build-type is
+    given.
+    """
+
+    helpers.create_and_write(
+        west_workplace_parametrized["project"],
+        "east.yml",
+        east_yaml_no_apps_key,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["app"],
+        "build --build-type debug",
+        should_succed=False,
+    )
+
+
+def test_no_apps_key_in_east_yml_app(west_workplace_parametrized, monkeypatch, mocker):
+    """
+    Apps key is optional.
+    Running east build with no apps key in east.yml and building for app should not emit
+    any extra cmake args.
+    """
+
+    helpers.create_and_write(
+        west_workplace_parametrized["project"],
+        "east.yml",
+        east_yaml_no_apps_key,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["app"],
+        "build --build-type debug",
+        should_succed=False,
+    )
+
+
+def test_no_apps_key_in_east_yml_sample(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    Apps key is optional.
+    Running east build with no apps key in east.yml should not emit any extra cmake
+    args.
+    """
+
+    helpers.create_and_write(
+        west_workplace_parametrized["project"],
+        "east.yml",
+        east_yaml_no_apps_key,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        os.path.join(west_workplace_parametrized["project"], "samples", "settings"),
+        "build",
+        "build",
+        should_succed=True,
+    )
+
+
+east_yaml_no_samples_key = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+"""
+
+
+def test_no_samples_key_in_east_yml(west_workplace_parametrized, monkeypatch, mocker):
+    """
+    Samples key is optional.
+    Running east build with no samples key in east.yml in samples should not emit any
+    extra args.
+    """
+
+    helpers.create_and_write(
+        west_workplace_parametrized["project"],
+        "east.yml",
+        east_yaml_no_samples_key,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        os.path.join(west_workplace_parametrized["project"], "samples", "settings"),
+        "build",
+        "build",
+        should_succed=True,
+    )
+
+
+east_yaml_empty_apps_key = """
+apps:
+"""
+
+
+def test_empty_apps_key(west_workplace_parametrized, monkeypatch, mocker):
+    """
+    Empty apps key is not allowed.
+    """
+
+    helpers.create_and_write(
+        west_workplace_parametrized["project"],
+        "east.yml",
+        east_yaml_empty_apps_key,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["app"],
+        "build",
+        should_succed=False,
+    )
+
+
+@pytest.mark.parametrize(
+    "build_path",
+    [
+        "project",
+        "test",
+    ],
+)
+def test_building_outside_of_app_and_samples(
+    west_workplace_parametrized, build_path, monkeypatch, mocker
+):
+    """
+    Empty apps key is not allowed, and samples can not inherit from it.
+    """
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized[build_path],
+        "build -b native_posix",
+        "build -b native_posix",
         should_succed=True,
     )

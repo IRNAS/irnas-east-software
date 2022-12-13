@@ -180,6 +180,8 @@ def _create_good_west_workspace(west_top_dir):
     os.mkdir(os.path.join(west_top_dir, "project/samples"))
     os.mkdir(os.path.join(west_top_dir, "project/samples/settings"))
     os.mkdir(os.path.join(west_top_dir, "project/samples/dfu"))
+    os.mkdir(os.path.join(west_top_dir, "project/tests"))
+    os.mkdir(os.path.join(west_top_dir, "project/tests/basic"))
     os.mkdir(os.path.join(west_top_dir, "zephyr"))
 
     create_and_write(west_top_dir, ".west/config", west_config_content)

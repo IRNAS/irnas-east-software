@@ -10,15 +10,6 @@ class EastYmlLoadError(RuntimeError):
     """Some error happened when trying to load east.yml."""
 
 
-east_yml_load_error_msg = """
-[bold yellow]east.yml[/] was [bold red]not found[/] in the project's root directory!
-
-See documentation on how to create it.
-"""
-# TODO: Provide a better help string, by recommending east help config command, when it
-# is implemented
-
-
 def format_east_yml_load_error_msg(exception_msg):
     """Use this to format error messages that happen when trying to load east.yml"""
     return (
@@ -28,10 +19,19 @@ def format_east_yml_load_error_msg(exception_msg):
 
 
 def load_east_yml(project_dir: str):
+    """Try to load east.yml. If that succeds validate it.
+
+        project_dir (str): Path to project directory, where east.yml should be located.
+
+    Returns:
+        dict with east.yml contents if east.yml is found and correctly validated. If it
+        can not be found it returns None.
+
+    """
     east_yml = os.path.join(project_dir, "east.yml")
 
     if not os.path.isfile(east_yml):
-        raise EastYmlLoadError(east_yml_load_error_msg)
+        return None
 
     # Validate yaml
     schema_yml = os.path.join(os.path.dirname(__file__), "configuration-schema.yaml")
@@ -55,29 +55,52 @@ def load_east_yml(project_dir: str):
                 " in [bold]east.yml[/]!"
             )
 
-    check_duplicated_entries(east_yml["apps"], "apps", "name")
-    check_duplicated_entries(east_yml["samples"], "samples", "name")
-    for app in east_yml["apps"]:
-        check_duplicated_entries(
-            app["build-types"], f"{app['name']}.build-types", "type"
+    # This is needed to discern between apps key present, apps key present, but not set
+    # and not app key at all.
+    apps = east_yml.get("apps", -1)
+
+    # apps are optional
+    if apps is not None and apps != -1:
+        check_duplicated_entries(east_yml["apps"], "apps", "name")
+        for app in east_yml["apps"]:
+            check_duplicated_entries(
+                app["build-types"], f"{app['name']}.build-types", "type"
+            )
+
+    if apps is None:
+        # Exists, but it was not set
+        raise EastYmlLoadError(
+            "[bold]apps[/] key in [bold yellow]east.yml[/] has no apps listed under it!"
         )
 
-    # For each sample that has inherit key check if that app with that build type exists
-    for sample in east_yml["samples"]:
-        if "inherit-build-type" in sample:
-            inherited_app = sample["inherit-build-type"]["app"]
-            inherited_type = sample["inherit-build-type"]["build-type"]
+    # samples are optional
+    if east_yml.get("samples"):
+        check_duplicated_entries(east_yml["samples"], "samples", "name")
+        # For each sample that has inherit key check if that app with that build type
+        # exists
+        for sample in east_yml["samples"]:
+            if "inherit-build-type" in sample:
+                # Inherit needs apps
+                if not east_yml.get("apps"):
+                    raise EastYmlLoadError(
+                        f"Sample [bold]{sample['name']}[/] is trying to inherit, but"
+                        " there are no apps to inherit from!"
+                    )
 
-            app = return_dict_on_match(east_yml["apps"], "name", inherited_app)
-            if not app:
-                raise EastYmlLoadError(
-                    f"Sample [bold]{sample['name']}[/] is trying to inherit from a"
-                    f" [bold red]non-existing[/] app [bold]{inherited_app}[/]."
-                )
-            if not return_dict_on_match(app["build-types"], "type", inherited_type):
-                raise EastYmlLoadError(
-                    f"Sample [bold]{sample['name']}[/] is trying to inherit from a"
-                    f" [bold red]non-existing[/] build-type [bold]{inherited_type}[/]."
-                )
+                inherited_app = sample["inherit-build-type"]["app"]
+                inherited_type = sample["inherit-build-type"]["build-type"]
+
+                app = return_dict_on_match(east_yml["apps"], "name", inherited_app)
+                if not app:
+                    raise EastYmlLoadError(
+                        f"Sample [bold]{sample['name']}[/] is trying to inherit from a"
+                        f" [bold red]non-existing[/] app [bold]{inherited_app}[/]."
+                    )
+                if not return_dict_on_match(app["build-types"], "type", inherited_type):
+                    raise EastYmlLoadError(
+                        f"Sample [bold]{sample['name']}[/] is trying to inherit from a"
+                        " [bold red]non-existing[/] build-type"
+                        f" [bold]{inherited_type}[/]."
+                    )
 
     return east_yml

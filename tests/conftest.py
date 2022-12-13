@@ -154,6 +154,7 @@ def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
     project_path = west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
 
     app_path = os.path.join(project_path, "app")
+    test_path = os.path.join(project_path, "tests", "basic")
     prefix_path = "../../app/"
 
     if request.param == "multi":
@@ -161,4 +162,9 @@ def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
         app_path = os.path.join(project_path, "app", "test_one")
         prefix_path = "../../app/test_one/"
 
-    return {"project": project_path, "app": app_path, "prefix": prefix_path}
+    return {
+        "project": project_path,
+        "app": app_path,
+        "prefix": prefix_path,
+        "test": test_path,
+    }

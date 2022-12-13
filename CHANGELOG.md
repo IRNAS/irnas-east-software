@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.5.0] - 2022-12-13
+
+### Added
+
+-   Command _east build_ will now after every build step copy
+    `compile_commands.json`, if found, from the build directory to the project
+    directory. This makes job of locating this file easier for clangd. Help
+    description for _east build_ was updated to reflect that.
+
+### Changed
+
+-   Make east.yml optional for everything, except for the usage of east build
+    command with --build-type option.
+-   Make apps key and samples key inside east.yml optional. This is useful for
+    driver projects, which do not need apps, or any project that might not have
+    samples.
+
+### Fixed
+
+-   Properly handle _east build_ commands outside of applications and samples.
+    This means that running _east build_ command will default to plain west
+    behaviour, as it should.
+
 ## [0.4.0] - 2022-11-21
 
 ### Added
@@ -71,7 +94,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.5.0...HEAD
+
+[0.5.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.4.0...v0.5.0
 
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 

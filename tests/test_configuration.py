@@ -5,7 +5,7 @@ from click.testing import CliRunner
 
 from east.__main__ import cli
 from east.east_context import EastContext
-from east.east_yml import east_yml_load_error_msg, format_east_yml_load_error_msg
+from east.east_yml import format_east_yml_load_error_msg
 
 from . import helpers
 
@@ -65,28 +65,3 @@ def test_no_west_yaml_west_workplace(west_workplace_parametrized):
 
     east = EastContext()
     assert_all_is_none(east, project_path)
-
-
-list_of_workspace_commands = [
-    "build",
-    "flash",
-    "clean",
-    "bypass",
-    "release",
-]
-
-
-@pytest.mark.parametrize("workspace_command", list_of_workspace_commands)
-def test_no_east_yaml_west_workplace(west_workplace_parametrized, workspace_command):
-    project_path = west_workplace_parametrized["project"]
-    os.remove(os.path.join(project_path, "east.yml"))
-
-    # Detection of east.yml needs to be done in every west_workplace command, clean is
-    # used here as an example
-    runner = CliRunner()
-    result = runner.invoke(cli, [workspace_command])
-
-    assert result.exit_code == 1
-    helpers.assert_strings_equal(
-        result.output, format_east_yml_load_error_msg(east_yml_load_error_msg)
-    )
