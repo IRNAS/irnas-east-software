@@ -44,14 +44,20 @@ def _construct_required_cmake_args(
     # We always use common.conf
     cmake_args = f"-DCONF_FILE={prefix}conf/common.conf"
 
-    # Location of the board file depends on the source_dir and prefix
-    board_prefix = f"{source_dir}/{prefix}" if source_dir else f"{prefix}"
-    board_conf = f"{board_prefix}conf/{board}.conf"
-
     overlay_configs = []
-    # If a west board config file exists then add it first
-    if os.path.isfile(board_conf):
-        overlay_configs.append(f"{board}.conf")
+
+    # If a west board is given search for board specific config file and add it to the
+    # the start of overlay_configs, if it is found.
+    if board:
+        # Sanitize the board input, user might gave hv version
+        board = board.split("@")[0]
+
+        # Location of the board file depends on the source_dir and prefix
+        board_prefix = f"{source_dir}/{prefix}" if source_dir else f"{prefix}"
+        board_conf = f"{board_prefix}conf/{board}.conf"
+
+        if os.path.isfile(board_conf):
+            overlay_configs.append(f"{board}.conf")
 
     # Then add conf_files if there are any
     overlay_configs += conf_files
@@ -110,6 +116,10 @@ cyan]-/u--build-type[/] needs it to determine [bold]Kconfig[/] overlay files, ex
 build_type_misuse_msg = """
 Option [bold cyan]--build-type[/] can only be used inside of the application folder, exiting!"""
 
+build_type_misuse_no_app_msg = """
+Option [bold cyan]--build-type[/] can only be used when apps key in [bold yellow]east.yml[/] has atleast one
+application entry!"""
+
 
 def no_build_type_msg(build_type):
     return (
@@ -141,11 +151,11 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
 
     Returns:  String that should be placed after `--`
     """
-    try:
-        app_array = east.east_yml["apps"]
-        sample_array = east.east_yml["samples"]
-    except TypeError:
+
+    if not east.east_yml:
         if not build_type:
+            # east.yml is optional, if it is not present present then default to plain
+            # west behaviour: no cmake args
             return ""
         else:
             east.print(build_type_misuse_no_east_yml_msg)
@@ -156,23 +166,40 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     source_dir = source_dir if source_dir else ""
     cwd = os.path.join(east.cwd, source_dir).rstrip("/")
 
-    # Are we inside project_dir and does the relative path contain app/apps or samples
-    # string
-    inside_project_dir = is_child_in_parent(east.project_dir, cwd)
+    # Does the relative path contain app or samples string
     relpath = os.path.relpath(cwd, start=east.project_dir)
     inside_app = "app" in relpath
     inside_sample = "samples" in relpath
 
-    if board:
-        # Sanitize the board input, user might give hv version
-        board = board.split("@")[0]
+    if not inside_app:
+        if build_type:
+            # --build-type can only be given from inside of the project dir
+            # (--source-dir can be given to point to some app), or directly inside app.
+            # Any other location is not allowed.
+            east.print(build_type_misuse_msg)
+            east.exit()
+        if not build_type and not inside_sample:
+            # We are not inside app and not inside sample, no build type was given, we
+            # are default to plain west behaviour: no cmake args.
+            return ""
 
-    if build_type and (not inside_project_dir or not inside_app):
-        east.print(build_type_misuse_msg)
+    # We get past this point if we are inside app or sample.
+
+    # apps field is optional, using build type without that field is however not
+    # allowed.
+    app_array = east.east_yml.get("apps")
+    if build_type and not app_array:
+        east.print(build_type_misuse_no_app_msg)
         east.exit()
 
     # If inside samples determine in which sample are we, get its element
     if inside_sample:
+        # samples key is optional, if it is not present in east_yml then we default to
+        # plain west behaviour: no cmake args
+        sample_array = east.east_yml.get("samples")
+        if not sample_array:
+            return ""
+
         sample_name = os.path.basename(cwd)
         sample_dict = return_dict_on_match(sample_array, "name", sample_name)
 
@@ -192,7 +219,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         else:
             path_prefix = os.path.join(path_to_project_dir, "app", inherited_app)
 
-    else:
+    if inside_app:
         # Determine what kind of project it is, single or multi app
         if len(app_array) == 1:
             app = app_array[0]

@@ -22,9 +22,10 @@ _build-types_, how to use them and how to specify binary assets for the
 `east.yml` contains two main keys:
 
 - `apps` - lists **one** or **more** applications with their own specific
-  configurations.
+  configurations. This key is optional (useful for driver projects).
 - `samples` - lists **one** or **more** samples which can inherit configurations
-  from applications.
+  from applications. This key is optional (for projects that might not need
+  samples).
 
 Below is an example of `east.yml` with comments that can be copied into a
 project and modified:

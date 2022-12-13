@@ -2,7 +2,7 @@ type: map
 mapping:
   apps:
     # app key is required, it needs to be a sequence
-    required: true
+    required: false
     type: seq
     sequence:
       - type: map
@@ -57,4 +57,3 @@ mapping:
                 type: str
               build-type:
                 type: str
-
