@@ -84,6 +84,15 @@ class EastContext:
             self.detected_ncs_version = None
             self.project_dir = None
 
+    def chdir(self, path: str):
+        """Change directory.
+
+        self ():
+        path (str): Relative or absolute path of the directory to change to.
+        """
+        os.chdir(path)
+        self.cwd = os.getcwd()
+
     def print(self, *objects, **kwargs):
         """Prints to the console.
 
