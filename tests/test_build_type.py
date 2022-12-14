@@ -43,10 +43,7 @@ def helper_test_against_west_run(
     else:
         run_west.assert_not_called()
 
-    if should_succed:
-        expected_return_code = 0
-    else:
-        expected_return_code = 1
+    expected_return_code = 0 if should_succed else 1
 
     assert result.exit_code == expected_return_code
     return result

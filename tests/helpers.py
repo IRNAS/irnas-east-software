@@ -1,5 +1,4 @@
 import os
-import shutil
 
 west_config_content = """
 [manifest]
@@ -131,14 +130,14 @@ samples:
 """
 
 
-def create_and_write(path: str, filename: str, content: str):
+def create_and_write(path: str, filename: str, content: str = None):
     """Create a file in the given path with the given content.
 
     Args:
         path (str):         Path from where to create the filename
         filename (str):     Filename can be either a direct file name such as a file.txt
                             or a longer path, such as dir_a/dir_b/file.txt
-        content (str):      Content that will be written.
+        content (str):      File content to write. If None, nothing is written.
 
     """
     filepath = os.path.join(path, filename)
@@ -146,23 +145,8 @@ def create_and_write(path: str, filename: str, content: str):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
     with open(filepath, "w", encoding="utf-8") as f:
-        f.write(content)
-
-
-def _delete_all_in(path: str):
-    """Deletes all files in given path.
-
-    path (str):
-    """
-    for filename in os.listdir(path):
-        file_path = os.path.join(path, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print("Failed to delete %s. Reason: %s" % (file_path, e))
+        if content:
+            f.write(content)
 
 
 dummy_config = """
@@ -175,14 +159,16 @@ def _create_good_west_workspace(west_top_dir):
     Main function, which will create correct west workspace. All other 'bad'
     functions will just delete from it.
     """
-    os.mkdir(os.path.join(west_top_dir, "project"))
-    os.mkdir(os.path.join(west_top_dir, "project/app"))
-    os.mkdir(os.path.join(west_top_dir, "project/samples"))
-    os.mkdir(os.path.join(west_top_dir, "project/samples/settings"))
-    os.mkdir(os.path.join(west_top_dir, "project/samples/dfu"))
-    os.mkdir(os.path.join(west_top_dir, "project/tests"))
-    os.mkdir(os.path.join(west_top_dir, "project/tests/basic"))
-    os.mkdir(os.path.join(west_top_dir, "zephyr"))
+    folders = [
+        os.path.join("project", "app"),
+        os.path.join("project", "samples", "settings"),
+        os.path.join("project", "samples", "dfu"),
+        os.path.join("project", "tests", "basic"),
+        "zephyr",
+    ]
+
+    for folder in folders:
+        os.makedirs(os.path.join(west_top_dir, folder), exist_ok=True)
 
     create_and_write(west_top_dir, ".west/config", west_config_content)
     create_and_write(west_top_dir, "project/west.yml", nrfsdk_yaml_content)
@@ -190,6 +176,41 @@ def _create_good_west_workspace(west_top_dir):
     create_and_write(
         west_top_dir, "project/app/conf/nrf52840dk_nrf52840.conf", dummy_config
     )
+
+    # Board files, just create them, you do not need to write anything.
+    board_path = "project/boards/arm/custom_nrf52840dk"
+    board_files = [
+        "board.cmake",
+        "Kconfig",
+        "Kconfig.board",
+        "Kconfig.defconfig",
+        "revision.cmake",
+        "custom_nrf52840dk - pinctrl.dtsi",
+        "custom_nrf52840dk.dts",
+        "custom_nrf52840dk.yaml",
+        "custom_nrf52840dk_1_0_0.conf",
+        "custom_nrf52840dk_1_0_0.overlay",
+        "custom_nrf52840dk_1_1_0.conf",
+        "custom_nrf52840dk_1_1_0.overlay",
+        "custom_nrf52840dk_2_20_1.conf",
+        "custom_nrf52840dk_2_20_1.overlay",
+        "custom_nrf52840dk_defconfig",
+    ]
+    for board_file in board_files:
+        create_and_write(west_top_dir, os.path.join(board_path, board_file))
+    board_path = "project/boards/arm/nrf52840dk_nrf52840"
+    board_files = [
+        "board.cmake",
+        "Kconfig",
+        "Kconfig.board",
+        "Kconfig.defconfig",
+        "revision.cmake",
+        "nrf52840dk_nrf52840.dts",
+        "nrf52840dk_nrf52840.yaml",
+        "nrf52840dk_nrf52840_defconfig",
+    ]
+    for board_file in board_files:
+        create_and_write(west_top_dir, os.path.join(board_path, board_file))
 
     return os.path.join(west_top_dir, "project")
 

@@ -78,6 +78,27 @@ def build(east, board, build_type, build_dir, target, source_dir):
 
     east.pre_workspace_command_check()
 
+    build_command(east, board, build_type, build_dir, target, source_dir)
+
+    compile_file = os.path.join("build", "compile_commands.json")
+    if os.path.isfile(compile_file):
+        sh.copyfile(
+            compile_file, os.path.join(east.project_dir, "compile_commands.json")
+        )
+
+
+def build_command(
+    east,
+    board=None,
+    build_type=None,
+    build_dir=None,
+    target=None,
+    source_dir=None,
+    dry_run=None,
+    be_silent_and_return=False,
+):
+    """Actual build command. This is needed so it can also be reused by release command
+    """
     build_cmd = "build"
 
     if board:
@@ -107,14 +128,17 @@ def build(east, board, build_type, build_dir, target, source_dir):
     if build_type_args:
         build_cmd += f" -- {build_type_args}"
 
-    # Determine conf files depending on the build type
-    east.run_west(build_cmd)
-
-    compile_file = os.path.join("build", "compile_commands.json")
-    if os.path.isfile(compile_file):
-        sh.copyfile(
-            compile_file, os.path.join(east.project_dir, "compile_commands.json")
-        )
+    if dry_run:
+        east.print_info(build_cmd)
+        # Return fake succesful east.run result object
+        return {"output": "", "returncode": 0}
+    else:
+        # kwargs = (
+        #     {"silent": True, "return_output": True, "exit_on_error": False}
+        #     if be_silent_and_return
+        #     else {}
+        # )
+        return east.run_west(build_cmd)
 
 
 @click.command(**east_command_settings)
