@@ -52,8 +52,7 @@ def helper_test_against_west_run(
     if expected_west_cmds:
         # This conversion is needed due to assert_has_calls interface
         calls = [
-            # mocker.call(cmd, silent=True, return_output=True, exit_on_error=False)
-            mocker.call(cmd)
+            mocker.call(cmd, silent=True, return_output=True, exit_on_error=False)
             for cmd in expected_west_cmds
         ]
         run_west.assert_has_calls(calls)

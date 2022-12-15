@@ -78,7 +78,11 @@ def build(east, board, build_type, build_dir, target, source_dir):
 
     east.pre_workspace_command_check()
 
-    build_command(east, board, build_type, build_dir, target, source_dir)
+    build_cmd = create_build_command(
+        east, board, build_type, build_dir, target, source_dir
+    )
+
+    east.run_west(build_cmd)
 
     compile_file = os.path.join("build", "compile_commands.json")
     if os.path.isfile(compile_file):
@@ -87,17 +91,16 @@ def build(east, board, build_type, build_dir, target, source_dir):
         )
 
 
-def build_command(
+def create_build_command(
     east,
     board=None,
     build_type=None,
     build_dir=None,
     target=None,
     source_dir=None,
-    dry_run=None,
-    be_silent_and_return=False,
+    silence_diagnostic=False,
 ):
-    """Actual build command. This is needed so it can also be reused by release command
+    """Creates build command. This is needed so it can also be reused by release command
     """
     build_cmd = "build"
 
@@ -111,13 +114,16 @@ def build_command(
         build_cmd += f" {source_dir}"
 
     # WARN: cmake args are making some problems in this form.
-
     # if cmake_args:
     #     build_cmd += f" -- \"{' '.join(cmake_args)}\""
 
-    # Locate east yaml
-    # Get possible
-    build_type_args = construct_extra_cmake_arguments(
+    # "release" is an alias for default build type (for both apps and samples).
+    # This is here to make the release logic cleaner, and not to further complicate the
+    # construct_extra_cmake_arguments, however it should be inside of it.
+    if build_type == "release":
+        build_type = None
+
+    build_type_args, diagnostic = construct_extra_cmake_arguments(
         east,
         build_type,
         board,
@@ -125,20 +131,13 @@ def build_command(
         source_dir,
     )
 
+    if diagnostic and not silence_diagnostic:
+        east.print(diagnostic)
+
     if build_type_args:
         build_cmd += f" -- {build_type_args}"
 
-    if dry_run:
-        east.print_info(build_cmd)
-        # Return fake succesful east.run result object
-        return {"output": "", "returncode": 0}
-    else:
-        # kwargs = (
-        #     {"silent": True, "return_output": True, "exit_on_error": False}
-        #     if be_silent_and_return
-        #     else {}
-        # )
-        return east.run_west(build_cmd)
+    return build_cmd
 
 
 @click.command(**east_command_settings)
