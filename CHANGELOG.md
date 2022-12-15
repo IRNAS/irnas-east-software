@@ -8,11 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [0.6.0] - 2022-12-15
 
-## [0.5.0] - 2022-12-13
-
 ### Added
 
 -   _east release_ command. Usage is explained in the "doc/configuration.md".
+
+## [0.5.0] - 2022-12-13
 
 ### Added
 
