@@ -279,7 +279,9 @@ class EastContext:
 
         return self.run(cmd, **kwargs)
 
-    def _run_arbi_manager(self, arbitary_command: str, **kwargs):
+    def _run_arbi_manager(
+        self, arbitary_command: str, exit_on_error: bool = True, **kwargs
+    ):
         """Run an arbitary command through Nordic's Toolchain Manager
 
         This method should be used when passing any arbitary command, like west command.
@@ -331,7 +333,7 @@ class EastContext:
             returncode = 0
         else:
             returncode = 1
-            if kwargs.get("exit_on_error"):
+            if exit_on_error:
                 self.exit()
 
         cleanup()

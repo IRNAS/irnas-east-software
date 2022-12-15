@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
+-   _east release_ command. Usage is explained in the "doc/configuration.md".
+
+### Added
+
 -   Command _east build_ will now after every build step copy
     `compile_commands.json`, if found, from the build directory to the project
     directory. This makes job of locating this file easier for clangd. Help

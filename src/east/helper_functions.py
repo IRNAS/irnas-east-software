@@ -257,3 +257,52 @@ def ncs_version_not_supported_msg(east, supported_versions):
         + "\n\nThis means that you need to manually install the [bold cyan]NCS[/]"
         " toolchain by yourself.\n"
     )
+
+
+def find_all_boards(east, west_board: str) -> List[str]:
+    """Find all west board names by searching the boards directory
+
+    Search for directory that contains *_defconfig file with given west_board name,
+    (this is the same process that west uses to determine the boards).
+
+    After such directory is found, scan it and try to find what board revisions are
+    present and generate a list of board names and board revisions in format expected by
+    west build command.
+
+    If no folder is found or there are no revision specific files in the folder then
+    just return west_board.
+
+        east ():            East context.
+        west_board (str):   Board to search for.
+
+    Returns:
+        List of west boards to be used by west build -b <board>
+    """
+
+    def dir_find(root, west_board):
+        for path, _, files in os.walk(root):
+            for file in files:
+                if file.endswith("_defconfig"):
+                    if west_board == file[: -len("_defconfig")]:
+                        return path
+        return None
+
+    board_dir = dir_find(os.path.join(east.project_dir, "boards"), west_board)
+
+    if not board_dir:
+        return [west_board]
+
+    files = os.listdir(board_dir)
+
+    # Find all files with west board name, no matter the version
+    pattern = f"^{west_board}_[0-9]?[0-9]?_[0-9]?[0-9]?_[0-9]?[0-9]?\.conf"
+    matches = [file for file in files if re.match(pattern, file)]
+
+    # Extract hardware versions and put them into format expected by the west.
+    hw_versions = [
+        ".".join(m.split(".")[0].replace(west_board, "").split("_")[1:])
+        for m in matches
+    ]
+    boards = ["@".join([west_board, hw]) for hw in sorted(hw_versions)]
+
+    return boards if boards else [west_board]

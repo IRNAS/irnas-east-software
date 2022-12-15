@@ -222,33 +222,51 @@ samples:
 
 ## Release command
 
-Command `east release` builds every single combination of firmware which is
-listed in the `east.yml` file.
+`east release` command runs a release process consisting of a series of
+`east build` commands to build applications and samples listed in the
+`east.yml`. Created build artefacts are then renamed and placed into `release`
+folder in project's root directory.
+
+Version number is inferred from `git describe --tags --always --long --dirty=+`
+command. If the `east release` command is run directly on a commit with a
+version tag (such as `v1.0.2`), and there are no local changes, then only
+version tag is added to the name of artefacts, otherwise the additional git hash
+qualifier is added. If there is no tag then default of `v0.0.0` is used.
+
+As both `apps` and `samples` keys in `east.yml` are optional, release process
+for a specific key will be skipped, if it is not present.
 
 Different hardware versions of listed boards are picked up automatically from
 the `board` directory.
 
-Generally, this means:
-
-```
-* Create a binary for each `app`
-    * for each hardware version of the `west-board`
-        * for each `build-type`
-```
-
-and
-
-```
-* Create a binary for each `sample`
-    * for each hardware version of the `west-board`
-        * for `build-type` (either inherited or just `prj.conf`)
-```
-
 Created binaries are named according to the [IRNAS's release artefact naming
-guidelines]. Samples are placed into a separate folder to avoid confusion.
+guidelines]. Samples are placed into a separate folder to avoid confusion. A
+collection of zip files is created to simplify upload to GitHub Release page.
 
-`east release` accepts the software version which is injected into the binaries
-(this depends on the modules used) and is added to the created file names.
+High-level release process looks like this:
+
+```
+# Release process for applications:
+# for each application:
+#   for each west_board:
+#     for each of its hardware revisions:
+#       for every build type:
+#         Run west build command with correct conf files
+#         Create release subfolder with application binaries
+#
+# for each application:
+#   for every build type:
+#     Create a zip folder
+
+# Release process for samples:
+# for each samples:
+#   for each west_board:
+#     for each of its hardware revisions:
+#         Run west build command with correct conf files
+#         Create release subfolder with samples binaries
+#
+# Create a zip folder of samples
+```
 
 ## Resources for beginners
 
