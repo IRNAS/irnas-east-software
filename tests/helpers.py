@@ -273,3 +273,31 @@ def assert_strings_equal(string1: str, string2: str):
         return string.replace("\n", "").replace("\t", 8 * " ")
 
     assert clear_rich(string1) == clear_rich(string2)
+
+
+def helper_test_against_west_run1(
+    monkeypatch, mocker, path, east_cmd, expected_west_cmds=None, should_succed=True
+):
+    """
+    Helper function for tests easier to debug.
+    Running this instead of the real helper will just make sure that the correct command
+    runs, but it will not execute any east.run_west() calls.
+
+    Args:
+        monkeypatch ():         fixture
+        mocker ():              fixture
+        path ():                To which path should we change
+        east_cmd ():            which east command should be called
+        expected_west_cmd ():   Not used
+        should_succed ():       Not used
+    """
+    _ = expected_west_cmds
+    _ = should_succed
+
+    runner = CliRunner()
+
+    monkeypatch.chdir(path)
+    mocker.patch("east.east_context.EastContext.run_west")
+
+    result = runner.invoke(cli, east_cmd.strip().split(" "))
+    print(result.output)
