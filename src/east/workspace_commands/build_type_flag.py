@@ -149,14 +149,18 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         board ():           Board given from the east build
         build_dir ():       Location of build_dir, if None then "./build" is used
 
-    Returns:  String that should be placed after `--`
+    Returns:  Tuple of strings
+                First string are extra cmake arguments for west build command should be
+                placed after `--` in west command
+                Second string is diagnostic message that can be printed. It might not be
+                given so it should be checked first.
     """
 
     if not east.east_yml:
         if not build_type:
             # east.yml is optional, if it is not present present then default to plain
             # west behaviour: no cmake args
-            return ""
+            return ("", "")
         else:
             east.print(build_type_misuse_no_east_yml_msg)
             east.exit()
@@ -181,7 +185,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         if not build_type and not inside_sample:
             # We are not inside app and not inside sample, no build type was given, we
             # are default to plain west behaviour: no cmake args.
-            return ""
+            return ("", "")
 
     # We get past this point if we are inside app or sample.
 
@@ -198,7 +202,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         # plain west behaviour: no cmake args
         sample_array = east.east_yml.get("samples")
         if not sample_array:
-            return ""
+            return ("", "")
 
         sample_name = os.path.basename(cwd)
         sample_dict = return_dict_on_match(sample_array, "name", sample_name)
@@ -206,7 +210,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         if not sample_dict or "inherit-build-type" not in sample_dict:
             # In case where there is no inherit, or sample is not listed we default to
             # plain west behavior: no cmake args.
-            return ""
+            return ("", "")
 
         # Determine if we have to inherit from some app or we can just use prj.conf
         inherited_app = sample_dict["inherit-build-type"]["app"]
@@ -247,17 +251,14 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     previous_cmake_args = _construct_previous_cmake_args(build_dir)
 
     if required_cmake_args == previous_cmake_args:
-        return ""
+        return ("", "")
     else:
         if previous_cmake_args:
-            east.print(
+            msg = (
                 "[italic bold dim]💬 Old settings found in build folder, forcing CMake"
                 " rebuild[/]"
             )
         else:
             # Previous cmake args are empty string, no build folder was found
-            east.print(
-                "[italic bold dim]💬 Build folder not found, running CMake build[/]"
-            )
-
-        return required_cmake_args
+            msg = "[italic bold dim]💬 Build folder not found, running CMake build[/]"
+        return required_cmake_args, msg

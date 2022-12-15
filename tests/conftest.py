@@ -81,7 +81,7 @@ def west_workplace_fixture_common(west_top_dir, monkeypatch, mocker):
         _ = kwargs
 
         if command == "list":
-            return ["v2.0.0", "v2.1.0"]
+            return {"output": ["v2.0.0", "v2.1.0"], "returncode": 0}
 
     mocker.patch("east.east_context.EastContext.check_exe", mocked_check_exe)
     mocker.patch("east.east_context.EastContext.run_manager", mocked_run_manager)

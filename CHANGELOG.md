@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.6.0] - 2022-12-15
+
+### Added
+
+-   _east release_ command. Usage is explained in the "doc/configuration.md".
+
 ## [0.5.0] - 2022-12-13
 
 ### Added
@@ -94,7 +100,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.0...HEAD
+
+[0.6.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.5.0...v0.6.0
 
 [0.5.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.4.0...v0.5.0
 

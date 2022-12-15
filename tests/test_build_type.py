@@ -7,6 +7,7 @@ import east
 from east.__main__ import cli
 
 from . import helpers
+from .helpers import helper_test_against_west_run1
 
 
 def helper_test_against_west_run(
@@ -43,40 +44,10 @@ def helper_test_against_west_run(
     else:
         run_west.assert_not_called()
 
-    if should_succed:
-        expected_return_code = 0
-    else:
-        expected_return_code = 1
+    expected_return_code = 0 if should_succed else 1
 
     assert result.exit_code == expected_return_code
     return result
-
-
-def helper_test_against_west_run1(
-    monkeypatch, mocker, path, east_cmd, expected_west_cmd=None, should_succed=True
-):
-    """
-    Helper function for making tests easier to read.
-
-    Args:
-        monkeypatch ():         fixture
-        mocker ():              fixture
-        path ():                To which path should we change
-        east_cmd ():            which east command should be called
-        expected_west_cmd ():   what is expected west cmd that should be produced. If
-                                none then no run_west call should happend.
-        should_succed ():       If true then the command should succeded.
-
-    Returns:
-        Result object, which can be further checked.
-    """
-    runner = CliRunner()
-
-    monkeypatch.chdir(path)
-    mocker.patch("east.east_context.EastContext.run_west")
-
-    result = runner.invoke(cli, east_cmd.strip().split(" "))
-    print(result.output)
 
 
 def test_build_type_with_no_east_yml(west_workplace_parametrized, monkeypatch):

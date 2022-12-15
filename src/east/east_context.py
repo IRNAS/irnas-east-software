@@ -65,7 +65,7 @@ class EastContext:
         self.echo = echo
         self.consts = const_paths
 
-        # Create EAST_DIR and its parents, if they do not exists
+        # Create EAST_DIR and its parents, if they do not exist
         os.makedirs(self.consts["east_dir"], exist_ok=True)
 
         self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
@@ -84,6 +84,15 @@ class EastContext:
             self.detected_ncs_version = None
             self.project_dir = None
 
+    def chdir(self, path: str):
+        """Change directory.
+
+        self ():
+        path (str): Relative or absolute path of the directory to change to.
+        """
+        os.chdir(path)
+        self.cwd = os.getcwd()
+
     def print(self, *objects, **kwargs):
         """Prints to the console.
 
@@ -94,6 +103,21 @@ class EastContext:
         https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.print
         """
         self.console.print(*objects, **kwargs)
+
+    def print_info(self, info: str):
+        """Prints a message, with many rich settings disabled, with magnify icon
+        prepended. Suitable for printing info messages that should not be formatted.
+        """
+        self.print(
+            ":mag_right: " + info,
+            markup=True,
+            style="bold italic dim",
+            overflow="ignore",
+            crop=False,
+            highlight=False,
+            soft_wrap=False,
+            no_wrap=True,
+        )
 
     def print_markdown(self, *objects, **kwargs):
         """Interprets given object (string) as Markdown style text and prints it to the
@@ -147,39 +171,47 @@ class EastContext:
                                     no strerr, due
                                     to piping.
 
-            silent (bool):  Do not print command's output.
+            silent (bool):          Do not print command's output.
+
+        Returns:
+            If exit_on_error is False then dict with two keys is returned:
+                output(str):        Contains stdout of the process that run, if
+                                    return_output is True, otherwise empty string.
+                returncode(int):    Return code of the process that run
         """
+
         if self.echo:
-            self.console.print(
-                ":mag_right: " + command,
-                markup=True,
-                style="bold italic dim",
-                overflow="ignore",
-                crop=False,
-                highlight=False,
-                soft_wrap=False,
-                no_wrap=True,
-            )
+            self.print_info(command)
 
         if return_output:
+            # Prepare varibale for later assingment
+            returncode = None
+
             # This works but it has no color and no stderr
-            def execute(cmd, exit_on_err):
+            def execute(cmd, exit_on_error):
                 """Helper function that correctly executes the process and returns
                 output.
                 """
+
                 popen = subprocess.Popen(
                     cmd,
                     shell=True,
                     bufsize=1,
                     stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
                     universal_newlines=True,
                 )
                 for stdout_line in iter(popen.stdout.readline, ""):
                     yield stdout_line
                 popen.stdout.close()
-                return_code = popen.wait()
-                if exit_on_err and return_code:
-                    self.exit(return_code)
+                rc = popen.wait()
+
+                # Assign to global, so the value can be seen outside
+                nonlocal returncode
+                returncode = rc
+
+                if exit_on_error and rc:
+                    self.exit(rc)
 
             output = []
 
@@ -187,7 +219,8 @@ class EastContext:
                 output.append(line)
                 if not silent:
                     print(line, end="")
-            return "".join(output)
+
+            return {"output": "".join(output), "returncode": returncode}
 
         else:
             out = None
@@ -203,6 +236,8 @@ class EastContext:
             # Should we exit on the error?
             if exit_on_error and p.returncode:
                 self.exit(p.returncode)
+
+            return {"output": "", "returncode": p.returncode}
 
     def run_west(self, west_command: str, **kwargs) -> str:
         """Run wrapper which should be used when executing commands with west tool.
@@ -227,7 +262,7 @@ class EastContext:
         else:
             return self.run(cmd, **kwargs)
 
-    def run_manager(self, command, **kwargs) -> str:
+    def run_manager(self, command, **kwargs):
         """Executes a command with Nordic's Toolchain manager executable.
 
         This is not suitable to be used with a type of a 'launch -- <command>' command.
@@ -244,7 +279,9 @@ class EastContext:
 
         return self.run(cmd, **kwargs)
 
-    def _run_arbi_manager(self, arbitary_command: str, **kwargs):
+    def _run_arbi_manager(
+        self, arbitary_command: str, exit_on_error: bool = True, **kwargs
+    ):
         """Run an arbitary command through Nordic's Toolchain Manager
 
         This method should be used when passing any arbitary command, like west command.
@@ -263,11 +300,14 @@ class EastContext:
         So we are checking for success.txt file after every call and exit if it does not
         exist.
 
-        We also need to be carefull what quotes are we using.
+        We also need to be carefull what quotes we are using.
 
         Args:
             arbitary_command (str):
             **kwargs:
+
+        Returns:
+            Check .run
         """
 
         arbitary_command = arbitary_command.replace("'", '"')
@@ -279,20 +319,27 @@ class EastContext:
         )
 
         # Clean any success.txt file from before
-        try:
-            os.remove("success.txt")
-        except FileNotFoundError:
-            pass
+        def cleanup():
+            try:
+                os.remove("success.txt")
+            except FileNotFoundError:
+                pass
 
+        cleanup()
         result = self.run(cmd, **kwargs)
 
-        if not os.path.isfile("success.txt"):
-            self.exit()
+        # Correctly pass the information if the previous command run successfully
+        if os.path.isfile("success.txt"):
+            returncode = 0
+        else:
+            returncode = 1
+            if exit_on_error:
+                self.exit()
 
-        try:
-            os.remove("success.txt")
-        except FileNotFoundError:
-            pass
+        cleanup()
+
+        # Patch opver the correct returncode
+        result["returncode"] = returncode
 
         return result
 
@@ -308,11 +355,8 @@ class EastContext:
 
         Returns:
             True if given executable was found.
-
         """
-        exe_path = which(exe)
-
-        if not exe_path:
+        if not which(exe):
             if on_fail_exit:
                 self.exit()
             return False
@@ -323,14 +367,13 @@ class EastContext:
         """
         Checks for version of provided exe program and compares it against
         provided one.
+
         """
 
+        # WARN: Checkk version was not yet anywhere, behaviour yet needs to be verified
         response = self.run(f"{exe} {version_cmd}", silent=True, return_output=True)
 
-        if expected_version in response.stdout:
-            return True
-        else:
-            return False
+        return True if expected_version in response["output"] else False
 
     def pre_workspace_command_check(
         self,
@@ -377,18 +420,17 @@ class EastContext:
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
-        # # Check if toolchain for detected ncs version is installed
-        if self.detected_ncs_version in self.run_manager(
-            "list", silent=True, return_output=True
-        ):
+        # Check if toolchain for detected ncs version is installed
+        result = self.run_manager("list", silent=True, return_output=True)
+        if self.detected_ncs_version in result["output"]:
             # If it is installed then is also supported
             self.ncs_version_installed = True
             self.ncs_version_supported = True
             return
 
         # Check if toolchain for detected ncs version is supported
-        supported_versions = self.run_manager("search", silent=True, return_output=True)
-        if self.detected_ncs_version in supported_versions:
+        result = self.run_manager("search", silent=True, return_output=True)
+        if self.detected_ncs_version in result["output"]:
             # Supported but not installed, should we exit program or silently pass?
             if ignore_uninstalled_ncs:
                 self.ncs_version_supported = False
@@ -406,6 +448,6 @@ class EastContext:
         # Exit program
         # This is usually set if we intend to install the toolchain later
         self.print(
-            ncs_version_not_supported_msg(self, supported_versions), highlight=False
+            ncs_version_not_supported_msg(self, result["output"]), highlight=False
         )
         self.exit()

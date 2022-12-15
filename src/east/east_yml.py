@@ -14,7 +14,7 @@ def format_east_yml_load_error_msg(exception_msg):
     """Use this to format error messages that happen when trying to load east.yml"""
     return (
         "An [bold red]error[/] occurred when trying to load [bold yellow]east.yml[/]"
-        f" file!\n\nError message:\n\n\t[italic yellow]{exception_msg}[/]\n"
+        f" file!\n\n[italic yellow]{exception_msg}[/]\n"
     )
 
 
