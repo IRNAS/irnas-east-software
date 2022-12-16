@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.6.1] - 2022-12-16
+
+### Fixed
+
+-   Case where there is not apps key in east.yml and we are building and app
+    without build type was not correctly handled.
+
 ## [0.6.0] - 2022-12-15
 
 ### Added
@@ -100,7 +107,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.1...HEAD
+
+[0.6.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.0...v0.6.1
 
 [0.6.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.5.0...v0.6.0
 
