@@ -97,11 +97,9 @@ def rtt(east, local_echo):
         east.print(no_jlink_tool_msg("JLinkRTTClient"), highlight=False)
         east.exit()
 
-    cmd = "JLinkRTTClient "
-    if local_echo:
-        cmd += "-LocalEcho On"
+    local_echo = "On" if local_echo else "Off"
 
-    east.run(cmd)
+    east.run(f"JLinkRTTClient -LocalEcho {local_echo}")
 
 
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
