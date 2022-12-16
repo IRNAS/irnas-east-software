@@ -224,6 +224,11 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             path_prefix = os.path.join(path_to_project_dir, "app", inherited_app)
 
     if inside_app:
+        # If we do not have an app array and we there is no build type, we default to
+        # plaing west behaviour: no cmake args.
+        if not app_array:
+            return ("", "")
+
         # Determine what kind of project it is, single or multi app
         if len(app_array) == 1:
             app = app_array[0]

@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Case where there is not apps key in east.yml and we are building and app
+    without build type was not correctly handled.
+
 ## [0.6.0] - 2022-12-15
 
 ### Added

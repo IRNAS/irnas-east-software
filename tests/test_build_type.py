@@ -912,8 +912,8 @@ def test_no_apps_key_in_east_yml_app(west_workplace_parametrized, monkeypatch, m
         monkeypatch,
         mocker,
         west_workplace_parametrized["app"],
-        "build --build-type debug",
-        should_succed=False,
+        "build",
+        "build",
     )
 
 
