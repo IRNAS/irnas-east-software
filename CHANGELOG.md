@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   _east util rtt_ command, local echo option was not passed correctly.
+
 ## [0.6.1] - 2022-12-16
 
 ### Fixed
