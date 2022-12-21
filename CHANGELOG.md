@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Fixed release artefacts naming issue where build type would not appear 
+    correctly.
+-   Create a `release_dry_run` folder instead of release folder when using 
+    --dry-run option with _east release_ command.
+
 ## [0.6.2] - 2022-12-16
 
 ### Fixed
