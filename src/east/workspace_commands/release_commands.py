@@ -200,6 +200,20 @@ release_misuse_no_east_yml_msg = """
 [bold yellow]east.yml[/] not found in project's root directory, [bold yellow]east release[/] needs it to determine required build steps, exiting!"""
 
 
+def non_existing_app_msg_fmt(app_name):
+    return (
+        f"Incorrect [bold yellow]east.yml[/], app [bold]{app_name}[/] was not"
+        " found in app folder, exiting!"
+    )
+
+
+def non_existing_sample_msg_fmt(sample_name):
+    return (
+        f"Incorrect [bold yellow]east.yml[/], sample [bold]{sample_name}[/] was not"
+        " found in samples folder, exiting!"
+    )
+
+
 @click.command(**east_command_settings)
 @click.option(
     "-d",
@@ -264,16 +278,30 @@ def release(east, dry_run, verbose):
     apps = east.east_yml.get("apps", [])
     samples = east.east_yml.get("samples", [])
 
-    # We inject app and samples with additional key/value pairs so the below logic for
-    # detection of jobs can be common/simpler.
+    # We inject app and samples with additional key/value pairs in below two for loops
+    # so the logic afterwards for detection of jobs can be common/simpler.
+    # We also do some existence checks.
+
+    # Small adjusment for projects which only have one single app
+    apps_in_dir = apps[0].name if len(apps) == 1 else os.listdir("app")
+
     for app in apps:
+        # Check, if the app even exists before building for it
+        if app not in apps_in_dir:
+            east.print(non_existing_app_msg_fmt(app["name"]))
+            east.exit()
         # Add parent to mark from where this key comes from
         app.update({"parent": "apps"})
         # Add "release" type
         # (but only in apps context).
         app["build-types"].append({"type": "release"})
 
+    samples_in_dir = os.listdir("samples")
     for sample in samples:
+        # Check, if the sample even exists before building for it
+        if sample not in samples_in_dir:
+            east.print(non_existing_sample_msg_fmt(sample["name"]))
+            east.exit()
         # Add parent to mark from where this key comes from
         sample.update({"parent": "samples"})
         # Add "release" build type which for samples does nothing.

@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     correctly.
 -   Create a `release_dry_run` folder instead of release folder when using 
     --dry-run option with _east release_ command.
+-   `east release` command now runs a pre-check on the apps and samples from 
+    `east.yml`, if they exists before running the release process. That way you 
+    can catch a typo, or a mistake before you spent some time waiting through 
+    the release process.
 
 ## [0.6.2] - 2022-12-16
 
