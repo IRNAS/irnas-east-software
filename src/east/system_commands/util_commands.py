@@ -49,7 +49,7 @@ def connect(east, device):
     \n\n[bold]Note:[/] If the current directory contains a Zepyhr's build folder it will
     automatically try to determine the correct target device for [bold cyan]JLinkExe[/] command.
     If there is no build folder and target device can not be determined, then [bold
-    cyan]JLinkExe[/] command will give option to select the correct target device.
+    cyan]JLinkExe[/] command will ask the user to provide the correct target device.
     \n\nUser can also provide --device option directly, in that case the previously
     described process is skipped.
 
