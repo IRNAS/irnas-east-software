@@ -2,7 +2,7 @@
 
 `east` is a command line meta-tool, useful for creating, managing, and deploying
 Zephyr or nRF Connect SDK (NCS) projects. It is built on top of Zephyr's RTOS
-meta-tool, [West] and Nordic's [nRF Connect Toolchain Manager].
+meta-tool [West] and Nordic's [nRF Connect Toolchain Manager].
 
 [west]: https://github.com/zephyrproject-rtos/west
 [nrf connect toolchain manager]:
@@ -18,7 +18,7 @@ meta-tool, [West] and Nordic's [nRF Connect Toolchain Manager].
   environment.
 - Automated process of generating release artefacts for your entire project, no
   matter the number of applications, samples or boards.
-- Support for build types into the usual build process.
+- Support for build types, which is integrated into the usual build process.
 - RTT utility commands to connect and see the RTT stream.
 
 ## Reasoning behind `east`
