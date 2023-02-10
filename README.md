@@ -1,7 +1,11 @@
 # East - tool for building NCS/Zephyr applications
 
 East is a command line meta-tool, useful for creating, managing, and deploying
-Zephyr or nRF Connect SDK (NCS) projects.
+[Zephyr] or [nRF Connect SDK] (NCS) projects.
+
+[zephyr]: https://docs.zephyrproject.org/latest/
+[nrf connect sdk]:
+  https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/introduction.html
 
 It is built on top of Zephyr's RTOS meta-tool [West] and Nordic's [nRF Connect
 Toolchain Manager].
@@ -44,13 +48,15 @@ East automates the above tasks and tries to make the developer more productive.
 
 `docs` directory contains several markdown documents about East:
 
-- [Getting stared guide] - Quickly setup an example project and get it building
-  with East.
-- [Development guide] - How to setup development environment for working on
+- [Getting stared] - Quickly setup an example project and get it building with
   East.
+- [How East works] - How East works under the hood and what to expect from it.
 - [Configuration] - How to configure build types and release procedure via
   `east.yml` file.
+- [Development guide] - How to setup development environment for working on
+  East.
 
-[getting stared guide]: getting_started.md
-[development guide]: development_guide.md
-[configuration]: configuration.md
+[getting stared]: docs/getting_started.md
+[how east works]: docs/how_east_works.md
+[configuration]: docs/configuration.md
+[development guide]: docs/development_guide.md
