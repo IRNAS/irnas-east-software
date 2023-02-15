@@ -35,23 +35,29 @@ def get_device(runner_yaml):
 @click.option(
     "-d",
     "--device",
+    default=get_device(os.path.join("build", "zephyr", "runners.yaml")),
     type=str,
-    help="Selects the target device, required by JLinkExe.",
+    help=(
+        "Sets the target device, required by JLinkExe, i.e. [bold]NRF52840_xxAA[/]. "
+        "If not given, east tries to infer the device by looking into Zephyr's build folder."
+    ),
+)
+@click.option(
+    "-i",
+    "--jlink-id",
+    type=int,
+    help=(
+        "Identification number of a JLink programmer that should be used for connecting."
+    ),
 )
 @click.pass_obj
-def connect(east, device):
+def connect(east, device, jlink_id):
+
     """Connects to a device and creates a RTT server with [bold cyan]JLinkExe[/].
 
 
     \b
     \n\nRTT server will emmit any RTT messages produced by the device over its dedicated port. Execute [bold magenta]east util rtt[/] command in the separate window to observe these messages.
-
-    \n\n[bold]Note:[/] If the current directory contains a Zepyhr's build folder it will
-    automatically try to determine the correct target device for [bold cyan]JLinkExe[/] command.
-    If there is no build folder and target device can not be determined, then [bold
-    cyan]JLinkExe[/] command will ask the user to provide the correct target device.
-    \n\nUser can also provide --device option directly, in that case the previously
-    described process is skipped.
 
     """
 
@@ -61,18 +67,11 @@ def connect(east, device):
 
     cmd = "JLinkExe -AutoConnect 1 -Speed 4000 -If SWD "
 
-    # Execute early if --device is given
+    if jlink_id:
+        cmd += f"-USB {jlink_id} "
+
     if device:
-        cmd += f"-Device {device}"
-        east.run(cmd)
-
-    # Try to determine the device arg from runner.yaml file
-    runner_yaml = os.path.join("build", "zephyr", "runners.yaml")
-    device_arg = get_device(runner_yaml)
-
-    # Could be None
-    if device_arg:
-        cmd += f"-Device {device_arg }"
+        cmd += f"-Device {device} "
 
     east.run(cmd)
 
