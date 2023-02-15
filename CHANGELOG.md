@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   New documentation files in `docs` folder: `development_guide.md`, 
+    `getting_started.md`, `how_east_works.md`
+
+### Changed
+
+-   Updated readme so it points to the new documentation.
+
 ### Fixed
 
 -   Fixed release artefacts naming issue where build type would not appear 
