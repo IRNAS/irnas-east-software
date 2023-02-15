@@ -283,23 +283,22 @@ def release(east, dry_run, verbose):
     # We also do some existence checks.
 
     # Small adjusment for projects which only have one single app
-    apps_in_dir = apps[0].name if len(apps) == 1 else os.listdir("app")
+    apps_in_dir = apps[0]["name"] if len(apps) == 1 else os.listdir("app")
 
     for app in apps:
         # Check, if the app even exists before building for it
-        if app not in apps_in_dir:
+        if app["name"] not in apps_in_dir:
             east.print(non_existing_app_msg_fmt(app["name"]))
             east.exit()
         # Add parent to mark from where this key comes from
         app.update({"parent": "apps"})
-        # Add "release" type
-        # (but only in apps context).
+        # Add "release" type (but only in apps context).
         app["build-types"].append({"type": "release"})
 
     samples_in_dir = os.listdir("samples")
     for sample in samples:
         # Check, if the sample even exists before building for it
-        if sample not in samples_in_dir:
+        if sample["name"] not in samples_in_dir:
             east.print(non_existing_sample_msg_fmt(sample["name"]))
             east.exit()
         # Add parent to mark from where this key comes from
