@@ -12,6 +12,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     `getting_started.md`, `how_east_works.md`
 -   `make format` command, which uses `black` and `isort`. 
     `development_guide.md` explains the use.
+-   Both commands `east util connect` and `east util rtt` now accept 
+    `--rtt-port` option, which sets the RTT Telnet port. Command 
+    `east util connect` now also accepts the `--jlink-id` option, same as 
+    `east flash`. With those new options is now easier to connect and listen to 
+    RTT messages from multiple JLink devices.
 
 ### Changed
 
