@@ -1,63 +1,62 @@
-# East tool
+# East - tool for building NCS/Zephyr applications
 
-## Installation and updating
+East is a command line meta-tool, useful for creating, managing, and deploying
+[Zephyr] or [nRF Connect SDK] (NCS) projects.
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install East.
+[zephyr]: https://docs.zephyrproject.org/latest/
+[nrf connect sdk]:
+  https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/introduction.html
 
-```bash
-pip install --upgrade east-tool
-```
+It is built on top of Zephyr's RTOS meta-tool [West] and Nordic's [nRF Connect
+Toolchain Manager].
 
-## Usage
+[west]: https://github.com/zephyrproject-rtos/west
+[nrf connect toolchain manager]:
+  https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager
 
-`east` intends to be fully documented inside the tool itself, (which is not
-yet). Executing `east` or `east --help` in the command line should give you
-sufficient information on how to use the tool in basic ways.
+## Reasoning behind East
 
-To learn more about configuration refer to the [docs](docs) folder.
+There are several reasons why someone would like to create yet another tool on
+top of `west`:
 
+- Working on several projects at once means using different versions of the NCS
+  repository and different versions of the toolchain. Managing these differences
+  is not a trivial task.
+- There is no reproducible build guarantee between the developer's machines.
+  Slight differences between tool versions can manifest into hard-to-find bugs.
+- Creating GitHub releases manually takes ages as you have to run the build
+  process for every combination of the board, application, build variant, etc.
+  and properly rename the release binary. The release procedure gets longer with
+  every addition of new hardware and build variation option.
 
-## Developing East
+East automates the above tasks and tries to make the developer more productive.
 
-For development and testing of `east` the use of `virtualenv` is suggested.
+## Key features
 
-Install `virtualenv`:
+- Automated detection and installation of tooling required for NCS projects.
+- Common `west` commands used for the development, such as `build`, `flash`,
+  etc.
+- Sandboxed development environment, thanks to the nRF Connect Toolchain
+  Manager, every `build`, `flash`, etc. command runs inside of its toolchain
+  environment.
+- Automated process of generating release artefacts for your entire project, no
+  matter the number of applications, samples or boards.
+- Support for build types, which is integrated into the usual build process.
+- RTT utility commands to connect and see the RTT stream.
 
-```bash
-pip install virtualenv
-```
+## Documentation
 
-Create and activate `virtualenv`, run this from project root:
+`docs` directory contains several markdown documents about East:
 
-```bash
-virtualenv venv
-source venv/bin/activate
-```
+- [Getting stared] - Quickly setup an example project and get it building with
+  East.
+- [How East works] - How East works under the hood and what to expect from it.
+- [Configuration] - How to configure build types and release procedure via
+  `east.yml` file.
+- [Development guide] - How to setup development environment for working on
+  East.
 
-To create and editable install of `east` run below command. Whatever change you
-make in the code it will be immediately reflected in the actual tool.
-
-```bash
-make install-dev
-```
-
-### Running unit tests
-
-```bash
-make test
-```
-
-#### Editable install does not work
-
-If `make install` (more exactly `pip install -e .`) ever misbehaves, it is
-probably due to this: https://github.com/pypa/pip/issues/7953.
-
-Run below command once and then again `make install`, this fixed it last time:
-
-```bash
-python3 -m pip install --prefix=$(python3 -m site --user-base) -e .
-```
-
-#### Test for version check fails
-
-This happens if the `make install-dev` command was not run before running `make test`.
+[getting stared]: docs/getting_started.md
+[how east works]: docs/how_east_works.md
+[configuration]: docs/configuration.md
+[development guide]: docs/development_guide.md
