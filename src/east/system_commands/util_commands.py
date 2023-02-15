@@ -50,8 +50,15 @@ def get_device(runner_yaml):
         "Identification number of a JLink programmer that should be used for connecting."
     ),
 )
+@click.option(
+    "-p",
+    "--rtt-port",
+    type=int,
+    default=19021,
+    help=("Sets the RTT Telnet port. Default: 19021."),
+)
 @click.pass_obj
-def connect(east, device, jlink_id):
+def connect(east, device, jlink_id, rtt_port):
 
     """Connects to a device and creates a RTT server with [bold cyan]JLinkExe[/].
 
@@ -65,7 +72,7 @@ def connect(east, device, jlink_id):
         east.print(no_jlink_tool_msg("JLinkExe"), highlight=False)
         east.exit()
 
-    cmd = "JLinkExe -AutoConnect 1 -Speed 4000 -If SWD "
+    cmd = f"JLinkExe -AutoConnect 1 -Speed 4000 -If SWD -RTTTelnetPort {rtt_port} "
 
     if jlink_id:
         cmd += f"-USB {jlink_id} "
@@ -83,8 +90,15 @@ def connect(east, device, jlink_id):
     is_flag=True,
     help="Turns on local echo.",
 )
+@click.option(
+    "-p",
+    "--rtt-port",
+    type=int,
+    default=19021,
+    help=("Sets the RTT Telnet port. Default: 19021."),
+)
 @click.pass_obj
-def rtt(east, local_echo):
+def rtt(east, local_echo, rtt_port):
     """Runs a RTT client which connects to a running RTT server.
 
 
@@ -98,7 +112,7 @@ def rtt(east, local_echo):
 
     local_echo = "On" if local_echo else "Off"
 
-    east.run(f"JLinkRTTClient -LocalEcho {local_echo}")
+    east.run(f"JLinkRTTClient -LocalEcho {local_echo} -RTTTelnetPort {rtt_port}")
 
 
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
