@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.7.0] - 2023-02-15
+
 ### Added
 
 -   New documentation files in `docs` folder: `development_guide.md`, 
@@ -27,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Fixed release artefacts naming issue where build type would not appear 
     correctly.
 -   Create a `release_dry_run` folder instead of release folder when using 
-    --dry-run option with _east release_ command.
+    \--dry-run option with _east release_ command.
 -   `east release` command now runs a pre-check on the apps and samples from 
     `east.yml`, if they exists before running the release process. That way you 
     can catch a typo, or a mistake before you spent some time waiting through 
@@ -140,7 +142,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.7.0...HEAD
+
+[0.7.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.2...v0.7.0
 
 [0.6.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.1...v0.6.2
 
