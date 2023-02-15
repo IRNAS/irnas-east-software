@@ -57,7 +57,7 @@ def clean(east):
 @click.pass_obj
 def build(east, board, build_type, build_dir, target, source_dir):
     """
-    Build firmware in current directory.
+    Build firmware in the current directory.
 
     \b
     \n\nInternally runs [magenta bold]west build[/] command in current directory if --source-dir is not set.
@@ -100,8 +100,7 @@ def create_build_command(
     source_dir=None,
     silence_diagnostic=False,
 ):
-    """Creates build command. This is needed so it can also be reused by release command
-    """
+    """Creates build command. This is needed so it can also be reused by release command"""
     build_cmd = "build"
 
     if board:

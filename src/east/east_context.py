@@ -408,7 +408,8 @@ class EastContext:
             self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
 
-        # Exit if east.yml is not present in the project dir
+        # Exit if east.yml could not be loaded from the project dir; it is not an error
+        # if it does not exist, we support that.
         try:
             self.east_yml = load_east_yml(self.project_dir)
         except EastYmlLoadError as msg:
@@ -446,7 +447,7 @@ class EastContext:
             return
 
         # Exit program
-        # This is usually set if we intend to install the toolchain later
+        # This is usually set, if we intend to install the toolchain later
         self.print(
             ncs_version_not_supported_msg(self, result["output"]), highlight=False
         )
