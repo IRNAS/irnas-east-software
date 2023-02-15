@@ -6,6 +6,7 @@
 
 - [Setup](#setup)
 - [Running unit tests](#running-unit-tests)
+- [Formatting](#formatting)
 - [Known issues](#known-issues)
   - [Editable install does not work](#editable-install-does-not-work)
   - [Test for version check fails](#test-for-version-check-fails)
@@ -49,12 +50,20 @@ To run unit tests:
 make test
 ```
 
+## Formatting
+
+To format the project run:
+
+```bash
+make format
+```
+
 ## Known issues
 
 ### Editable install does not work
 
-If `make install` (more exactly `pip install -e .`) ever misbehaves, it is
-probably due to this: https://github.com/pypa/pip/issues/7953.
+If `make install` or `make install-dev` (more exactly `pip install -e .`) ever
+misbehaves, it is probably due to this: https://github.com/pypa/pip/issues/7953.
 
 Run the below command once and then again `make install`, this fixed it last
 time:

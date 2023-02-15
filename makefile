@@ -9,6 +9,10 @@ install-dev:
 test:
 	pytest -s
 
+format:
+	isort --profile black .
+	black .
+
 build:
 	@python3 -m build
 

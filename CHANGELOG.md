@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 -   New documentation files in `docs` folder: `development_guide.md`, 
     `getting_started.md`, `how_east_works.md`
+-   `make format` command, which uses `black` and `isort`. 
+    `development_guide.md` explains the use.
 
 ### Changed
 
