@@ -7,7 +7,6 @@ import east
 from east.__main__ import cli
 
 from . import helpers
-from .helpers import helper_test_against_west_run1
 
 
 def helper_test_against_west_run(

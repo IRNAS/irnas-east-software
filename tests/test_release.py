@@ -279,3 +279,99 @@ def test_basic_release_behaviour(west_workplace, monkeypatch, mocker):
         expected_west_cmds=expected_app_release_west_commands
         + expected_samples_release_west_commands,
     )
+
+
+east_yaml_non_existing_sample = """
+samples:
+  - name: settings
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+
+  - name: dfu
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+
+  - name: non_existing_sample_name
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+"""
+
+
+def test_east_yml_with_non_existant_samples(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    Running east release when east.yml contains non-existing samples should abort before
+    issuing any of the west build commands.
+    """
+
+    helpers.create_and_write(
+        west_workplace_parametrized["project"],
+        "east.yml",
+        east_yaml_non_existing_sample,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["project"],
+        "release",
+        should_succed=False,
+    )
+
+
+east_yaml_non_existing_app = """
+apps:
+  - name: test_one
+    west-boards:
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+
+  - name: test_two
+    west-boards:
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+
+  - name: test_three_which_does_not_exist
+    west-boards:
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+"""
+
+
+def test_east_yml_with_non_existant_apps(west_workplace_multi_app, monkeypatch, mocker):
+    """
+    Running east release when east.yml contains non-existing apps should abort before
+    issuing any of the west build commands. This only make sense in multi app
+    workspaces.
+    """
+    project = west_workplace_multi_app
+
+    helpers.create_and_write(
+        project,
+        "east.yml",
+        east_yaml_non_existing_app,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project,
+        "release",
+        should_succed=False,
+    )

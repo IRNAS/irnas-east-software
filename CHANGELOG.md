@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.7.0] - 2023-02-15
+
+### Added
+
+-   New documentation files in `docs` folder: `development_guide.md`, 
+    `getting_started.md`, `how_east_works.md`
+-   `make format` command, which uses `black` and `isort`. 
+    `development_guide.md` explains the use.
+-   Both commands `east util connect` and `east util rtt` now accept 
+    `--rtt-port` option, which sets the RTT Telnet port. Command 
+    `east util connect` now also accepts the `--jlink-id` option, same as 
+    `east flash`. With those new options is now easier to connect and listen to 
+    RTT messages from multiple JLink devices.
+
+### Changed
+
+-   Updated readme so it points to the new documentation.
+
+### Fixed
+
+-   Fixed release artefacts naming issue where build type would not appear 
+    correctly.
+-   Create a `release_dry_run` folder instead of release folder when using 
+    \--dry-run option with _east release_ command.
+-   `east release` command now runs a pre-check on the apps and samples from 
+    `east.yml`, if they exists before running the release process. That way you 
+    can catch a typo, or a mistake before you spent some time waiting through 
+    the release process.
+
 ## [0.6.2] - 2022-12-16
 
 ### Fixed
@@ -113,7 +142,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.7.0...HEAD
+
+[0.7.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.2...v0.7.0
 
 [0.6.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.1...v0.6.2
 

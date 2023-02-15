@@ -1,17 +1,10 @@
 import os
 import shutil as sh
-import time
 
 import click
 from rich.box import ROUNDED
 from rich.panel import Panel
-from rich.progress import (
-    BarColumn,
-    MofNCompleteColumn,
-    Progress,
-    SpinnerColumn,
-    TextColumn,
-)
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from ..east_context import east_command_settings
@@ -35,7 +28,7 @@ def create_artefact_name(project, board, version, build_type):
     """
     board = board.replace("@", "-hv")
 
-    build_type = f"-{build_type}" if build_type == "release" else ""
+    build_type = "" if build_type == "release" else f"-{build_type}"
 
     git_hash = f"-{version['hash']}" if version["hash"] else ""
 
@@ -87,12 +80,12 @@ def get_git_version(east):
         # No git tag, only hash was produced
         version = {"tag": "v0.0.0", "hash": output[0]}
     elif len(output) == 3:
-        if output[1] == "0" and not output[2].endwith("+"):
+        if output[1] == "0" and not output[2].endswith("+"):
             # Clean version commit, no hash needed
             version = {"tag": output[0], "hash": ""}
         else:
             # Not on commit or dirty, both version and hash are needed
-            version = {"tag": output[0], "hash": output[2]}
+            version = {"tag": output[0], "hash": output[2][1:]}
 
     else:
         east.print(
@@ -207,12 +200,29 @@ release_misuse_no_east_yml_msg = """
 [bold yellow]east.yml[/] not found in project's root directory, [bold yellow]east release[/] needs it to determine required build steps, exiting!"""
 
 
+def non_existing_app_msg_fmt(app_name):
+    return (
+        f"Incorrect [bold yellow]east.yml[/], app [bold]{app_name}[/] was not"
+        " found in app folder, exiting!"
+    )
+
+
+def non_existing_sample_msg_fmt(sample_name):
+    return (
+        f"Incorrect [bold yellow]east.yml[/], sample [bold]{sample_name}[/] was not"
+        " found in samples folder, exiting!"
+    )
+
+
 @click.command(**east_command_settings)
 @click.option(
     "-d",
     "--dry-run",
     is_flag=True,
-    help="Just echo build commands and create dummy artefacts, do not actually build.",
+    help=(
+        "Just echo build commands and create dummy artefacts, do not actually build."
+        " Dummy artefacts are placed in into [bold italic]release_dry_run[/] folder. "
+    ),
 )
 @click.option(
     "-v",
@@ -249,11 +259,17 @@ def release(east, dry_run, verbose):
     # location
     east.chdir(east.project_dir)
 
-    # Clean up release folder.
+    # Clean up release folders.
     sh.rmtree("release", ignore_errors=True)
+    sh.rmtree("release_dry_run", ignore_errors=True)
 
     # Get version from git describe command
     version = get_git_version(east)
+
+    if dry_run:
+        release_dir = "release_dry_run"
+    else:
+        release_dir = "release"
 
     # Try to get apps and samples that need to be build, if some key is not found the
     # entire release process for it is skipped.
@@ -262,16 +278,29 @@ def release(east, dry_run, verbose):
     apps = east.east_yml.get("apps", [])
     samples = east.east_yml.get("samples", [])
 
-    # We inject app and samples with additional key/value pairs so the below logic for
-    # detection of jobs can be common/simpler.
+    # We inject app and samples with additional key/value pairs in below two for loops
+    # so the logic afterwards for detection of jobs can be common/simpler.
+    # We also do some existence checks.
+
+    # Small adjusment for projects which only have one single app
+    apps_in_dir = apps[0]["name"] if len(apps) == 1 else os.listdir("app")
+
     for app in apps:
+        # Check, if the app even exists before building for it
+        if app["name"] not in apps_in_dir:
+            east.print(non_existing_app_msg_fmt(app["name"]))
+            east.exit()
         # Add parent to mark from where this key comes from
         app.update({"parent": "apps"})
-        # Add "release" type
-        # (but only in apps context).
+        # Add "release" type (but only in apps context).
         app["build-types"].append({"type": "release"})
 
+    samples_in_dir = os.listdir("samples")
     for sample in samples:
+        # Check, if the sample even exists before building for it
+        if sample["name"] not in samples_in_dir:
+            east.print(non_existing_sample_msg_fmt(sample["name"]))
+            east.exit()
         # Add parent to mark from where this key comes from
         sample.update({"parent": "samples"})
         # Add "release" build type which for samples does nothing.
@@ -291,7 +320,7 @@ def release(east, dry_run, verbose):
                     # Some dance around built type name is needed for "release" type
 
                     common_dest = os.path.join(
-                        "release", target["parent"], target["name"]
+                        release_dir, target["parent"], target["name"]
                     )
 
                     if target["parent"] == "apps":
@@ -360,7 +389,7 @@ def release(east, dry_run, verbose):
     # First try to gather all zip targets and then execute them.
     zip_targets = []
 
-    samples_folder = os.path.join("release", "samples")
+    samples_folder = os.path.join(release_dir, "samples")
     if os.path.exists(samples_folder):
         zip_targets.append(
             {
@@ -375,7 +404,7 @@ def release(east, dry_run, verbose):
 
         for build_type in build_types:
             # A bit of naming manipulation for release build
-            app_folder = os.path.join("release", "apps", app["name"], build_type)
+            app_folder = os.path.join(release_dir, "apps", app["name"], build_type)
 
             build_type_suf = "" if build_type == "release" else f"-{build_type}"
 
@@ -390,14 +419,15 @@ def release(east, dry_run, verbose):
     # Execute all zip targets
     for zip_target in zip_targets:
         sh.make_archive(
-            os.path.join("release", zip_target["name"]),
+            os.path.join(release_dir, zip_target["name"]),
             "zip",
             zip_target["folder"],
         )
 
     east.print(
         Panel(
-            "[bold]Done with jobs 🎉 \n\nCheck release folder for artefacts.[/]",
+            f"[bold]Done with jobs 🎉 \n\nCheck [magenta]{release_dir}[/] folder for"
+            " artefacts.[/]",
             padding=1,
             border_style="green",
         )

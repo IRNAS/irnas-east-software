@@ -1,5 +1,9 @@
 import os
 
+from click.testing import CliRunner
+
+from east.__main__ import cli
+
 west_config_content = """
 [manifest]
 path = project
@@ -295,6 +299,12 @@ def helper_test_against_west_run1(
     _ = should_succed
 
     runner = CliRunner()
+
+    # Mock output of git commmand, so tests do not have to depend on it
+    mocker.patch(
+        "east.workspace_commands.release_commands.get_git_version",
+        return_value={"tag": "v1.0.0.", "hash": ""},
+    )
 
     monkeypatch.chdir(path)
     mocker.patch("east.east_context.EastContext.run_west")

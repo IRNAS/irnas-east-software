@@ -37,7 +37,7 @@ rich_click.rich_click.COMMAND_GROUPS = {
 @click.pass_context
 def cli(ctx, echo):
     """
-    [bold]East[/] is a command line meta-tool, usefull for creating, managing and
+    [bold]East[/] is a command line meta-tool, useful for creating, managing and
     deploying [bold cyan]nRF Connect SDK[/] projects.
 
     \b
