@@ -113,7 +113,7 @@ def show_job_summary(east, jobs):
             job["src_dir"].split("/")[-1],
             "app" if job["subdir"] == "apps" else "sample",
             job["board"],
-            job["build_type"] if job["subdir"] == "apps" else "None",
+            job["build_type"] if job["subdir"] == "apps" else "/",
         )
 
     east.print()

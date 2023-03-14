@@ -11,6 +11,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   `compile_commands.json` is now also copied to the top west directory. This 
     enables clangd to work as intended in `ncs` and `zephyr` folders (#53).
 
+### Changed
+
+-   Samples (which inherently do not have a build type) have their build type
+    marked with forward slash "/" instead of "None" in the Job table that 
+    appears when running `east release` (#52).
+
 ## [0.7.0] - 2023-02-15
 
 ### Added
