@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 -   `compile_commands.json` is now also copied to the top west directory. This 
     enables clangd to work as intended in `ncs` and `zephyr` folders (#53).
+-   Section in docs/configuration.md document describing `release` build type.
 
 ### Changed
 
