@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Sample binaries had incorrect `-None` build type qualifier in their release 
     name, when they shouldn't have. Incorrect build type qualifier was removed 
     (#52).
+-   Samples can now inherit from `release` build types (#47).
 
 ## [0.7.0] - 2023-02-15
 

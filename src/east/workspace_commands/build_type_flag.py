@@ -237,6 +237,11 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             app = return_dict_on_match(app_array, "name", os.path.basename(cwd))
         path_prefix = ""
 
+    # "release" is a special, implicit, default, build type. Samples can request to
+    # inherit from it, in that case only the common.conf is added to the build.
+    if build_type == "release":
+        build_type = None
+
     # Extract a list of conf files from the app, exit if they do not exist.
     conf_files = []
     if build_type:

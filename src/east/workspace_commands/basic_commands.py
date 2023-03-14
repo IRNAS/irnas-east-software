@@ -120,12 +120,6 @@ def create_build_command(
     # if cmake_args:
     #     build_cmd += f" -- \"{' '.join(cmake_args)}\""
 
-    # "release" is an alias for default build type (for both apps and samples).
-    # This is here to make the release logic cleaner, and not to further complicate the
-    # construct_extra_cmake_arguments, however it should be inside of it.
-    if build_type == "release":
-        build_type = None
-
     build_type_args, diagnostic = construct_extra_cmake_arguments(
         east,
         build_type,

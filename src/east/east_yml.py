@@ -96,11 +96,16 @@ def load_east_yml(project_dir: str):
                         f"Sample [bold]{sample['name']}[/] is trying to inherit from a"
                         f" [bold red]non-existing[/] app [bold]{inherited_app}[/]."
                     )
-                if not return_dict_on_match(app["build-types"], "type", inherited_type):
-                    raise EastYmlLoadError(
-                        f"Sample [bold]{sample['name']}[/] is trying to inherit from a"
-                        " [bold red]non-existing[/] build-type"
-                        f" [bold]{inherited_type}[/]."
-                    )
+                # Release build type is special, apps always have it implicitly, so we
+                # do not have to search for it.
+                if inherited_type != "release":
+                    if not return_dict_on_match(
+                        app["build-types"], "type", inherited_type
+                    ):
+                        raise EastYmlLoadError(
+                            f"Sample [bold]{sample['name']}[/] is trying to inherit "
+                            "from a [bold red]non-existing[/] build-type"
+                            f" [bold]{inherited_type}[/]."
+                        )
 
     return east_yml
