@@ -44,12 +44,21 @@ def move_build_artefacts(art_name, art_dest, dry_run):
     # Create artefact destination
     os.makedirs(art_dest, exist_ok=True)
 
-    binaries = ["app_update.bin", "merged.hex", "zephyr.elf"]
-
     build_dir = os.path.join("build", "zephyr")
 
+    # Determine, if we have basic, default build or we are using MCUBoot or TF-M
+    if (
+        os.path.isfile(os.path.join(build_dir, "app_update.bin"))
+        or dry_run
+        or RUNNING_TESTS
+    ):
+        # MCUBoot or TF-M
+        binaries = ["dfu_application.zip", "app_update.bin", "merged.hex", "zephyr.elf"]
+    else:
+        # Basic build
+        binaries = ["zephyr.bin", "zephyr.hex", "zephyr.elf"]
+
     for binary in binaries:
-        exten = binary.split(".")[1]
         bin_path = os.path.join(build_dir, binary)
 
         # If doing dry run or running tests we just create empty files so that we have
@@ -58,8 +67,8 @@ def move_build_artefacts(art_name, art_dest, dry_run):
             os.makedirs(build_dir, exist_ok=True)
             open(bin_path, "w").close()
 
-        # app_update.bin and merged.hex are created only if building a DFU image
         if os.path.isfile(bin_path):
+            exten = binary.split(".")[1]
             sh.copyfile(
                 bin_path,
                 os.path.join(art_dest, ".".join([art_name, exten])),

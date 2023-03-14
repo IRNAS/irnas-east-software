@@ -282,6 +282,18 @@ High-level release process looks like this:
 # Create a zip folder of samples
 ```
 
+### Copied build artefacts
+
+Which build artefacts are copied and renamed from `build/zephyr` to the
+`release` subfolders depends on what kind of build was done:
+
+- If a default build was done then `zephyr.bin`, `zephyr.hex`, `zephyr.elf`
+  files are copied and renamed.
+- If a MCUBoot or TF-M build was done then `dfu_application.zip`,
+  `app_update.bin`, `merged.hex`, `zephyr.elf` files are copied and renamed.
+
+In both cases the file extensions are preserved.
+
 ## Resources for beginners
 
 This document assumes knowledge of several different concepts:

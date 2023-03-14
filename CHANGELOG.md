@@ -24,6 +24,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     name, when they shouldn't have. Incorrect build type qualifier was removed 
     (#52).
 -   Samples can now inherit from `release` build types (#47).
+-   `east release` command now correctly copies build artefacts when
+    `merged.hex` is not generated. Additionally, new _Copied build artefacts_
+    section in `docs/configuration.md` now exactly defines which build artefacts
+    are copied and renamed in release procedure (#51).
 
 ## [0.7.0] - 2023-02-15
 
