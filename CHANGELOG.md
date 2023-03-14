@@ -17,6 +17,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     marked with forward slash "/" instead of "None" in the Job table that 
     appears when running `east release` (#52).
 
+### Fixed
+
+-   Sample binaries had incorrect `-None` build type qualifier in their release 
+    name, when they shouldn't have. Incorrect build type qualifier was removed 
+    (#52).
+
 ## [0.7.0] - 2023-02-15
 
 ### Added

@@ -28,7 +28,8 @@ def create_artefact_name(project, board, version, build_type):
     """
     board = board.replace("@", "-hv")
 
-    build_type = "" if build_type == "release" else f"-{build_type}"
+    # "release" or None build_type should not generate any build type qualifier.
+    build_type = "" if build_type == "release" or not build_type else f"-{build_type}"
 
     git_hash = f"-{version['hash']}" if version["hash"] else ""
 
