@@ -167,4 +167,5 @@ def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
         "app": app_path,
         "prefix": prefix_path,
         "test": test_path,
+        "project_type": request.param,
     }

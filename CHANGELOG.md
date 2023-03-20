@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.8.0] - 2023-03-20
+
+### Added
+
+-   `compile_commands.json` is now also copied to the top west directory. This 
+    enables clangd to work as intended in `ncs` and `zephyr` folders (#53).
+-   Section in docs/configuration.md document describing `release` build type.
+
+### Changed
+
+-   Samples (which inherently do not have a build type) have their build type
+    marked with forward slash "/" instead of "None" in the Job table that 
+    appears when running `east release` (#52).
+
+### Fixed
+
+-   Sample binaries had incorrect `-None` build type qualifier in their release 
+    name, when they shouldn't have. Incorrect build type qualifier was removed 
+    (#52).
+-   Samples can now inherit from `release` build types (#47).
+-   `east release` command now correctly copies build artefacts when
+    `merged.hex` is not generated. Additionally, new _Copied build artefacts_
+    section in `docs/configuration.md` now exactly defines which build artefacts
+    are copied and renamed in release procedure (#51).
+
 ## [0.7.0] - 2023-02-15
 
 ### Added
@@ -142,7 +167,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.8.0...HEAD
+
+[0.8.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.7.0...v0.8.0
 
 [0.7.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.2...v0.7.0
 

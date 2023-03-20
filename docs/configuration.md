@@ -131,9 +131,8 @@ specified in `east.yml`:
   samples it is still allowed).
 - `common.conf` is always used with each build type, so it does not need to be
   explicitly specified in `conf-files`.
-- Calling `east build` without the `--build-type` option will use `common.conf`
-  automatically (`east` performs a search to determine which `common.conf`
-  should be used).
+- Calling `east build` without the `--build-type` option will use **only**
+  `common.conf`.
 - Order of additional conf files matters, as they are applied in the order
   listed.
 - As normal, conf files that are specific to the used `west` boards,
@@ -148,6 +147,21 @@ means that:
 - When we use the `debug` build type, `common.conf` and `debug.conf` are used.
 - When we use the `uart` build type, `common.conf`, `debug.conf` and `uart.conf`
   are used.
+
+### Release build type
+
+Calling `east build` without the `--build-type` option just uses `common.conf`.
+This kind of build type is known as a `release` build type.
+
+Several things to note about the `release` build type:
+
+- Samples can inherit configuration from a `release` build type, just like from
+  the other build types (See _Samples_ section below).
+- `release` build type does not appear as a misc qualifier, as do other build
+  types, in the build artefact names when running `east release` command (see
+  _Release command_ section below).
+- Released firmware that has a `release` build type is considered as one and
+  only firmware that should be used in the production.
 
 ## Applications
 
@@ -267,6 +281,18 @@ High-level release process looks like this:
 #
 # Create a zip folder of samples
 ```
+
+### Copied build artefacts
+
+Which build artefacts are copied and renamed from `build/zephyr` to the
+`release` subfolders depends on what kind of build was done:
+
+- If a default build was done then `zephyr.bin`, `zephyr.hex`, `zephyr.elf`
+  files are copied and renamed.
+- If a MCUBoot or TF-M build was done then `dfu_application.zip`,
+  `app_update.bin`, `merged.hex`, `zephyr.elf` files are copied and renamed.
+
+In both cases the file extensions are preserved.
 
 ## Resources for beginners
 

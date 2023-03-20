@@ -452,6 +452,96 @@ def test_non_existing_inherited_app(west_workplace_parametrized, monkeypatch, mo
     )
 
 
+east_yaml_inheriting_from_release_single_app = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+
+samples:
+  - name: settings
+    west-boards:
+      - custom_nrf52840dk
+    inherit-build-type:
+        app: test_one
+        build-type: release
+"""
+
+east_yaml_inheriting_from_release_multi_app = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+
+  - name: test_two
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+
+samples:
+  - name: settings
+    west-boards:
+      - custom_nrf52840dk
+    inherit-build-type:
+        app: test_one
+        build-type: release
+"""
+
+
+def test_inheriting_from_release_build_type(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    It should be possible for a sample to inherit from a "release" build type. In that
+    case only common.conf should be added to the build.
+    """
+
+    project_path = west_workplace_parametrized["project"]
+
+    def west_cmd_fmt(prefix):
+        return f"build -- -DCONF_FILE={prefix}conf/common.conf"
+
+    if west_workplace_parametrized["project_type"] == "single":
+        east_yml = east_yaml_inheriting_from_release_single_app
+
+    if west_workplace_parametrized["project_type"] == "multi":
+        east_yml = east_yaml_inheriting_from_release_multi_app
+
+    helpers.create_and_write(
+        project_path,
+        "east.yml",
+        east_yml,
+    )
+
+    sample_path = os.path.join(project_path, "samples", "settings")
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        sample_path,
+        "build",
+        expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
+        should_succed=True,
+    )
+
+
 east_yaml_duplicated_app_names = """
 apps:
   - name: test_one

@@ -71,7 +71,8 @@ def build(east, board, build_type, build_dir, target, source_dir):
     For additional info see chapter [bold]Building, Flashing and Debugging[/], section
     [bold]One-Time CMake Arguments[/].
 
-    \n\n[bold]Note:[/] This command will, after build step, copy [bold]compile_commands.json[/], if found, from the build directory to the project directory. This makes job of locating this file easier for [bold yellow]clangd[/].
+    \n\n[bold]Note:[/] This command will, after build step, copy
+    [bold]compile_commands.json[/], if found, from the build directory to the project and top west directory. This makes job of locating this file easier for [bold yellow]clangd[/].
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -88,6 +89,9 @@ def build(east, board, build_type, build_dir, target, source_dir):
     if os.path.isfile(compile_file):
         sh.copyfile(
             compile_file, os.path.join(east.project_dir, "compile_commands.json")
+        )
+        sh.copyfile(
+            compile_file, os.path.join(east.west_dir_path, "compile_commands.json")
         )
 
 
@@ -115,12 +119,6 @@ def create_build_command(
     # WARN: cmake args are making some problems in this form.
     # if cmake_args:
     #     build_cmd += f" -- \"{' '.join(cmake_args)}\""
-
-    # "release" is an alias for default build type (for both apps and samples).
-    # This is here to make the release logic cleaner, and not to further complicate the
-    # construct_extra_cmake_arguments, however it should be inside of it.
-    if build_type == "release":
-        build_type = None
 
     build_type_args, diagnostic = construct_extra_cmake_arguments(
         east,
