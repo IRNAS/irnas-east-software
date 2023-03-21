@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.8.0] - 2023-03-20
+
 ### Added
 
 -   `compile_commands.json` is now also copied to the top west directory. This 
@@ -165,7 +167,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.8.0...HEAD
+
+[0.8.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.7.0...v0.8.0
 
 [0.7.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.6.2...v0.7.0
 
