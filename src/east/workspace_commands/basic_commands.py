@@ -4,6 +4,7 @@ import shutil as sh
 import click
 
 from ..east_context import east_command_settings
+from ..helper_functions import clean_up_extra_args
 from .build_type_flag import construct_extra_cmake_arguments
 
 
@@ -44,7 +45,7 @@ def clean(east):
     ),
 )
 @click.option("-t", "--target", type=str, help="Run this build system target.")
-# @click.argument("cmake-args", nargs=-1, type=str, metavar="-- [cmake-args]")
+@click.argument("cmake-args", nargs=-1, type=str, metavar="-- [cmake-args]")
 @click.option(
     "-s",
     "--source-dir",
@@ -55,7 +56,7 @@ def clean(east):
     ),
 )
 @click.pass_obj
-def build(east, board, build_type, build_dir, target, source_dir):
+def build(east, board, build_type, build_dir, target, source_dir, cmake_args):
     """
     Build firmware in the current directory.
 
@@ -80,7 +81,7 @@ def build(east, board, build_type, build_dir, target, source_dir):
     east.pre_workspace_command_check()
 
     build_cmd = create_build_command(
-        east, board, build_type, build_dir, target, source_dir
+        east, board, build_type, build_dir, target, source_dir, cmake_args
     )
 
     east.run_west(build_cmd)
@@ -102,23 +103,12 @@ def create_build_command(
     build_dir=None,
     target=None,
     source_dir=None,
+    cmake_args=None,
     silence_diagnostic=False,
 ):
-    """Creates build command. This is needed so it can also be reused by release command"""
-    build_cmd = "build"
-
-    if board:
-        build_cmd += f" -b {board}"
-    if build_dir:
-        build_cmd += f" -d {build_dir}"
-    if target:
-        build_cmd += f" -t {target}"
-    if source_dir:
-        build_cmd += f" {source_dir}"
-
-    # WARN: cmake args are making some problems in this form.
-    # if cmake_args:
-    #     build_cmd += f" -- \"{' '.join(cmake_args)}\""
+    """Helper for creating a build command. This extra helper is needed so it can also
+    be reused by release command.
+    """
 
     build_type_args, diagnostic = construct_extra_cmake_arguments(
         east,
@@ -131,8 +121,26 @@ def create_build_command(
     if diagnostic and not silence_diagnostic:
         east.print(diagnostic)
 
+    build_cmd = "build"
+
+    if board:
+        build_cmd += f" -b {board}"
+    if build_dir:
+        build_cmd += f" -d {build_dir}"
+    if target:
+        build_cmd += f" -t {target}"
+    if source_dir:
+        build_cmd += f" {source_dir}"
+
+    # Some flags need to be passed as extra parameters to the west tool
+    if build_type_args or cmake_args:
+        build_cmd += " --"
+
     if build_type_args:
-        build_cmd += f" -- {build_type_args}"
+        build_cmd += f" {build_type_args}"
+
+    if cmake_args:
+        build_cmd += f" {clean_up_extra_args(cmake_args)}"
 
     return build_cmd
 
@@ -184,16 +192,12 @@ def flash(east, build_dir, runner, verify, jlink_id, extra_args):
     if runner:
         flash_cmd += f"-r {runner} "
 
-    # Some flags need to be passed as extra parameters to the west tool
-    if verify or jlink_id or extra_args:
-        flash_cmd += "-- "
-
     if verify:
         flash_cmd += "--verify "
     if jlink_id:
         flash_cmd += f"-i {jlink_id} "
     if extra_args:
-        flash_cmd += f"\"{' '.join(extra_args)}\" "
+        flash_cmd += f" {clean_up_extra_args(extra_args)}"
 
     east.run_west(flash_cmd)
 
@@ -223,14 +227,6 @@ def bypass(east, args):
     if not args:
         east.exit()
 
-    # Click argument automatically strips double quotes from anything that is given
-    # after "--". Double quotes are needed if specifying define values (-D) to the cmake
-    # args, below list comprehension adds them back.
-    def add_back_double_quotes(arg):
-        splited = arg.split("=")
-        return f'{splited[0]}="{splited[1]}"'
+    cmd = clean_up_extra_args(args)
 
-    args = [add_back_double_quotes(arg) if "=" in arg else arg for arg in args]
-
-    cmd = f"{' '.join(args)} "
     east.run_west(cmd)

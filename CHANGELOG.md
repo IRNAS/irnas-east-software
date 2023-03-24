@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+-   Add back functionality to provide `cmake_args` after `--` marker for `build`
+    command. Now it is possible to provide custom `-D` define values to the
+    CMake. Commands `flash`, `bypass` already provided option for extra
+    arguments after `--`, however they did it incorrectly for very edge cases,
+    as they removed double quotes from all arguments passed after `--` marker
+    (#56).
+
 ## [0.8.0] - 2023-03-20
 
 ### Added

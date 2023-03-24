@@ -306,3 +306,32 @@ def find_all_boards(east, west_board: str) -> List[str]:
     boards = ["@".join([west_board, hw]) for hw in sorted(hw_versions)]
 
     return boards if boards else [west_board]
+
+
+def clean_up_extra_args(args):
+    """
+    Clean up extra args, by adding back double qutoes to the define assingments.
+
+    Click argument automatically strips double quotes from anything that is given
+    after "--". We can not know for sure from where double quotes were removed,
+    however we know that CMake in atleast one case requires them.
+    For example, double quotes are needed, if you are assing a list of tokens to the
+    define value, like so: -DFILES="file1.txt;file2.txt".
+    Double qutes are also added if there is an assigemnt to a flag, like:
+    --some-flag=something.
+    If this line gets to Cmake without double quotes, it will not be parsed
+    correctly.
+
+        args ():    Extra args, passed after '--' as Click argument.
+
+    Returns:
+        cleaned up args, already formatted as a string.
+    """
+
+    def add_back_double_quotes(arg):
+        if (arg.startswith("-D") or arg.startswith("--")) and "=" in arg:
+            splited = arg.split("=")
+            arg = f'{splited[0]}="{splited[1]}"'
+        return arg
+
+    return f"{' '.join(list(map(add_back_double_quotes, args)))}"
