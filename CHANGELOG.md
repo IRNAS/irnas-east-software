@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   `util rtt` command now supports `--logfile` with which you can specify file 
+    into which to store RTT logs (#42).
+
 ### Changed
 
 -   Add back functionality to provide `cmake_args` after `--` marker for `build`

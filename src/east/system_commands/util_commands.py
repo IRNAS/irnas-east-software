@@ -97,8 +97,14 @@ def connect(east, device, jlink_id, rtt_port):
     default=19021,
     help=("Sets the RTT Telnet port. Default: 19021."),
 )
+@click.option(
+    "-l",
+    "--logfile",
+    type=str,
+    help="Relative path to a log file into which to save RTT output.",
+)
 @click.pass_obj
-def rtt(east, local_echo, rtt_port):
+def rtt(east, local_echo, rtt_port, logfile):
     """Runs a RTT client which connects to a running RTT server.
 
 
@@ -112,7 +118,12 @@ def rtt(east, local_echo, rtt_port):
 
     local_echo = "On" if local_echo else "Off"
 
-    east.run(f"JLinkRTTClient -LocalEcho {local_echo} -RTTTelnetPort {rtt_port}")
+    rtt_cmd = f"JLinkRTTClient -LocalEcho {local_echo} -RTTTelnetPort {rtt_port} "
+
+    if logfile:
+        rtt_cmd += f"| tee {logfile}"
+
+    east.run(rtt_cmd)
 
 
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
