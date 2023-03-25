@@ -8,8 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
--   `util rtt` command now supports `--logfile` with which you can specify file 
+-   `util rtt` command now supports `--logfile` with which you can specify file
     into which to store RTT logs (#42).
+-   `debug` command which uses `west debug` or (`west attach`) to connect to the
+    board and start a debugging session.
 
 ### Changed
 

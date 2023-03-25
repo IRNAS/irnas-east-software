@@ -230,3 +230,45 @@ def bypass(east, args):
     cmd = clean_up_extra_args(args)
 
     east.run_west(cmd)
+
+
+@click.command(**east_command_settings)
+@click.pass_obj
+@click.option(
+    "-t",
+    "--tui",
+    is_flag=True,
+    help="If given GDB uses Text User Interface",
+)
+@click.option(
+    "-a",
+    "--attach",
+    is_flag=True,
+    help=(
+        "If given only connect to the board and start a debugging session, skip "
+        "flashing (uses [bold magenta]west attach[/] instead of [bold magenta]west "
+        "debug[/])."
+    ),
+)
+@click.argument("extra_args", nargs=-1, type=str, metavar="-- [args]")
+def debug(east, tui, attach, extra_args):
+    """Connect to the board, flash the program, and start a debugging session.
+
+    \b
+    \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
+    the [bold magenta]west[/] tool (run east debug -- --help to see all possible options).
+
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+    east.pre_workspace_command_check()
+
+    cmd = "attach " if attach else "debug "
+
+    if tui:
+        cmd += "--tui "
+
+    if extra_args:
+        cmd += f"{clean_up_extra_args(extra_args)} "
+
+    east.run_west(cmd)
