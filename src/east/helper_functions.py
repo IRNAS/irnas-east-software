@@ -97,17 +97,17 @@ def download_file(task_id: TaskID, url: str, path: str):
 def download_files(urls: List[str], dest_dir: str) -> List[str]:
     """Download concurrently multiple files from the internet to the given directory.
 
-    Function expects a list of urls that point to the files.
+    Function expects a list of URLs that point to the files.
 
     After all files were downloaded the function returns a list of paths to the
     downloaded files in the same order as they were given.
 
-    Downloaded files are not renamed, they have the same name as in the url. Only
+    Downloaded files are not renamed, they have the same name as in the URL. Only
     exception to this rule are raw files from the GitHub, they end with '?raw=true', so
     that part is removed.
 
     Args:
-        urls (List[strl]):      Url that points to a file to be downloaded.
+        urls (List[strl]):      URL that points to a file to be downloaded.
 
     Return:
         files (List[str]):      List of paths to the downloaded files.
@@ -310,14 +310,14 @@ def find_all_boards(east, west_board: str) -> List[str]:
 
 def clean_up_extra_args(args):
     """
-    Clean up extra args, by adding back double qutoes to the define assingments.
+    Clean up extra args, by adding back double quotes to the define assignments.
 
     Click argument automatically strips double quotes from anything that is given
     after "--". We can not know for sure from where double quotes were removed,
-    however we know that CMake in atleast one case requires them.
-    For example, double quotes are needed, if you are assing a list of tokens to the
+    however we know that CMake in at least one case requires them.
+    For example, double quotes are needed, if you are assigning a list of tokens to the
     define value, like so: -DFILES="file1.txt;file2.txt".
-    Double qutes are also added if there is an assigemnt to a flag, like:
+    Double quotes are also added if there is an assignment to a flag, like:
     --some-flag=something.
     If this line gets to Cmake without double quotes, it will not be parsed
     correctly.
@@ -330,8 +330,8 @@ def clean_up_extra_args(args):
 
     def add_back_double_quotes(arg):
         if (arg.startswith("-D") or arg.startswith("--")) and "=" in arg:
-            splited = arg.split("=")
-            arg = f'{splited[0]}="{splited[1]}"'
+            split = arg.split("=")
+            arg = f'{split[0]}="{split[1]}"'
         return arg
 
     return f"{' '.join(list(map(add_back_double_quotes, args)))}"

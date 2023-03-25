@@ -47,7 +47,7 @@ def _construct_required_cmake_args(
     overlay_configs = []
 
     # If a west board is given search for board specific config file and add it to the
-    # the start of overlay_configs, if it is found.
+    # start of overlay_configs, if it is found.
     if board:
         # Sanitize the board input, user might gave hv version
         board = board.split("@")[0]
@@ -117,7 +117,7 @@ build_type_misuse_msg = """
 Option [bold cyan]--build-type[/] can only be used inside of the application folder, exiting!"""
 
 build_type_misuse_no_app_msg = """
-Option [bold cyan]--build-type[/] can only be used when apps key in [bold yellow]east.yml[/] has atleast one
+Option [bold cyan]--build-type[/] can only be used when apps key in [bold yellow]east.yml[/] has at least one
 application entry!"""
 
 
@@ -166,7 +166,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             east.exit()
 
     # Modify current working dir, if source_dir is used, rstrip is needed cause
-    # path.join adds one "/" if joning empty string.
+    # path.join adds one "/" if joining empty string.
     source_dir = source_dir if source_dir else ""
     cwd = os.path.join(east.cwd, source_dir).rstrip("/")
 

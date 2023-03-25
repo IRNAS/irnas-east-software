@@ -10,10 +10,10 @@ from ..helper_functions import check_python_version, download_files
 
 
 def _get_conda_download_link():
-    """Construct download link for conda installer script based on system python
+    """Construct download link for Conda installer script based on system python
     version"""
 
-    # Link to the conda installer script. Two big Xs will be later replaced with python
+    # Link to the Conda installer script. Two big Xs will be later replaced with python
     # version, like 39 or 38.
     link = "https://repo.anaconda.com/miniconda/Miniconda3-pyXX_4.12.0-Linux-x86_64.sh"
     py_ver = str(sys.version_info.major) + str(sys.version_info.minor)
@@ -84,7 +84,7 @@ manually with one of the below commands for changes to take effect:
 toolchain_installed_msg = """
 [bold green]Nordic's Toolchain Manager install done![/]
 
-East will now smartly use Nordic's Toolechain Manager whenever it can.
+East will now smartly use Nordic's Toolchain Manager whenever it can.
 
 [bold]Note:[/] You still need to run [italic bold blue]east update toolchain[/] inside
 of a [yellow bold]West workspace[/] to get the actual toolchain.

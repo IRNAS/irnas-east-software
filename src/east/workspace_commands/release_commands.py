@@ -141,7 +141,7 @@ def run_job(east, progress, job, dry_run, verbose):
     verbose():          If true the Cmake output is shown.
 
     Return:
-        Bool            True, if job succeded, false if it did not.
+        Bool            True, if job succeeded, false if it did not.
     """
 
     build_cmd = create_build_command(
@@ -292,7 +292,7 @@ def release(east, dry_run, verbose):
     # so the logic afterwards for detection of jobs can be common/simpler.
     # We also do some existence checks.
 
-    # Small adjusment for projects which only have one single app
+    # Small adjustment for projects which only have one single app
     apps_in_dir = apps[0]["name"] if len(apps) == 1 else os.listdir("app")
 
     for app in apps:
@@ -316,7 +316,7 @@ def release(east, dry_run, verbose):
         # Add "release" build type which for samples does nothing.
         sample.update({"build-types": [{"type": None}]})
 
-    # Apps and samples become targets, which can be handled in similiar way.
+    # Apps and samples become targets, which can be handled in similar way.
     targets = apps + samples
 
     jobs = []

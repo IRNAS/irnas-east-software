@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     as they removed double quotes from all arguments passed after `--` marker
     (#56).
 
+### Fixed
+
+-   Ton of spelling mistakes in the code and comments.
+
 ## [0.8.0] - 2023-03-20
 
 ### Added

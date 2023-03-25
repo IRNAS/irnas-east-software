@@ -19,7 +19,7 @@ NRF_TOOLCHAIN_MANAGER_PATH = os.path.join(EAST_DIR, "nrfutil-toolchain-manager.e
 # Directory will all Conda stuff
 MINICONDA_DIR = os.path.join(HOME_DIR, "miniconda3")
 
-# Path to the Conda executable, this can be used when the conda is not yet on PATH
+# Path to the Conda executable, this can be used when the Conda is not yet on PATH
 CONDA_PATH = os.path.join(MINICONDA_DIR, "bin", "conda")
 
 const_paths = {

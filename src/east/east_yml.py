@@ -19,7 +19,7 @@ def format_east_yml_load_error_msg(exception_msg):
 
 
 def load_east_yml(project_dir: str):
-    """Try to load east.yml. If that succeds validate it.
+    """Try to load east.yml. If that succeeds validate it.
 
         project_dir (str): Path to project directory, where east.yml should be located.
 

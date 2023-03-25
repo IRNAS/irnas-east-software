@@ -64,7 +64,7 @@ def connect(east, device, jlink_id, rtt_port):
 
 
     \b
-    \n\nRTT server will emmit any RTT messages produced by the device over its dedicated port. Execute [bold magenta]east util rtt[/] command in the separate window to observe these messages.
+    \n\nRTT server will emit any RTT messages produced by the device over its dedicated port. Execute [bold magenta]east util rtt[/] command in the separate window to observe these messages.
 
     """
 
@@ -128,7 +128,7 @@ def rtt(east, local_echo, rtt_port, logfile):
 
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
 @click.pass_obj
-def util(east):
+def util(_):
     """Command with several subcommands related to utilities."""
     pass
 

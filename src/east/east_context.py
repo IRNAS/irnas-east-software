@@ -26,7 +26,7 @@ from .helper_functions import (
 RICH_CONSOLE_ENABLE_MARKUP = True
 
 """
-Convenience dicts for storing settings that are indentical across Click's commands and
+Convenience dicts for storing settings that are identical across Click's commands and
 groups.
 """
 east_command_settings = {
@@ -59,7 +59,7 @@ class EastContext:
             to executing it. Default: ``False``.
         """
 
-        # This init will be called on true command invocation, --help flag or similiar
+        # This init will be called on true command invocation, --help flag or similar
         # do not count.
         self.cwd = os.getcwd()
         self.echo = echo
@@ -155,7 +155,7 @@ class EastContext:
         exit_on_error: bool = True,
         return_output: bool = False,
         silent: bool = False,
-    ) -> str:
+    ) -> dict:
         """
         Executes given command in shell as a process. This is a blocking call, process
         needs to finish before this command can return;
@@ -174,7 +174,7 @@ class EastContext:
             silent (bool):          Do not print command's output.
 
         Returns:
-            If exit_on_error is False then dict with two keys is returned:
+            Dict with two keys is always returned:
                 output(str):        Contains stdout of the process that run, if
                                     return_output is True, otherwise empty string.
                 returncode(int):    Return code of the process that run
@@ -184,7 +184,7 @@ class EastContext:
             self.print_info(command)
 
         if return_output:
-            # Prepare varibale for later assingment
+            # Prepare variable for later assignment
             returncode = None
 
             # This works but it has no color and no stderr
@@ -257,7 +257,7 @@ class EastContext:
         cmd = f"west {west_command}"
 
         if self.ncs_version_installed:
-            # Run west command as arbitary command through manager
+            # Run west command as arbitrary command through manager
             return self._run_arbi_manager(cmd, **kwargs)
         else:
             return self.run(cmd, **kwargs)
@@ -280,41 +280,41 @@ class EastContext:
         return self.run(cmd, **kwargs)
 
     def _run_arbi_manager(
-        self, arbitary_command: str, exit_on_error: bool = True, **kwargs
+        self, arbitrary_command: str, exit_on_error: bool = True, **kwargs
     ):
-        """Run an arbitary command through Nordic's Toolchain Manager
+        """Run an arbitrary command through Nordic's Toolchain Manager
 
-        This method should be used when passing any arbitary command, like west command.
+        This method should be used when passing any arbitrary command, like west command.
 
-        To properly execute an arbitary command and propagate its return code to the
+        To properly execute an arbitrary command and propagate its return code to the
         caller we have do a bit of a bash shell dancing, as Nordic's Toolchain Manager
         does not do this for some commands (if west build fails then return code is not
         propagated, but issuing non-existing command does propagate up).
 
-        What we do is that we run as a total arbitary command following:
+        What we do is that we run as a total arbitrary command following:
 
-            bash -c '{arbitary_command} && touch success.txt'
+            bash -c '{arbitrary_command} && touch success.txt'
 
-        if arbitary_command inside it fails, then `touch success.txt` is not executed.
+        if arbitrary_command inside it fails, then `touch success.txt` is not executed.
 
         So we are checking for success.txt file after every call and exit if it does not
         exist.
 
-        We also need to be carefull what quotes we are using.
+        We also need to be careful what quotes we are using.
 
         Args:
-            arbitary_command (str):
+            arbitrary_command (str):
             **kwargs:
 
         Returns:
             Check .run
         """
 
-        arbitary_command = arbitary_command.replace("'", '"')
+        arbitrary_command = arbitrary_command.replace("'", '"')
 
         cmd = (
             f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
-            f" {self.detected_ncs_version} -- bash -c '{arbitary_command} "
+            f" {self.detected_ncs_version} -- bash -c '{arbitrary_command} "
             "&& touch success.txt'"
         )
 
@@ -338,7 +338,7 @@ class EastContext:
 
         cleanup()
 
-        # Patch opver the correct returncode
+        # Patch over the correct returncode
         result["returncode"] = returncode
 
         return result
@@ -354,7 +354,7 @@ class EastContext:
             on_fail_exit (bool):    If true it exits cli on exit
 
         Returns:
-            True if given executable was found.
+            True if given executable was found, false otherwise.
         """
         if not which(exe):
             if on_fail_exit:
@@ -370,7 +370,8 @@ class EastContext:
 
         """
 
-        # WARN: Checkk version was not yet anywhere, behaviour yet needs to be verified
+        # WARN: Check version is not yet used anywhere, behaviour yet needs to be
+        # verified
         response = self.run(f"{exe} {version_cmd}", silent=True, return_output=True)
 
         return True if expected_version in response["output"] else False
@@ -398,7 +399,7 @@ class EastContext:
 
             ignore_unsupported_ncs (bool):  When true, self.does not exit if detected
                                             NCS version is not supported by the
-                                            Toolchain Managaer. Workspace commands such
+                                            Toolchain Manager. Workspace commands such
                                             as build, flash, clean should set this to
                                             True. Update command should set this to
                                             false.
