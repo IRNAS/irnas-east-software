@@ -106,7 +106,7 @@ To view RTT logs:
 # Run in first terminal window
 east util connect
 
-# Run in second, new terminal window
+# Run in second, new, terminal window
 east util rtt
 ```
 
