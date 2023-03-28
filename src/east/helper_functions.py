@@ -30,6 +30,7 @@ PathType = Union[str, os.PathLike]
 supported_python_versions = [
     {"major": 3, "minor": 8},
     {"major": 3, "minor": 9},
+    {"major": 3, "minor": 10},
 ]
 
 progress = Progress(
