@@ -46,16 +46,19 @@ def move_build_artefacts(art_name, art_dest, dry_run):
 
     build_dir = os.path.join("build", "zephyr")
 
-    # Determine, if we have basic, default build or we are using MCUBoot or TF-M
+    # Determine, if we have basic build with MCUBoot, some other build with child images, or default build
     if (
         os.path.isfile(os.path.join(build_dir, "app_update.bin"))
         or dry_run
         or RUNNING_TESTS
     ):
-        # MCUBoot or TF-M
+        # MCUBoot
         binaries = ["dfu_application.zip", "app_update.bin", "merged.hex", "zephyr.elf"]
+    elif os.path.isfile(os.path.join(build_dir, "merged.hex")):
+        # Other (TFM, SPM, ...)
+        binaries = ["merged.hex", "zephyr.elf"]
     else:
-        # Basic build
+        # Basic build (No merged.hex is generated)
         binaries = ["zephyr.bin", "zephyr.hex", "zephyr.elf"]
 
     for binary in binaries:
