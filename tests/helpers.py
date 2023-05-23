@@ -2,6 +2,7 @@ import os
 
 from click.testing import CliRunner
 
+import east
 from east.__main__ import cli
 
 west_config_content = """
@@ -277,6 +278,74 @@ def assert_strings_equal(string1: str, string2: str):
         return string.replace("\n", "").replace("\t", 8 * " ")
 
     assert clear_rich(string1) == clear_rich(string2)
+
+
+def helper_test_against_west_run(
+    monkeypatch,
+    mocker,
+    path,
+    east_cmd,
+    expected_west_cmd=None,
+    expected_west_cmds=None,
+    should_succed=True,
+):
+    """
+    Helper function for making tests easier to read.
+
+    Args:
+        monkeypatch ():         fixture
+        mocker ():              fixture
+        path ():                To which path should we change
+        east_cmd ():            which east command should be called
+        expected_west_cmd ():   A single expected west cmd, a string.
+        expected_west_cmds ():  A List of expected west_cmds.
+        should_succed ():       If true then the command should succeded.
+
+    Only a expected_west_cmd or expected_west_cmds can be given, both not both.
+    If none is given then no run_west call should happend.
+
+    Returns:
+        Result object, which can be further checked.
+    """
+    runner = CliRunner()
+
+    # Mock output of git commmand, so tests do not have to depend on it
+    mocker.patch(
+        "east.workspace_commands.release_commands.get_git_version",
+        return_value={"tag": "v1.0.0.", "hash": ""},
+    )
+
+    monkeypatch.chdir(path)
+    mocker.patch(
+        "east.east_context.EastContext.run_west",
+        return_value={"output": "", "returncode": 0},
+    )
+
+    # Setting catch_exceptions to False enables us to see programming errors in East
+    # code
+    result = runner.invoke(cli, east_cmd.strip().split(" "), catch_exceptions=False)
+
+    run_west = east.east_context.EastContext.run_west
+
+    if expected_west_cmds:
+
+        # This conversion is needed due to assert_has_calls interface
+        calls = [
+            mocker.call(cmd, silent=True, return_output=True, exit_on_error=False)
+            for cmd in expected_west_cmds
+        ]
+        run_west.assert_has_calls(calls)
+
+    elif expected_west_cmd:
+        run_west.assert_called_once_with(expected_west_cmd)
+    else:
+
+        run_west.assert_not_called()
+
+    expected_return_code = 0 if should_succed else 1
+
+    assert result.exit_code == expected_return_code
+    return result
 
 
 def helper_test_against_west_run1(
