@@ -422,6 +422,12 @@ class EastContext:
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
+        # Check if ncs version was even detected, this can happen in the cases where
+        # normal zephyr repo is used
+        if self.detected_ncs_version is None:
+            self.ncs_version_installed = False
+            return
+
         # Check if toolchain for detected ncs version is installed
         result = self.run_manager("list", silent=True, return_output=True)
         if self.detected_ncs_version in result["output"]:
