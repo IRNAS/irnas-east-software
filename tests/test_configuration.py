@@ -26,11 +26,11 @@ def test_good_west_workplace(west_workplace_parametrized):
     assert east.west_dir_path == os.path.dirname(project_path)
     assert east.detected_ncs_version == "v2.1.0"
 
-    assert east.ncs_version_installed is False
+    assert east.use_toolchain_manager is False
     assert east.east_yml is None
 
     east.pre_workspace_command_check()
-    assert east.ncs_version_installed is True
+    assert east.use_toolchain_manager is True
     assert east.east_yml is not None
 
 
