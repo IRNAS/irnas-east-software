@@ -69,8 +69,7 @@ class EastContext:
         os.makedirs(self.consts["east_dir"], exist_ok=True)
 
         self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
-        self.ncs_version_installed = False
-        self.ncs_version_supported = False
+        self.use_toolchain_manager = False
         self.east_yml = None
 
         try:
@@ -256,7 +255,7 @@ class EastContext:
 
         cmd = f"west {west_command}"
 
-        if self.ncs_version_installed:
+        if self.use_toolchain_manager:
             # Run west command as arbitrary command through manager
             return self._run_arbi_manager(cmd, **kwargs)
         else:
@@ -382,14 +381,20 @@ class EastContext:
         ignore_unsupported_ncs: bool = True,
     ):
         """
-        A list of checks that every workspace command should call before executing its
-        actual command.
+        This function contains a list of checks that every workspace (not system)
+        command should call before executing its actual command.
 
-        This command will also load the east.yml file if it is found.
+        In current implementation it does general things:
+        * Asserts that workspace command was run from the west workspace
+        * Tries to load east.yml
+        * Tries to determine the NCS version that is used in the project.
+        * Tries to find the version of the toolcahin in the nordic's toolchain manager.
 
+        This function esentially tries to answer the questions: should the underlying
+        west command be passed to the nordic's toolchain manager or directly to the
+        west.
 
         Args:
-            self.(self.ontext):             self.context for printing and exiting
             ignore_uninstalled_ncs (bool):  When true, self.does not exit if detected
                                             NCS version is not installed by the
                                             Toolchain Manager. Workspace commands such
@@ -404,7 +409,8 @@ class EastContext:
                                             True. Update command should set this to
                                             false.
         """
-        # Exit if we are not inside west workspace
+        # Workspace commands can only be run inside west workspace, so exit if that is
+        # not the case.
         if not self.west_dir_path:
             self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
@@ -422,12 +428,17 @@ class EastContext:
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
-        # Check if toolchain for detected ncs version is installed
+        # Check if ncs version was even detected, this can happen in the cases where
+        # normal zephyr repo is used
+        if self.detected_ncs_version is None:
+            self.use_toolchain_manager = False
+            return
+
+        # Early exit if toolchain for detected ncs version is installed
         result = self.run_manager("list", silent=True, return_output=True)
         if self.detected_ncs_version in result["output"]:
             # If it is installed then is also supported
-            self.ncs_version_installed = True
-            self.ncs_version_supported = True
+            self.use_toolchain_manager = True
             return
 
         # Check if toolchain for detected ncs version is supported
@@ -435,21 +446,19 @@ class EastContext:
         if self.detected_ncs_version in result["output"]:
             # Supported but not installed, should we exit program or silently pass?
             if ignore_uninstalled_ncs:
-                self.ncs_version_supported = False
                 return
             else:
                 self.print(no_toolchain_msg(self), highlight=False)
                 self.exit()
 
-        # Not supported, should we exit program or silently pass?
+        # Not supported, should we silently pass or exit program with message?
         if ignore_unsupported_ncs:
             # Silently pass
-            self.ncs_version_supported = False
             return
-
-        # Exit program
-        # This is usually set, if we intend to install the toolchain later
-        self.print(
-            ncs_version_not_supported_msg(self, result["output"]), highlight=False
-        )
-        self.exit()
+        else:
+            # Exit program
+            # This is usually set, if we intend to install the toolchain later
+            self.print(
+                ncs_version_not_supported_msg(self, result["output"]), highlight=False
+            )
+            self.exit()

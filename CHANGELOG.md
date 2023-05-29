@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.10.1] - 2023-05-29
+
+### Changed
+
+-   Refactor preworkspace check to improve clarity.
+-   Unify helper functions in build type and release tests.
+
+### Fixed
+
+-   A bug that caused a crash when east was run from non-NCS projects.
+-   The wrong selection of release binaries when building application with only
+    TFM or SPM (#62)
+
 ## [0.10.0] - 2023-03-28
 
 ### Added
@@ -24,11 +37,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 -   Add back functionality to provide `cmake_args` after `--` marker for `build`
-    command. Now it is possible to provide custom `-D` define values to the
-    CMake. Commands `flash`, `bypass` already provided option for extra
-    arguments after `--`, however they did it incorrectly for very edge cases,
-    as they removed double quotes from all arguments passed after `--` marker
-    (#56).
+    command. Now it is possible to provide custom `-D` define values to the CMake.
+    Commands `flash`, `bypass` already provided option for extra arguments after
+    `--`, however they did it incorrectly for very edge cases, as they removed
+    double quotes from all arguments passed after `--` marker (#56).
 
 ### Fixed
 
@@ -38,40 +50,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
--   `compile_commands.json` is now also copied to the top west directory. This 
+-   `compile_commands.json` is now also copied to the top west directory. This
     enables clangd to work as intended in `ncs` and `zephyr` folders (#53).
 -   Section in docs/configuration.md document describing `release` build type.
 
 ### Changed
 
 -   Samples (which inherently do not have a build type) have their build type
-    marked with forward slash "/" instead of "None" in the Job table that 
-    appears when running `east release` (#52).
+    marked with forward slash "/" instead of "None" in the Job table that appears
+    when running `east release` (#52).
 
 ### Fixed
 
--   Sample binaries had incorrect `-None` build type qualifier in their release 
-    name, when they shouldn't have. Incorrect build type qualifier was removed 
+-   Sample binaries had incorrect `-None` build type qualifier in their release
+    name, when they shouldn't have. Incorrect build type qualifier was removed
     (#52).
 -   Samples can now inherit from `release` build types (#47).
--   `east release` command now correctly copies build artefacts when
-    `merged.hex` is not generated. Additionally, new _Copied build artefacts_
-    section in `docs/configuration.md` now exactly defines which build artefacts
-    are copied and renamed in release procedure (#51).
+-   `east release` command now correctly copies build artefacts when `merged.hex`
+    is not generated. Additionally, new _Copied build artefacts_ section in
+    `docs/configuration.md` now exactly defines which build artefacts are copied
+    and renamed in release procedure (#51).
 
 ## [0.7.0] - 2023-02-15
 
 ### Added
 
--   New documentation files in `docs` folder: `development_guide.md`, 
+-   New documentation files in `docs` folder: `development_guide.md`,
     `getting_started.md`, `how_east_works.md`
--   `make format` command, which uses `black` and `isort`. 
-    `development_guide.md` explains the use.
--   Both commands `east util connect` and `east util rtt` now accept 
-    `--rtt-port` option, which sets the RTT Telnet port. Command 
-    `east util connect` now also accepts the `--jlink-id` option, same as 
-    `east flash`. With those new options is now easier to connect and listen to 
-    RTT messages from multiple JLink devices.
+-   `make format` command, which uses `black` and `isort`. `development_guide.md`
+    explains the use.
+-   Both commands `east util connect` and `east util rtt` now accept `--rtt-port`
+    option, which sets the RTT Telnet port. Command `east util connect` now also
+    accepts the `--jlink-id` option, same as `east flash`. With those new options
+    is now easier to connect and listen to RTT messages from multiple JLink
+    devices.
 
 ### Changed
 
@@ -79,14 +91,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
--   Fixed release artefacts naming issue where build type would not appear 
+-   Fixed release artefacts naming issue where build type would not appear
     correctly.
--   Create a `release_dry_run` folder instead of release folder when using 
+-   Create a `release_dry_run` folder instead of release folder when using
     \--dry-run option with _east release_ command.
--   `east release` command now runs a pre-check on the apps and samples from 
-    `east.yml`, if they exists before running the release process. That way you 
-    can catch a typo, or a mistake before you spent some time waiting through 
-    the release process.
+-   `east release` command now runs a pre-check on the apps and samples from
+    `east.yml`, if they exists before running the release process. That way you
+    can catch a typo, or a mistake before you spent some time waiting through the
+    release process.
 
 ## [0.6.2] - 2022-12-16
 
@@ -195,7 +207,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.10.1...HEAD
+
+[0.10.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.10.0...v0.10.1
 
 [0.10.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.9.0...v0.10.0
 

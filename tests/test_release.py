@@ -8,62 +8,7 @@ from east.east_context import EastContext
 from east.helper_functions import find_all_boards
 
 from . import helpers
-from .helpers import helper_test_against_west_run1
-
-
-def helper_test_against_west_run(
-    monkeypatch, mocker, path, east_cmd, expected_west_cmds=None, should_succed=True
-):
-    """
-    Helper function for making tests easier to read.
-
-    Args:
-        monkeypatch ():         fixture
-        mocker ():              fixture
-        path ():                To which path should we change
-        east_cmd ():            which east command should be called
-        expected_west_cmds ():  List of expected west_cmds. If
-                                none then no run_west call should happend.
-        should_succed ():       If true then the command should succeded.
-
-    Returns:
-        Result object, which can be further checked.
-    """
-    runner = CliRunner()
-
-    # Mock output of git commmand, so tests do not have to depend on it
-    mocker.patch(
-        "east.workspace_commands.release_commands.get_git_version",
-        return_value={"tag": "v1.0.0.", "hash": ""},
-    )
-
-    monkeypatch.chdir(path)
-    mocker.patch(
-        "east.east_context.EastContext.run_west",
-        return_value={"output": "", "returncode": 0},
-    )
-
-    # Setting catch_exceptions to False enables us to see programming errors in East
-    # code
-    result = runner.invoke(cli, east_cmd.strip().split(" "), catch_exceptions=False)
-
-    run_west = east.east_context.EastContext.run_west
-
-    if expected_west_cmds:
-        # This conversion is needed due to assert_has_calls interface
-        calls = [
-            mocker.call(cmd, silent=True, return_output=True, exit_on_error=False)
-            for cmd in expected_west_cmds
-        ]
-        run_west.assert_has_calls(calls)
-    else:
-        run_west.assert_not_called()
-
-    expected_return_code = 0 if should_succed else 1
-
-    assert result.exit_code == expected_return_code
-    return result
-
+from .helpers import helper_test_against_west_run
 
 east_yaml_single_app = """
 apps:
