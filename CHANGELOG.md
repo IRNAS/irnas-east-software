@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 - A bug that caused a crash when east was run from non-NCS projects.
-- Fixed wrong selection of release binaries when building application with only
+- The wrong selection of release binaries when building application with only
   TFM or SPM (#62)
 
 ## [0.10.0] - 2023-03-28
