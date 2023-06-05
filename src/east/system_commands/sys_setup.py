@@ -60,12 +60,19 @@ def _get_toolchain_download_link():
 
     This link will be updated regularly to follow the progress on the Nordic's repo.
 
-    Current version of the executable is v0.8.0.
+    Output of --version flag:
+
+    nrfutil-toolchain-manager 0.13.0-alpha.3 (a7ee07d 2023-05-26)
+    commit-hash: a7ee07d0cbc1539dbf5f89446f558580f0cf000d
+    commit-date: 2023-05-26
+    host: x86_64-unknown-linux-gnu
+    build-timestamp: 2023-05-26T13:54:13.429101305Z
+    classification: nrf-internal
     """
 
     link = (
         "https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager/"
-        "blob/2f24ef572b8a7182cb6838fc2f080ad1b4fee448/resources/"
+        "blob/7dda8ba815a0c9df52a22c943a25cb43cd622bcb/resources/"
         "nrfutil-toolchain-manager/linux/nrfutil-toolchain-manager.exe?raw=true"
     )
     return link
