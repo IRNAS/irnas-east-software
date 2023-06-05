@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Updated version of the nrfutil toolchain manager binary to 0.13.0-alpha.3. 
     This version now supports toolchains up to v2.4.0. 
 
+### Fixed
+-   Completely remove `ncs_version_installed` variable that should be removed 
+    in previous version but it was not.
+
 ## [0.10.1] - 2023-05-29
 
 ### Changed
