@@ -55,7 +55,7 @@ def toolchain(east, force):
         f" version [bold]{east.detected_ncs_version}[/], this will take some time...\n",
         highlight=False,
     )
-    east.run_manager(f"install {east.detected_ncs_version}")
+    east.run_manager(f"install --ncs-version {east.detected_ncs_version}")
 
     east.print("\n[bold green]Done!")
 
