@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.11.1] - 2023-06-05
+
 ### Fixed
 
 -   nrfutil toolchain manager binary now needs --ncs-version flag when 
@@ -224,7 +226,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.11.1...HEAD
+
+[0.11.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.11.0...v0.11.1
 
 [0.11.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.10.1...v0.11.0
 
