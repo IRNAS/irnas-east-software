@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.12.0] - 2023-06-07
+
+### Added
+
+-   Added `--speed` flag to the `east util connect`. 
+
 ## [0.11.1] - 2023-06-05
 
 ### Fixed
@@ -226,7 +232,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.0...HEAD
+
+[0.12.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.11.1...v0.12.0
 
 [0.11.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.11.0...v0.11.1
 

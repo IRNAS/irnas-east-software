@@ -57,8 +57,18 @@ def get_device(runner_yaml):
     default=19021,
     help=("Sets the RTT Telnet port. Default: 19021."),
 )
+@click.option(
+    "-s",
+    "--speed",
+    type=str,
+    default=4000,
+    help=(
+        "Sets the connection speed, can be a number, 'auto' or 'adaptive'. "
+        "Default: '4000'."
+    ),
+)
 @click.pass_obj
-def connect(east, device, jlink_id, rtt_port):
+def connect(east, device, jlink_id, rtt_port, speed):
 
     """Connects to a device and creates a RTT server with [bold cyan]JLinkExe[/].
 
@@ -72,7 +82,7 @@ def connect(east, device, jlink_id, rtt_port):
         east.print(no_jlink_tool_msg("JLinkExe"), highlight=False)
         east.exit()
 
-    cmd = f"JLinkExe -AutoConnect 1 -Speed 4000 -If SWD -RTTTelnetPort {rtt_port} "
+    cmd = f"JLinkExe -AutoConnect 1 -Speed {speed} -If SWD -RTTTelnetPort {rtt_port} "
 
     if jlink_id:
         cmd += f"-USB {jlink_id} "
