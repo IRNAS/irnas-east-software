@@ -130,8 +130,8 @@ expected_app_release_west_commands = [
 
 def test_basic_app_release_behaviour(west_workplace, monkeypatch, mocker):
     """
-    Running east release with samples key, should skip build process for samples and build
-    apps.
+    Running east release with no samples key, should skip build process for samples and
+    build apps.
     """
 
     project_path = west_workplace
