@@ -1,4 +1,5 @@
 import os
+import shutil as sh
 
 from click.testing import CliRunner
 
@@ -148,6 +149,32 @@ def test_basic_app_release_behaviour(west_workplace, monkeypatch, mocker):
         monkeypatch,
         mocker,
         project_path,
+        "release",
+        expected_west_cmds=expected_app_release_west_commands,
+    )
+
+
+def test_basic_app_release_behaviour_no_samples_folder(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    Running east release with no samples key and no samples folder should skip build
+    process for samples and build apps.
+    """
+    project = west_workplace_parametrized["project"]
+
+    helpers.create_and_write(
+        project,
+        "east.yml",
+        east_yaml_no_samples_key,
+    )
+
+    sh.rmtree(os.path.join(project, "samples"))
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project,
         "release",
         expected_west_cmds=expected_app_release_west_commands,
     )

@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Missing sample folder would abort `east release` even if samples are not 
+    specified in the `east.yml`.
+
 ## [0.12.0] - 2023-06-07
 
 ### Added

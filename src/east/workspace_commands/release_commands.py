@@ -308,7 +308,7 @@ def release(east, dry_run, verbose):
         # Add "release" type (but only in apps context).
         app["build-types"].append({"type": "release"})
 
-    samples_in_dir = os.listdir("samples")
+    samples_in_dir = os.listdir("samples") if os.path.isdir("samples") else []
     for sample in samples:
         # Check, if the sample even exists before building for it
         if sample["name"] not in samples_in_dir:
