@@ -5,7 +5,7 @@ import os
 # There is however one exception: NRF_TOOLCHAIN_MANAGER_PATH is needed for downloading
 # in sys_setup.py.
 
-HOME_DIR = os.path.join("/home", os.environ["USER"])
+HOME_DIR = os.path.join("/home", os.environ["USER"]) if "USER" in os.environ else "/"
 
 # Directory that can be used for temporary intermediate files that we do not care about.
 CACHE_DIR = os.path.join(HOME_DIR, ".cache", "east")

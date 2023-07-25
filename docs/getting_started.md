@@ -141,6 +141,7 @@ apps:
           - debug.conf
       - type: rtt
         conf-files:
+          - debug.conf
           - rtt.conf
 ```
 
