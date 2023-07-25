@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.12.2] - 2023-07-25
+
 ### Fixed
 
 -   `USER` environmental variable is not present on GitHub Action Runners, so 
@@ -244,7 +246,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.2...HEAD
+
+[0.12.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.1...v0.12.2
 
 [0.12.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.0...v0.12.1
 
