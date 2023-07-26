@@ -98,12 +98,13 @@ of a [yellow bold]West workspace[/] to get the actual toolchain.
 """
 
 packages = [
-    {
-        "exe": "conda",
-        "url": _get_conda_download_link(),
-        "install_method": _install_conda,
-        "installed_msg": conda_installed_msg,
-    },
+    # Do not install Conda for now, it is not needed.
+    # {
+    #     "exe": "conda",
+    #     "url": _get_conda_download_link(),
+    #     "install_method": _install_conda,
+    #     "installed_msg": conda_installed_msg,
+    # },
     {
         "exe": NRF_TOOLCHAIN_MANAGER_PATH,
         "url": _get_toolchain_download_link(),

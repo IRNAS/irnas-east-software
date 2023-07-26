@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Removed
+
+-   Conda install from `east sys-setup` command as it is not needed by East.
+
 ## [0.12.3] - 2023-07-26
 
 ### Fixed
