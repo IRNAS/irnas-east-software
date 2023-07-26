@@ -5,7 +5,7 @@ import os
 # There is however one exception: NRF_TOOLCHAIN_MANAGER_PATH is needed for downloading
 # in sys_setup.py.
 
-HOME_DIR = os.path.join("/home", os.environ["USER"]) if "USER" in os.environ else "/"
+HOME_DIR = os.environ["HOME"]
 
 # Directory that can be used for temporary intermediate files that we do not care about.
 CACHE_DIR = os.path.join(HOME_DIR, ".cache", "east")
@@ -23,7 +23,6 @@ MINICONDA_DIR = os.path.join(HOME_DIR, "miniconda3")
 CONDA_PATH = os.path.join(MINICONDA_DIR, "bin", "conda")
 
 const_paths = {
-    "home_dir": HOME_DIR,
     "cache_dir": CACHE_DIR,
     "east_dir": EAST_DIR,
     "nrf_toolchain_manager_path": NRF_TOOLCHAIN_MANAGER_PATH,
