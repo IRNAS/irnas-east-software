@@ -20,7 +20,7 @@ pip install --upgrade east-tool
 To install `west` refer to its
 [documentation](https://docs.zephyrproject.org/latest/develop/west/install.html).
 
-## First time system setup
+### First time system setup
 
 `east` needs some programs installed on the host system, to function.
 
@@ -30,7 +30,7 @@ This can be done with below command:
 east sys-setup
 ```
 
-## Example use walk-through
+## Example project walk-through
 
 Below example showcases the use of `east` tool by using Zephyr's [example
 application] repository as a starting point.
@@ -42,7 +42,7 @@ application] repository as a starting point.
 of the example application. The `HEAD` of the `main` branch is currently broken
 / not compatible with this guide.
 
-### Initialization
+### Setup
 
 Initialize `my-workspace` folder for the `example-application`.
 
@@ -51,7 +51,7 @@ west init -m https://github.com/zephyrproject-rtos/example-application --mr v3.1
 cd my-workspace/example-application
 ```
 
-### Convert repository into a NCS project
+#### Convert repository into a NCS project
 
 Open `west.yml` and overwrite it with below snippet:
 
@@ -78,7 +78,7 @@ west update
 There is no need to overwrite the contents of the `west.yml`, if it already
 imports NCS repo. Only `west update` is needed in that case.
 
-### Toolchain installation
+#### Toolchain installation
 
 To install required toolchain run below command:
 
@@ -89,6 +89,22 @@ east update toolchain
 East determines the correct version of the toolchain from the `west.yml`
 manifest file and downloads it to the host machine. Toolchain only needs to be
 installed once per every NCS version and not per project.
+
+#### Board overlay files
+
+This examples uses `nrf52840dk_nrf52840` and `nrf52dk_nrf52832` boards, so we
+need to create board overlay files for them:
+
+```bash
+cp app/boards/nucleo_f302r8.overlay app/boards/nrf52840dk_nrf52840.overlay
+cp app/boards/nucleo_f302r8.overlay app/boards/nrf52dk_nrf52832.overlay
+sed -i 's/gpioc/gpio0/g' app/boards/nrf52840dk_nrf52840.overlay
+sed -i 's/gpioc/gpio0/g' app/boards/nrf52dk_nrf52832.overlay
+```
+
+Above two `sed` commands open both `.overlay` files that you just copied and
+replace in both every occurrence of `gpioc` to `gpio0` (Nordic chips index their
+ports with numbers instead with letters).
 
 ### Building, flashing and connecting
 
@@ -129,7 +145,8 @@ Below steps describe minimal basic setup to get it working.
 ### Prerequisites
 
 Make sure that you performed all steps described in
-[Example use walk-through](#Example-use-walk-through) section before continuing.
+[Example project walk-through](#Example-project-walk-through) section before
+continuing.
 
 Create a `east.yml` file in the root folder with below content:
 
@@ -157,13 +174,7 @@ mkdir conf
 mv prj.conf conf/common.conf
 mv debug.conf conf
 mv rtt.conf conf
-cp boards/nucleo_f302r8.overlay boards/nrf52840dk_nrf52840.overlay
-cp boards/nucleo_f302r8.overlay boards/nrf52dk_nrf52832.overlay
 ```
-
-Open both `.overlay` files that you just copied and replace in both every
-occurrence of `gpioc` to `gpio0` (Nordic chips index their ports with numbers
-instead with letters).
 
 ### Release
 
