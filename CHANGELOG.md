@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.12.3] - 2023-07-26
+
+### Fixed
+
+-   Use `HOME` environmental variable instead of `USER` to determine home 
+    directory. 
+
 ## [0.12.2] - 2023-07-25
 
 ### Fixed
@@ -246,7 +253,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.2...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.3...HEAD
+
+[0.12.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.2...v0.12.3
 
 [0.12.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.1...v0.12.2
 

@@ -35,14 +35,19 @@ east sys-setup
 Below example showcases the use of `east` tool by using Zephyr's [example
 application] repository as a starting point.
 
-[example application]: https://github.com/zephyrproject-rtos/example-application
+[example application]:
+  https://github.com/zephyrproject-rtos/example-application/tree/v3.1.0
+
+**Note:** Above link and below `west init` both reference the `v3.1.0` version
+of the example application. The `HEAD` of the `main` branch is currently broken
+/ not compatible with this guide.
 
 ### Initialization
 
 Initialize `my-workspace` folder for the `example-application`.
 
 ```bash
-west init -m https://github.com/zephyrproject-rtos/example-application --mr main my-workspace
+west init -m https://github.com/zephyrproject-rtos/example-application --mr v3.1.0 my-workspace
 cd my-workspace/example-application
 ```
 
