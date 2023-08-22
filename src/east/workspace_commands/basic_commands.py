@@ -207,15 +207,17 @@ def flash(east, build_dir, runner, verify, jlink_id, extra_args):
 @click.pass_obj
 def bypass(east, args):
     """
-    Bypass any set of commands directly to the [magenta bold]west tool[/].
+    Bypass any set of commands directly to the [magenta bold]Nordic's nRF Toolchain Manager[/].
 
     \b
     \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
-    the [bold magenta]west[/] tool.
+    the [bold magenta]Nordic's nRF Toolchain Manager[/] executable.
+
+    \n\nThose commands will run in the context of the isolated environment, which is provided by the executable.
 
     \n\nExample:
 
-    \n\nCommand [bold]east bypass -- build -b nrf52840dk_nrf52840[/]
+    \n\nCommand [bold]east bypass -- west build -b nrf52840dk_nrf52840[/]
     \n\nbecomes [bold]west build -b nrf52840dk_nrf52840[/]
 
 
@@ -227,9 +229,11 @@ def bypass(east, args):
     if not args:
         east.exit()
 
-    cmd = clean_up_extra_args(args)
-
-    east.run_west(cmd)
+    if east.use_toolchain_manager:
+        cmd = clean_up_extra_args(args)
+        east.run_cmd_in_manager(cmd)
+    else:
+        east.exit("Toolchain manager is not available in this West workspace.")
 
 
 @click.command(**east_command_settings)

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+-   `east bypass` now passes arbitrary commands into directly into the Nordic's nRF
+    Toolchain Manager instead into just West that is in the Manager. That way user can
+    user use other executables and python programs provided by the toolchains in the
+    Manager.
+
 ## [0.13.0] - 2023-07-26
 
 ### Removed
