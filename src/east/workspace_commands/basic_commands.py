@@ -203,9 +203,20 @@ def flash(east, build_dir, runner, verify, jlink_id, extra_args):
 
 
 @click.command(**east_command_settings)
+@click.option(
+    "-s",
+    "--shell",
+    is_flag=True,
+    help=(
+        "Launch a sub-shell within the current terminal inside the isolated "
+        "environment provided by the [magenta bold]Nordic's nRF Toolchain Manager[/]. "
+        "Commands after [bold]--[/] are ignored. To exit the sub-shell type "
+        "[bold]exit[/] into it and hit ENTER."
+    ),
+)
 @click.argument("args", nargs=-1, type=str, metavar="-- [args]")
 @click.pass_obj
-def bypass(east, args):
+def bypass(east, shell, args):
     """
     Bypass any set of commands directly to the [magenta bold]Nordic's nRF Toolchain Manager[/].
 
@@ -225,6 +236,10 @@ def bypass(east, args):
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
+
+    if shell:
+        east.enter_manager_shell()
+        east.exit(return_code=0)
 
     if not args:
         east.exit()

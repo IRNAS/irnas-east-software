@@ -261,6 +261,16 @@ class EastContext:
         else:
             return self.run(cmd, **kwargs)
 
+    def enter_manager_shell(self):
+        """Enters Nordic's Toolchain Manager shell using detected NCS version."""
+
+        cmd = (
+            f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
+            f" {self.detected_ncs_version} --shell"
+        )
+
+        return self.run(cmd)
+
     def run_manager(self, command, **kwargs):
         """Executes a command with Nordic's Toolchain manager executable.
 

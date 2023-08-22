@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   Add `--shell` flag to the `east bypass` command. It launches a sub-shell within the
+    current terminal inside the isolated environment provided by the Nordic's nRF
+    Toolchain Manager.
+
 ### Changed
 
 -   `east bypass` now passes arbitrary commands into directly into the Nordic's nRF
