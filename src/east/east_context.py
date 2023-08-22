@@ -257,7 +257,7 @@ class EastContext:
 
         if self.use_toolchain_manager:
             # Run west command as arbitrary command through manager
-            return self._run_arbi_manager(cmd, **kwargs)
+            return self.run_cmd_in_manager(cmd, **kwargs)
         else:
             return self.run(cmd, **kwargs)
 
@@ -265,7 +265,7 @@ class EastContext:
         """Executes a command with Nordic's Toolchain manager executable.
 
         This is not suitable to be used with a type of a 'launch -- <command>' command.
-        For that _run_arbi_manager should be used.
+        For that run_cmd_in_manager should be used.
 
         Args:
             manager_command (str):      Manager command to execute
@@ -278,7 +278,7 @@ class EastContext:
 
         return self.run(cmd, **kwargs)
 
-    def _run_arbi_manager(
+    def run_cmd_in_manager(
         self, arbitrary_command: str, exit_on_error: bool = True, **kwargs
     ):
         """Run an arbitrary command through Nordic's Toolchain Manager
