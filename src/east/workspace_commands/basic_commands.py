@@ -144,61 +144,43 @@ def create_build_command(
     return build_cmd
 
 
-@click.command(**east_command_settings)
-@click.option("-d", "--build-dir", type=str, help="Build directory to create or use.")
-@click.option(
-    "-r", "--runner", type=str, help="Override default runner from --build-dir."
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
 )
-@click.option(
-    "-v",
-    "--verify",
-    is_flag=True,
-    help=(
-        "Verify, after flash, that contents of the boards code memory regions are the"
-        " same as in flashed image."
-    ),
-)
-@click.option(
-    "-i",
-    "--jlink-id",
-    type=str,
-    help=(
-        "Identification number of a JLink programmer that should be used for flashing."
-    ),
-)
-@click.argument("extra-args", nargs=-1, type=str, metavar="-- [extra args]")
 @click.pass_obj
-def flash(east, build_dir, runner, verify, jlink_id, extra_args):
+@click.option(
+    "--extra-help",
+    is_flag=True,
+    help="Print help of the [bold magenta]west flash[/] command.",
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def flash(east, extra_help, args):
     """
     Flash binary to the board's flash.
 
     \b
-    \n\nInternally runs [magenta bold]west flash[/] command. If the build directory is not given, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used. If there are more than one JLinks connected to the host machine use --jlink-id flag to specify which one to use to avoid selection prompt.
+    \n\nInternally runs [magenta bold]west flash[/] command, all given arguments are passed directly to it.
 
-    \n\nTo pass additional arguments to the [bold cyan]runner[/] used by the [magenta
-    bold]west flash[/], pass them after a [bold white]"--"[/] at the end of the command line.
-
+    \n\nTo learn more about possible west flash arguments and options use --extra-help flag.
 
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
+
     east.pre_workspace_command_check()
 
-    flash_cmd = "flash "
+    cmd = "flash "
 
-    if build_dir:
-        flash_cmd += f"-d {build_dir} "
-    if runner:
-        flash_cmd += f"-r {runner} "
+    if extra_help:
+        cmd += "--help"
+        east.run_west(cmd)
+        east.exit(return_code=0)
 
-    if verify:
-        flash_cmd += "--verify "
-    if jlink_id:
-        flash_cmd += f"-i {jlink_id} "
-    if extra_args:
-        flash_cmd += f" {clean_up_extra_args(extra_args)}"
+    if args:
+        cmd += f"{clean_up_extra_args(args)} "
 
-    east.run_west(flash_cmd)
+    east.run_west(cmd)
 
 
 @click.command(**east_command_settings)
