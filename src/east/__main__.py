@@ -4,6 +4,7 @@ import rich_click
 from .east_context import EastContext, east_group_settings
 from .system_commands import sys_setup, util
 from .workspace_commands import (
+    attach,
     build,
     bypass,
     clean,
@@ -27,6 +28,7 @@ rich_click.rich_click.COMMAND_GROUPS = {
                 "flash",
                 "clean",
                 "debug",
+                "attach",
                 "update",
                 "bypass",
                 "release",
@@ -87,6 +89,7 @@ cli.add_command(sys_setup)
 cli.add_command(util)
 cli.add_command(release)
 cli.add_command(debug)
+cli.add_command(attach)
 cli.add_command(twister)
 
 

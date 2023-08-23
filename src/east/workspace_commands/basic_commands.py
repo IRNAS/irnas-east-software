@@ -314,6 +314,36 @@ def debug(east, extra_help, args):
 @click.option(
     "--extra-help",
     is_flag=True,
+    help="Print help of the [bold magenta]west attach[/] command.",
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def attach(east, extra_help, args):
+    """Like "east debug", but doesn't reflash the program.
+
+    \b
+    \n\nInternally runs [magenta bold]west attach[/] command, all given arguments are passed directly to it.
+
+    \n\nTo learn more about possible [magenta bold]west attach[/] arguments and options use --extra-help flag.
+
+    \n\n[bold]Note:[/] Add --tui flag to use Text User Interface.
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+    east.pre_workspace_command_check()
+
+    if extra_help:
+        east.run_west("attach --help")
+    else:
+        east.run_west("attach " + clean_up_extra_args(args))
+
+
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
+@click.pass_obj
+@click.option(
+    "--extra-help",
+    is_flag=True,
     help="Print help of the [bold magenta]west twister[/] command.",
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
