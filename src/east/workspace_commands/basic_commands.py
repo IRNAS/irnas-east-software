@@ -204,7 +204,7 @@ def flash(east, extra_help, args):
     \b
     \n\nInternally runs [magenta bold]west flash[/] command, all given arguments are passed directly to it.
 
-    \n\nTo learn more about possible west flash arguments and options use --extra-help flag.
+    \n\nTo learn more about possible [magenta bold]west flash[/] arguments and options use --extra-help flag.
 
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
