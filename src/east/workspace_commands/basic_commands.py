@@ -276,46 +276,34 @@ def bypass(east, shell, args):
         )
 
 
-@click.command(**east_command_settings)
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
 @click.pass_obj
 @click.option(
-    "-t",
-    "--tui",
+    "--extra-help",
     is_flag=True,
-    help="If given GDB uses Text User Interface",
+    help="Print help of the [bold magenta]west debug[/] command.",
 )
-@click.option(
-    "-a",
-    "--attach",
-    is_flag=True,
-    help=(
-        "If given only connect to the board and start a debugging session, skip "
-        "flashing (uses [bold magenta]west attach[/] instead of [bold magenta]west "
-        "debug[/])."
-    ),
-)
-@click.argument("extra_args", nargs=-1, type=str, metavar="-- [args]")
-def debug(east, tui, attach, extra_args):
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def debug(east, extra_help, args):
     """Connect to the board, flash the program, and start a debugging session.
 
     \b
-    \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
-    the [bold magenta]west[/] tool (run east debug -- --help to see all possible options).
+    \n\nInternally runs [magenta bold]west debug[/] command, all given arguments are passed directly to it.
 
+    \n\nTo learn more about possible [magenta bold]west debug[/] arguments and options use --extra-help flag.
 
+    \n\n[bold]Note:[/] Add --tui flag to use Text User Interface.
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
 
-    cmd = "attach " if attach else "debug "
-
-    if tui:
-        cmd += "--tui "
-
-    if extra_args:
-        cmd += f"{clean_up_extra_args(extra_args)} "
-
-    east.run_west(cmd)
+    if extra_help:
+        east.run_west("debug --help")
+    else:
+        east.run_west("debug " + clean_up_extra_args(args))
 
 
 @click.command(
