@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Add `--shell` flag to the `east bypass` command. It launches a sub-shell within the
     current terminal inside the isolated environment provided by the Nordic's nRF
     Toolchain Manager.
+-   `east twister` command. This command is just a wrapper for the `west twister`
+    command which runs Twister, a test runner tool.
 
 ### Changed
 

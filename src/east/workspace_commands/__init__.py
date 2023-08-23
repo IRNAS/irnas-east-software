@@ -1,3 +1,3 @@
-from .basic_commands import build, bypass, clean, debug, flash
+from .basic_commands import build, bypass, clean, debug, flash, twister
 from .release_commands import release
 from .update_commands import update

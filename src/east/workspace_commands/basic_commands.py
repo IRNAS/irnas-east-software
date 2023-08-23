@@ -291,3 +291,40 @@ def debug(east, tui, attach, extra_args):
         cmd += f"{clean_up_extra_args(extra_args)} "
 
     east.run_west(cmd)
+
+
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
+@click.pass_obj
+@click.option(
+    "--extra-help",
+    is_flag=True,
+    help="Print help of the [bold magenta]west twister[/] command.",
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def twister(east, extra_help, args):
+    """Run Twister, a test runner tool.
+
+    \b
+    \n\nInternally runs [magenta bold]west twister[/] command, all given arguments are passed directly to it.
+
+    \n\nTo learn more about possible Twister arguments and options use --extra-help flag.
+
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+    east.pre_workspace_command_check()
+
+    cmd = "twister "
+
+    if extra_help:
+        cmd += "--help"
+        east.run_west(cmd)
+        east.exit(return_code=0)
+
+    if args:
+        cmd += f"{clean_up_extra_args(args)} "
+
+    east.run_west(cmd)
