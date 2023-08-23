@@ -349,7 +349,13 @@ def helper_test_against_west_run(
 
 
 def helper_test_against_west_run1(
-    monkeypatch, mocker, path, east_cmd, expected_west_cmds=None, should_succed=True
+    monkeypatch,
+    mocker,
+    path,
+    east_cmd,
+    expected_west_cmd=None,
+    expected_west_cmds=None,
+    should_succed=True,
 ):
     """
     Helper function for tests easier to debug.
@@ -364,6 +370,7 @@ def helper_test_against_west_run1(
         expected_west_cmd ():   Not used
         should_succed ():       Not used
     """
+    _ = expected_west_cmd
     _ = expected_west_cmds
     _ = should_succed
 
