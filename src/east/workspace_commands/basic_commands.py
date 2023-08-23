@@ -72,8 +72,7 @@ def build(east, board, build_type, build_dir, target, source_dir, cmake_args):
     For additional info see chapter [bold]Building, Flashing and Debugging[/], section
     [bold]One-Time CMake Arguments[/].
 
-    \n\n[bold]Note:[/] This command will, after build step, copy
-    [bold]compile_commands.json[/], if found, from the build directory to the project and top west directory. This makes job of locating this file easier for [bold yellow]clangd[/].
+    \n\n[bold]Note:[/] This command will, after build step, copy [bold]compile_commands.json[/], if found, from the build directory to the project and top west directory. This makes job of locating this file easier for [bold yellow]clangd[/].
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -248,7 +247,9 @@ def bypass(east, shell, args):
         cmd = clean_up_extra_args(args)
         east.run_cmd_in_manager(cmd)
     else:
-        east.exit("Toolchain manager is not available in this West workspace.")
+        east.exit(
+            "Toolchain manager is not available in this [bold yellow]West workspace[/]."
+        )
 
 
 @click.command(**east_command_settings)
