@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.14.0] - 2023-08-24
+
+### Added
+
+-   Add `--shell` flag to the `east bypass` command. It launches a sub-shell within the
+    current terminal inside the isolated environment provided by the Nordic's nRF
+    Toolchain Manager.
+-   `east twister` command. This command is just a wrapper for the `west twister`
+    command which runs Twister, a test runner tool.
+-   `east attach` command. This command is just a wrapper for the `west attach`
+    command, which is similiar to the `west debug`.
+
+### Changed
+
+-   `east bypass` now passes arbitrary commands into directly into the Nordic's nRF
+    Toolchain Manager instead into just West that is in the Manager. That way user can
+    user use other executables and python programs provided by the toolchains in the
+    Manager.
+-   `east build`, `east flash` and `east debug` are now just wrappers for their 
+    west counterparts. Due to this the internals and externals of the East could 
+    be simplified. User experience did not change, the commands behave just like 
+    they did before, they just do not directly provide help for possible 
+    options and arguments, but instead instruct users to use `--extra-help` 
+    option to learn more about west command counterparts. Due to this change the
+    `attach` command was moved from `debug` command to its own place.
+
 ## [0.13.0] - 2023-07-26
 
 ### Removed
@@ -259,7 +285,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.14.0...HEAD
+
+[0.14.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.13.0...v0.14.0
 
 [0.13.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.12.3...v0.13.0
 

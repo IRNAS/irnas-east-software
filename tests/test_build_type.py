@@ -6,7 +6,7 @@ from click.testing import CliRunner
 from east.__main__ import cli
 
 from . import helpers
-from .helpers import helper_test_against_west_run
+from .helpers import helper_test_against_west_run, helper_test_against_west_run1
 
 
 def test_build_type_with_no_east_yml(west_workplace_parametrized, monkeypatch):
@@ -798,29 +798,29 @@ def test_different_build_dir_path_full_dir_different_build_type(
     "east_cmd, expected_west_cmd",
     [
         (
-            "build -s app/test_one",
+            "build app/test_one",
             "build app/test_one -- -DCONF_FILE=conf/common.conf",
         ),
         (
-            "build -s app/test_two",
+            "build app/test_two",
             "build app/test_two -- -DCONF_FILE=conf/common.conf",
         ),
         (
-            "build -s app/test_one --build-type debug",
+            "build app/test_one --build-type debug",
             (
                 "build app/test_one -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/debug.conf"'
             ),
         ),
         (
-            "build -s app/test_two --build-type debug",
+            "build app/test_two --build-type debug",
             (
                 "build app/test_two -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/debug.conf"'
             ),
         ),
         (
-            "build -s app/test_one -b nrf52840dk_nrf52840",
+            "build app/test_one -b nrf52840dk_nrf52840",
             (
                 "build -b nrf52840dk_nrf52840 app/test_one --"
                 " -DCONF_FILE=conf/common.conf"
@@ -828,7 +828,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
             ),
         ),
         (
-            "build -s app/test_one -b nrf52840dk_nrf52840 --build-type uart",
+            "build app/test_one -b nrf52840dk_nrf52840 --build-type uart",
             (
                 "build -b nrf52840dk_nrf52840 app/test_one --"
                 " -DCONF_FILE=conf/common.conf"
@@ -879,7 +879,7 @@ def test_sample_with_inherit_and_with_source_dir(
         monkeypatch,
         mocker,
         project_path,
-        "build -s samples/settings",
+        "build samples/settings",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
         should_succed=True,
     )
@@ -906,7 +906,7 @@ def test_sample_with_inherit_and_with_source_dir_and_board(
         monkeypatch,
         mocker,
         project_path,
-        "build -s samples/settings -b nrf52840dk_nrf52840",
+        "build samples/settings -b nrf52840dk_nrf52840",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
         should_succed=True,
     )

@@ -3,7 +3,17 @@ import rich_click
 
 from .east_context import EastContext, east_group_settings
 from .system_commands import sys_setup, util
-from .workspace_commands import build, bypass, clean, debug, flash, release, update
+from .workspace_commands import (
+    attach,
+    build,
+    bypass,
+    clean,
+    debug,
+    flash,
+    release,
+    twister,
+    update,
+)
 
 rich_click.rich_click.MAX_WIDTH = 80
 rich_click.rich_click.USE_RICH_MARKUP = True
@@ -18,9 +28,11 @@ rich_click.rich_click.COMMAND_GROUPS = {
                 "flash",
                 "clean",
                 "debug",
+                "attach",
                 "update",
                 "bypass",
                 "release",
+                "twister",
             ],
         },
         {
@@ -77,6 +89,8 @@ cli.add_command(sys_setup)
 cli.add_command(util)
 cli.add_command(release)
 cli.add_command(debug)
+cli.add_command(attach)
+cli.add_command(twister)
 
 
 def main():

@@ -1,7 +1,10 @@
+import argparse
+import copy
 import os
 import shutil as sh
 
 import click
+from rich_click import RichCommand
 
 from ..east_context import east_command_settings
 from ..helper_functions import clean_up_extra_args
@@ -22,66 +25,103 @@ def clean(east):
     east.run("rm -fr build")
 
 
-@click.command(**east_command_settings)
-@click.option("-b", "--board", type=str, help="West board to build for.")
+class SpecialCommand(RichCommand):
+    def parse_args(self, ctx, args):
+        # Before parsing the args, make a copy of them so they can be used later.
+        # This is needed because "--" is silently removed from the args by the click,
+        # but it is needed to determine the source dir.
+        ctx.raw_args = copy.deepcopy(args)
+        super(SpecialCommand, self).parse_args(ctx, args)
+
+
+@click.command(
+    cls=SpecialCommand,
+    options_metavar="[options]",
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
 @click.option(
     "-u",
     "--build-type",
     type=str,
     help=(
         "Which build type (a group of [bold]Kconfig[/] fragment files) to use. Requires"
-        " [bold yellow]east.yml[/] with possible build types."
+        " [bold yellow]east.yml[/] with possible build types with specified apps and "
+        "samples."
     ),
 )
 @click.option(
-    "-d",
-    "--build-dir",
-    type=str,
-    help=(
-        "Build directory to create or use. If the --build-dir directory is not set, the"
-        " default is [bold]build[/] unless the build.dir-fmt configuration variable is"
-        " set. The current directory is checked after that. If either is a Zephyr build"
-        " directory, it is used. "
-    ),
+    "--extra-help",
+    is_flag=True,
+    help="Print help of the [bold magenta]west build[/] command.",
 )
-@click.option("-t", "--target", type=str, help="Run this build system target.")
-@click.argument("cmake-args", nargs=-1, type=str, metavar="-- [cmake-args]")
-@click.option(
-    "-s",
-    "--source-dir",
-    type=str,
-    help=(
-        "Relative path to a directory that should be used as application source"
-        " directory."
-    ),
-)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
 @click.pass_obj
-def build(east, board, build_type, build_dir, target, source_dir, cmake_args):
+@click.pass_context
+def build(ctx, east, build_type, extra_help, args):
     """
     Build firmware in the current directory.
 
     \b
-    \n\nInternally runs [magenta bold]west build[/] command in current directory if --source-dir is not set.
+    \n\nInternally runs [magenta bold]west build[/] command, all given arguments are passed directly to it. To learn more about possible [magenta bold]west build[/] arguments and options use --extra-help flag.
+
+
+    \n\nAfter the build step, if the file [bold]compile_commands.json[/] is found in build dir it will be copied to the project and top west directory. This makes job of locating this file easier for [bold yellow]clangd[/].
+
 
     \n\nTo pass additional arguments to the [bold]CMake[/] invocation performed by the [magenta
     bold]west build[/], pass them after a [bold white]"--"[/] at the end of the command line.
 
-    \n\n[bold]Important:[/] Passing additional [bold]CMake[/] arguments like this forces [magenta
-    bold]west build[/] to re-run [bold]CMake[/], even if a build system has already been generated.
+    \n\nIf the source dir is listed in the [bold yellow]east.yml[/] then [bold yellow]build type[/] functionality is enabled. East will add a group of [bold]Kconfig[/] fragment files to the build as specified by the selected build type and [bold yellow]east.yml[/] file. See [bold]docs/configuration.md[/] for more info.
 
-    For additional info see chapter [bold]Building, Flashing and Debugging[/], section
-    [bold]One-Time CMake Arguments[/].
-
-    \n\n[bold]Note:[/] This command will, after build step, copy
-    [bold]compile_commands.json[/], if found, from the build directory to the project and top west directory. This makes job of locating this file easier for [bold yellow]clangd[/].
-
+    \n\n[bold]Note:[/] When using build types functionality make sure to not pass CONF_FILE and OVERLAY_CONFIG variables to the [bold]CMake[/].
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
+    _ = args
 
     east.pre_workspace_command_check()
 
+    if extra_help:
+        east.run_west("build --help")
+        east.exit(return_code=0)
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("-b", "--board")
+    parser.add_argument("-d", "--build-dir")
+    parser.add_argument("-t", "--target")
+
+    # find source_dir in the args
+    source_dir = None
+    option_flag = False
+
+    for arg in ctx.raw_args:
+        if arg == "--":
+            break
+        if arg.startswith("-"):
+            option_flag = True
+            continue
+        elif option_flag:
+            option_flag = False
+            continue
+        else:
+            source_dir = arg
+            break
+
+    # find cmake_args in the args
+    cmake_args = (
+        ctx.raw_args[ctx.raw_args.index("--") + 1 :] if "--" in ctx.raw_args else None
+    )
+
+    # Parse the rest of the args
+    opts, _ = parser.parse_known_args(ctx.raw_args)
+
     build_cmd = create_build_command(
-        east, board, build_type, build_dir, target, source_dir, cmake_args
+        east,
+        opts.board,
+        build_type,
+        opts.build_dir,
+        opts.target,
+        source_dir,
+        cmake_args,
     )
 
     east.run_west(build_cmd)
@@ -145,77 +185,72 @@ def create_build_command(
     return build_cmd
 
 
-@click.command(**east_command_settings)
-@click.option("-d", "--build-dir", type=str, help="Build directory to create or use.")
-@click.option(
-    "-r", "--runner", type=str, help="Override default runner from --build-dir."
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
 )
-@click.option(
-    "-v",
-    "--verify",
-    is_flag=True,
-    help=(
-        "Verify, after flash, that contents of the boards code memory regions are the"
-        " same as in flashed image."
-    ),
-)
-@click.option(
-    "-i",
-    "--jlink-id",
-    type=str,
-    help=(
-        "Identification number of a JLink programmer that should be used for flashing."
-    ),
-)
-@click.argument("extra-args", nargs=-1, type=str, metavar="-- [extra args]")
 @click.pass_obj
-def flash(east, build_dir, runner, verify, jlink_id, extra_args):
+@click.option(
+    "--extra-help",
+    is_flag=True,
+    help="Print help of the [bold magenta]west flash[/] command.",
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def flash(east, extra_help, args):
     """
     Flash binary to the board's flash.
 
     \b
-    \n\nInternally runs [magenta bold]west flash[/] command. If the build directory is not given, the default is build/ unless the build.dir-fmt configuration variable is set. The current directory is checked after that. If either is a Zephyr build directory, it is used. If there are more than one JLinks connected to the host machine use --jlink-id flag to specify which one to use to avoid selection prompt.
+    \n\nInternally runs [magenta bold]west flash[/] command, all given arguments are passed directly to it.
 
-    \n\nTo pass additional arguments to the [bold cyan]runner[/] used by the [magenta
-    bold]west flash[/], pass them after a [bold white]"--"[/] at the end of the command line.
-
+    \n\nTo learn more about possible [magenta bold]west flash[/] arguments and options use --extra-help flag.
 
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
+
     east.pre_workspace_command_check()
 
-    flash_cmd = "flash "
+    cmd = "flash "
 
-    if build_dir:
-        flash_cmd += f"-d {build_dir} "
-    if runner:
-        flash_cmd += f"-r {runner} "
+    if extra_help:
+        cmd += "--help"
+        east.run_west(cmd)
+        east.exit(return_code=0)
 
-    if verify:
-        flash_cmd += "--verify "
-    if jlink_id:
-        flash_cmd += f"-i {jlink_id} "
-    if extra_args:
-        flash_cmd += f" {clean_up_extra_args(extra_args)}"
+    if args:
+        cmd += f"{clean_up_extra_args(args)} "
 
-    east.run_west(flash_cmd)
+    east.run_west(cmd)
 
 
 @click.command(**east_command_settings)
+@click.option(
+    "-s",
+    "--shell",
+    is_flag=True,
+    help=(
+        "Launch a sub-shell within the current terminal inside the isolated "
+        "environment provided by the [magenta bold]Nordic's nRF Toolchain Manager[/]. "
+        "Commands after [bold]--[/] are ignored. To exit the sub-shell type "
+        "[bold]exit[/] into it and hit ENTER."
+    ),
+)
 @click.argument("args", nargs=-1, type=str, metavar="-- [args]")
 @click.pass_obj
-def bypass(east, args):
+def bypass(east, shell, args):
     """
-    Bypass any set of commands directly to the [magenta bold]west tool[/].
+    Bypass any set of commands directly to the [magenta bold]Nordic's nRF Toolchain Manager[/].
 
     \b
     \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
-    the [bold magenta]west[/] tool.
+    the [bold magenta]Nordic's nRF Toolchain Manager[/] executable.
+
+    \n\nThose commands will run in the context of the isolated environment, which is provided by the executable.
 
     \n\nExample:
 
-    \n\nCommand [bold]east bypass -- build -b nrf52840dk_nrf52840[/]
+    \n\nCommand [bold]east bypass -- west build -b nrf52840dk_nrf52840[/]
     \n\nbecomes [bold]west build -b nrf52840dk_nrf52840[/]
 
 
@@ -224,51 +259,114 @@ def bypass(east, args):
     """
     east.pre_workspace_command_check()
 
+    if shell:
+        east.enter_manager_shell()
+        east.exit(return_code=0)
+
     if not args:
         east.exit()
 
-    cmd = clean_up_extra_args(args)
+    if east.use_toolchain_manager:
+        cmd = clean_up_extra_args(args)
+        east.run_cmd_in_manager(cmd)
+    else:
+        east.exit(
+            "Toolchain manager is not available in this [bold yellow]West workspace[/]."
+        )
 
-    east.run_west(cmd)
 
-
-@click.command(**east_command_settings)
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
 @click.pass_obj
 @click.option(
-    "-t",
-    "--tui",
+    "--extra-help",
     is_flag=True,
-    help="If given GDB uses Text User Interface",
+    help="Print help of the [bold magenta]west debug[/] command.",
 )
-@click.option(
-    "-a",
-    "--attach",
-    is_flag=True,
-    help=(
-        "If given only connect to the board and start a debugging session, skip "
-        "flashing (uses [bold magenta]west attach[/] instead of [bold magenta]west "
-        "debug[/])."
-    ),
-)
-@click.argument("extra_args", nargs=-1, type=str, metavar="-- [args]")
-def debug(east, tui, attach, extra_args):
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def debug(east, extra_help, args):
     """Connect to the board, flash the program, and start a debugging session.
 
     \b
-    \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
-    the [bold magenta]west[/] tool (run east debug -- --help to see all possible options).
+    \n\nInternally runs [magenta bold]west debug[/] command, all given arguments are passed directly to it.
+
+    \n\nTo learn more about possible [magenta bold]west debug[/] arguments and options use --extra-help flag.
+
+    \n\n[bold]Note:[/] Add --tui flag to use Text User Interface.
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+    east.pre_workspace_command_check()
+
+    if extra_help:
+        east.run_west("debug --help")
+    else:
+        east.run_west("debug " + clean_up_extra_args(args))
+
+
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
+@click.pass_obj
+@click.option(
+    "--extra-help",
+    is_flag=True,
+    help="Print help of the [bold magenta]west attach[/] command.",
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def attach(east, extra_help, args):
+    """Like "east debug", but doesn't reflash the program.
+
+    \b
+    \n\nInternally runs [magenta bold]west attach[/] command, all given arguments are passed directly to it.
+
+    \n\nTo learn more about possible [magenta bold]west attach[/] arguments and options use --extra-help flag.
+
+    \n\n[bold]Note:[/] Add --tui flag to use Text User Interface.
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+    east.pre_workspace_command_check()
+
+    if extra_help:
+        east.run_west("attach --help")
+    else:
+        east.run_west("attach " + clean_up_extra_args(args))
+
+
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
+@click.pass_obj
+@click.option(
+    "--extra-help",
+    is_flag=True,
+    help="Print help of the [bold magenta]west twister[/] command.",
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def twister(east, extra_help, args):
+    """Run Twister, a test runner tool.
+
+    \b
+    \n\nInternally runs [magenta bold]west twister[/] command, all given arguments are passed directly to it.
+
+    \n\nTo learn more about possible Twister arguments and options use --extra-help flag.
 
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
 
-    cmd = "attach " if attach else "debug "
+    cmd = "twister "
 
-    if tui:
-        cmd += "--tui "
+    if extra_help:
+        cmd += "--help"
+        east.run_west(cmd)
+        east.exit(return_code=0)
 
-    if extra_args:
-        cmd += f"{clean_up_extra_args(extra_args)} "
+    if args:
+        cmd += f"{clean_up_extra_args(args)} "
 
     east.run_west(cmd)
