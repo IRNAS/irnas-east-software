@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     Toolchain Manager.
 -   `east twister` command. This command is just a wrapper for the `west twister`
     command which runs Twister, a test runner tool.
+-   `east attach` command. This command is just a wrapper for the `west attach`
+    command, which is similiar to the `west debug`.
 
 ### Changed
 
@@ -20,6 +22,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     Toolchain Manager instead into just West that is in the Manager. That way user can
     user use other executables and python programs provided by the toolchains in the
     Manager.
+-   `east build`, `east flash` and `east debug` are now just wrappers for their 
+    west counterparts. Due to this the internals and externals of the East could 
+    be simplified. User experience did not change, the commands behave just like 
+    they did before, they just do not directly provide help for possible 
+    options and arguments, but instead instruct users to use `--extra-help` 
+    option to learn more about west command counterparts. Due to this change the
+    `attach` command was moved from `debug` command to its own place.
 
 ## [0.13.0] - 2023-07-26
 
