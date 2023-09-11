@@ -2,8 +2,8 @@ import os
 
 # From this file only dict consts_path should be imported, and this should happen only
 # in __main__.
-# There are however exceptions: NRF_TOOLCHAIN_MANAGER_PATH and CPPCHECK_PATH are needed
-# for downloading in sys_setup.py.
+# There are however exceptions: NRF_TOOLCHAIN_MANAGER_PATH, CPPCHECK_PATH,
+# CLANG_PATH are needed for downloading in sys_setup.py.
 
 HOME_DIR = os.environ["HOME"]
 
@@ -22,6 +22,12 @@ NRF_TOOLCHAIN_MANAGER_PATH = os.path.join(EAST_DIR, "nrfutil-toolchain-manager.e
 # Path to the cppcheck executable
 CPPCHECK_PATH = os.path.join(TOOLING_DIR, "cppcheck", "cppcheck")
 
+# Path to the clang executables
+CLANG_BIN_PATH = os.path.join(TOOLING_DIR, "clang+llvm", "bin")
+CLANG_PATH = os.path.join(CLANG_BIN_PATH, "clang")
+CLANG_TIDY_PATH = os.path.join(CLANG_BIN_PATH, "clang-tidy")
+CLANG_REPLACE_PATH = os.path.join(CLANG_BIN_PATH, "clang-apply-replacements")
+
 # Directory will all Conda stuff
 MINICONDA_DIR = os.path.join(HOME_DIR, "miniconda3")
 
@@ -36,4 +42,8 @@ const_paths = {
     "miniconda_dir": MINICONDA_DIR,
     "conda_path": CONDA_PATH,
     "cppcheck_path": CPPCHECK_PATH,
+    "clang_path": CLANG_PATH,
+    "clang_tidy_path": CLANG_TIDY_PATH,
+    "clang_replace_path": CLANG_REPLACE_PATH,
+    "codechecker_path": CODECHECKER_PATH,
 }
