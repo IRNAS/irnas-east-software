@@ -1,4 +1,5 @@
 import glob
+import json
 import os
 import platform
 import re
@@ -6,14 +7,16 @@ import shutil
 import sys
 
 import click
+from rich.panel import Panel
 
-from ..constants import CLANG_PATH, CPPCHECK_PATH, NRF_TOOLCHAIN_MANAGER_PATH
-from ..east_context import EastContext, east_command_settings
-from ..helper_functions import (
-    check_python_version,
-    download_files,
-    return_dict_on_match,
+from ..constants import (
+    CLANG_PATH,
+    CODECHECKER_PATH,
+    CPPCHECK_PATH,
+    NRF_TOOLCHAIN_MANAGER_PATH,
 )
+from ..east_context import EastContext, east_command_settings
+from ..helper_functions import check_python_version, download_files
 
 
 def _get_conda_download_link():
@@ -167,6 +170,86 @@ def _install_clang_llvm(east: EastContext, exe_path: str):
     shutil.move(dir, clang_dir)
 
 
+def _get_codechecker_download_link():
+    """Just a convenience function for getting the link for the CodeChecker source code.
+
+    This link will be updated regularly.
+    """
+
+    version = "v6.22.2"
+
+    link = f"https://github.com/Ericsson/codechecker/archive/refs/tags/{version}.tar.gz"
+
+    return link
+
+
+def _install_codechecker(east: EastContext, exe_path: str):
+    """Installs codechecker to a proper location"""
+
+    codechecker_dir = os.path.join(east.consts["tooling_dir"], "codechecker")
+
+    # Remove old cppcheck dir if it exists
+    shutil.rmtree(codechecker_dir, ignore_errors=True)
+
+    shutil.unpack_archive(exe_path, east.consts["tooling_dir"], format="gztar")
+
+    # Remove version from the folder name
+    dir = glob.glob(os.path.join(east.consts["tooling_dir"], "codechecker-*"))[0]
+    shutil.move(dir, codechecker_dir)
+
+    # Set extra options package so you don't need gcc-multilib and ui code.
+    east.print(
+        "[bold blue]Compiling codechecker from source, this will take some time..."
+    )
+    result = east.run(
+        f"cd {codechecker_dir} && "
+        "BUILD_LOGGER_64_BIT_ONLY=YES BUILD_UI_DIST=NO make package",
+        exit_on_error=False,
+        return_output=True,
+        silent=True,
+    )
+
+    if result["returncode"] != 0:
+        east.print(
+            result["output"],
+            markup=False,
+            style="",
+            overflow="ignore",
+            crop=False,
+            highlight=False,
+            soft_wrap=False,
+            no_wrap=True,
+        )
+
+        msg = (
+            "Compiling codechecker [bold red]failed[/]! Check build output above"
+            " to see what went wrong."
+        )
+        east.print(Panel(msg, padding=1, border_style="red"))
+        east.exit()
+
+    east.print("[bold green]Done!")
+
+    # Set paths to the analyzers in the config file
+    # Codechecker somehow needs to know which analyzers it should use, this is the only
+    # way this can be set.
+    config_file = os.path.join(
+        codechecker_dir, "build", "CodeChecker", "config", "package_layout.json"
+    )
+
+    with open(config_file, "r") as f:
+        data = json.load(f)
+
+    data["runtime"]["analyzers"]["clangsa"] = east.consts["clang_path"]
+    data["runtime"]["analyzers"]["cppcheck"] = east.consts["cppcheck_path"]
+    data["runtime"]["analyzers"]["clang-tidy"] = east.consts["clang_tidy_path"]
+    data["runtime"]["clang-apply-replacements"] = east.consts["clang_replace_path"]
+
+    with open(config_file, "w") as f:
+
+        f.write(json.dumps(data, indent=2))
+
+
 conda_installed_msg = """
 [bold green]Conda install done![/]
 
@@ -192,6 +275,10 @@ cppcheck_installed_msg = """
 
 clang_llvm_installed_msg = """
 [bold green]clang-tidy and clang analyzer install done![/]
+"""
+
+codechecker_installed_msg = """
+[bold green]codechecker install done![/]
 """
 
 packages = [
@@ -223,6 +310,13 @@ packages = [
         "url": _get_clang_download_link(),
         "install_method": _install_clang_llvm,
         "installed_msg": clang_llvm_installed_msg,
+    },
+    {
+        "name": "codechecker",
+        "exe": CODECHECKER_PATH,
+        "url": _get_codechecker_download_link(),
+        "install_method": _install_codechecker,
+        "installed_msg": codechecker_installed_msg,
     },
 ]
 

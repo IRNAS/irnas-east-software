@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
--   east sys-setup now also installs cppcheck and clang+llvm.
+-   east sys-setup now also installs cppcheck, clang+llvm and CodeChecker.
 
 ## [0.14.0] - 2023-08-24
 
