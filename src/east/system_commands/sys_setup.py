@@ -1,11 +1,13 @@
+import glob
 import os
+import platform
 import re
 import shutil
 import sys
 
 import click
 
-from ..constants import CPPCHECK_PATH, NRF_TOOLCHAIN_MANAGER_PATH
+from ..constants import CLANG_PATH, CPPCHECK_PATH, NRF_TOOLCHAIN_MANAGER_PATH
 from ..east_context import EastContext, east_command_settings
 from ..helper_functions import (
     check_python_version,
@@ -117,6 +119,54 @@ def _install_cppcheck(east: EastContext, exe_path: str):
     )
 
 
+def _get_clang_download_link():
+    """Just a convenience function for getting the link for the clang+llvm binaries.
+
+    This link will be updated regularly.
+    """
+
+    version = "16.0.0"
+
+    arch = platform.processor().lower()
+
+    if arch == "x86_64":
+        arch = "x86_64-linux-gnu-ubuntu-18.04"
+    elif arch == "aarch64":
+        arch = "aarch64-linux-gnu"
+    elif arch == "arm64":
+        arch = "arm64-apple-darwin"
+    else:
+        print(
+            f"Unsupported architecture ({arch}), East will download x86_64 version "
+            "of clang+llvm binaries."
+        )
+        arch = "x86_64-linux-gnu-ubuntu-18.04"
+
+    link = (
+        "https://github.com/llvm/llvm-project/releases/download/"
+        f"llvmorg-{version}/clang+llvm-{version}-{arch}.tar.xz"
+    )
+
+    return link
+
+
+def _install_clang_llvm(east: EastContext, exe_path: str):
+    """Installs clang+llvm to a proper location"""
+
+    clang_dir = os.path.join(east.consts["tooling_dir"], "clang+llvm")
+
+    # Remove old clang dir if it exists
+    shutil.rmtree(clang_dir, ignore_errors=True)
+
+    east.print("[bold blue]Extracing clang+llvm binaries, this will take some time...")
+    shutil.unpack_archive(exe_path, east.consts["tooling_dir"], format="gztar")
+    east.print("[bold green]Done!")
+
+    # Remove version from the folder name
+    dir = glob.glob(os.path.join(east.consts["tooling_dir"], "clang+llvm-*"))[0]
+    shutil.move(dir, clang_dir)
+
+
 conda_installed_msg = """
 [bold green]Conda install done![/]
 
@@ -138,6 +188,10 @@ of a [yellow bold]West workspace[/] to get the actual toolchain.
 
 cppcheck_installed_msg = """
 [bold green]cppcheck install done![/]
+"""
+
+clang_llvm_installed_msg = """
+[bold green]clang-tidy and clang analyzer install done![/]
 """
 
 packages = [
@@ -162,6 +216,13 @@ packages = [
         "url": _get_cppcheck_download_link(),
         "install_method": _install_cppcheck,
         "installed_msg": cppcheck_installed_msg,
+    },
+    {
+        "name": "clang+llvm",
+        "exe": CLANG_PATH,
+        "url": _get_clang_download_link(),
+        "install_method": _install_clang_llvm,
+        "installed_msg": clang_llvm_installed_msg,
     },
 ]
 
