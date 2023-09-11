@@ -4,7 +4,7 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import requests
 import yaml
@@ -95,20 +95,18 @@ def download_file(task_id: TaskID, url: str, path: str):
                 f.write(chunk)
 
 
-def download_files(urls: List[str], dest_dir: str) -> List[str]:
+def download_files(files_to_download: List[Dict], dest_dir: str) -> List[str]:
     """Download concurrently multiple files from the internet to the given directory.
 
-    Function expects a list of URLs that point to the files.
+    Function expects a list of dicts, where each dict has a key "url" that points to the
+    file that should be downloaded and a key "name" that is used for naming and printing
+    purposes.
 
     After all files were downloaded the function returns a list of paths to the
     downloaded files in the same order as they were given.
 
-    Downloaded files are not renamed, they have the same name as in the URL. Only
-    exception to this rule are raw files from the GitHub, they end with '?raw=true', so
-    that part is removed.
-
     Args:
-        urls (List[strl]):      URL that points to a file to be downloaded.
+        files_to_download (List[Dict]): Files to download.
 
     Return:
         files (List[str]):      List of paths to the downloaded files.
@@ -118,9 +116,8 @@ def download_files(urls: List[str], dest_dir: str) -> List[str]:
 
     with progress:
         with ThreadPoolExecutor(max_workers=4) as pool:
-            for url in urls:
-                filename = url.split("/")[-1]
-                filename = re.sub("\?raw=true$", "", filename)
+            for file in files_to_download:
+                filename = file["name"]
 
                 if not os.path.isdir(dest_dir):
                     os.mkdir(dest_dir)
@@ -129,7 +126,7 @@ def download_files(urls: List[str], dest_dir: str) -> List[str]:
                 file_paths.append(dest_path)
 
                 task_id = progress.add_task("download", filename=filename, start=False)
-                pool.submit(download_file, task_id, url, dest_path)
+                pool.submit(download_file, task_id, file["url"], dest_path)
 
     return file_paths
 

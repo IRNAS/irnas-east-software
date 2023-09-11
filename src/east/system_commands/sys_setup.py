@@ -6,7 +6,11 @@ import click
 
 from ..constants import NRF_TOOLCHAIN_MANAGER_PATH
 from ..east_context import EastContext, east_command_settings
-from ..helper_functions import check_python_version, download_files
+from ..helper_functions import (
+    check_python_version,
+    download_files,
+    return_dict_on_match,
+)
 
 
 def _get_conda_download_link():
@@ -100,16 +104,25 @@ of a [yellow bold]West workspace[/] to get the actual toolchain.
 packages = [
     # Do not install Conda for now, it is not needed.
     # {
+    #     "name": "Conda",
     #     "exe": "conda",
     #     "url": _get_conda_download_link(),
     #     "install_method": _install_conda,
     #     "installed_msg": conda_installed_msg,
     # },
     {
+        "name": "nrfutil-toolchain-manager.exe",
         "exe": NRF_TOOLCHAIN_MANAGER_PATH,
         "url": _get_toolchain_download_link(),
         "install_method": _install_toolchain_manager,
         "installed_msg": toolchain_installed_msg,
+    },
+    {
+        "name": "cppcheck",
+        "exe": CPPCHECK_PATH,
+        "url": _get_cppcheck_download_link(),
+        "install_method": _install_cppcheck,
+        "installed_msg": cppcheck_installed_msg,
     },
 ]
 
@@ -137,27 +150,49 @@ def sys_setup(east):
     east.print(
         "[blue]Checking for required system packages and programs...", highlight=False
     )
-    urls = []
+
+    files_to_download = []
+    downloaded_files = os.listdir(east.consts["cache_dir"])
+
+    print_args = {
+        "highlight": False,
+        "overflow": "ignore",
+        "crop": False,
+        "soft_wrap": False,
+        "no_wrap": True,
+    }
+
     for package in packages:
         package["installed"] = east.check_exe(package["exe"])
         if package["installed"]:
-            east.print(f"{package['exe']} [green]found", highlight=False)
+            east.print(f"{package['exe']} [green]found", **print_args)
+        elif package["name"] in downloaded_files:
+            east.print(
+                f"{package['exe']} [red]not installed[/], but download file is "
+                f"present in the {east.consts['cache_dir']}",
+                **print_args,
+            )
         else:
-            east.print(f"{package['exe']} [red]not found", highlight=False)
-            urls.append(package["url"])
+            east.print(f"{package['exe']} [red]not found", **print_args)
+            files_to_download.append(
+                {
+                    "url": package["url"],
+                    "name": package["name"],
+                }
+            )
 
     if all([package["installed"] is True for package in packages]):
         east.print("\n[green]All required system packages and programs are installed.")
         east.exit(0)
 
     # Download all required files, which are actually programs or installer scripts
-    paths = download_files(urls, east.consts["cache_dir"])
+    download_files(files_to_download, east.consts["cache_dir"])
 
     # Run an installation method for packages that are not installed.
     for package in packages:
         if not package["installed"]:
-            index = urls.index(package["url"])
-            package["install_method"](east, paths[index])
+            exe_path = os.path.join(east.consts["cache_dir"], package["name"])
+            package["install_method"](east, exe_path)
 
     # WARN: We assume that download_files will never fail. Depending on the urgency we
     # should implement better handling.
