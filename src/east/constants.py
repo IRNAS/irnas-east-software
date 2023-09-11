@@ -2,8 +2,8 @@ import os
 
 # From this file only dict consts_path should be imported, and this should happen only
 # in __main__.
-# There is however one exception: NRF_TOOLCHAIN_MANAGER_PATH is needed for downloading
-# in sys_setup.py.
+# There are however exceptions: NRF_TOOLCHAIN_MANAGER_PATH and CPPCHECK_PATH are needed
+# for downloading in sys_setup.py.
 
 HOME_DIR = os.environ["HOME"]
 
@@ -13,8 +13,14 @@ CACHE_DIR = os.path.join(HOME_DIR, ".cache", "east")
 # East directory, any files that east needs to function normally are located here
 EAST_DIR = os.path.join(HOME_DIR, ".local", "share", "east")
 
+# Tooling directory, for all the tools that east uses
+TOOLING_DIR = os.path.join(EAST_DIR, "tooling")
+
 # Path to the toolchain executable, ignore the .exe extension, this works as it should
 NRF_TOOLCHAIN_MANAGER_PATH = os.path.join(EAST_DIR, "nrfutil-toolchain-manager.exe")
+
+# Path to the cppcheck executable
+CPPCHECK_PATH = os.path.join(TOOLING_DIR, "cppcheck", "cppcheck")
 
 # Directory will all Conda stuff
 MINICONDA_DIR = os.path.join(HOME_DIR, "miniconda3")
@@ -25,7 +31,9 @@ CONDA_PATH = os.path.join(MINICONDA_DIR, "bin", "conda")
 const_paths = {
     "cache_dir": CACHE_DIR,
     "east_dir": EAST_DIR,
+    "tooling_dir": TOOLING_DIR,
     "nrf_toolchain_manager_path": NRF_TOOLCHAIN_MANAGER_PATH,
     "miniconda_dir": MINICONDA_DIR,
     "conda_path": CONDA_PATH,
+    "cppcheck_path": CPPCHECK_PATH,
 }
