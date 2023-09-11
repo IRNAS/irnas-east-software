@@ -65,8 +65,10 @@ class EastContext:
         self.echo = echo
         self.consts = const_paths
 
-        # Create EAST_DIR and its parents, if they do not exist
+        # Create east, tooling and cache dirs, if they do not exist.
         os.makedirs(self.consts["east_dir"], exist_ok=True)
+        os.makedirs(self.consts["tooling_dir"], exist_ok=True)
+        os.makedirs(self.consts["cache_dir"], exist_ok=True)
 
         self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
         self.use_toolchain_manager = False
