@@ -1,10 +1,11 @@
 import os
 import re
+import shutil
 import sys
 
 import click
 
-from ..constants import NRF_TOOLCHAIN_MANAGER_PATH
+from ..constants import CPPCHECK_PATH, NRF_TOOLCHAIN_MANAGER_PATH
 from ..east_context import EastContext, east_command_settings
 from ..helper_functions import (
     check_python_version,
@@ -82,6 +83,40 @@ def _get_toolchain_download_link():
     return link
 
 
+def _get_cppcheck_download_link():
+    """Just a convenience function for getting the link for the Cppcheck source code.
+    This link will be updated regularly.
+
+    """
+
+    link = "https://github.com/danmar/cppcheck/archive/refs/tags/2.12.0.tar.gz"
+    return link
+
+
+def _install_cppcheck(east: EastContext, exe_path: str):
+    """Installs cppcheck to a proper location"""
+
+    cppcheck_dir = os.path.join(east.consts["tooling_dir"], "cppcheck")
+
+    # Remove old cppcheck dir if it exists
+    shutil.rmtree(cppcheck_dir, ignore_errors=True)
+
+    shutil.unpack_archive(exe_path, east.consts["tooling_dir"], format="gztar")
+
+    # Remove version from the folder name
+    dir = glob.glob(os.path.join(east.consts["tooling_dir"], "cppcheck-*"))[0]
+    shutil.move(dir, cppcheck_dir)
+
+    # Compile the cppcheck, no need to make it executable afterwards
+    east.run(
+        (
+            f"cd {cppcheck_dir} && "
+            f"make MATCHCOMPILER=yes FILESDIR={cppcheck_dir}/filesdir "
+            'CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j8'
+        )
+    )
+
+
 conda_installed_msg = """
 [bold green]Conda install done![/]
 
@@ -99,6 +134,10 @@ East will now smartly use Nordic's Toolchain Manager whenever it can.
 
 [bold]Note:[/] You still need to run [italic bold blue]east update toolchain[/] inside
 of a [yellow bold]West workspace[/] to get the actual toolchain.
+"""
+
+cppcheck_installed_msg = """
+[bold green]cppcheck install done![/]
 """
 
 packages = [
