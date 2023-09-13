@@ -1,5 +1,6 @@
 import inspect
 import os
+import signal
 import subprocess
 import sys
 from shutil import which
@@ -156,6 +157,7 @@ class EastContext:
         exit_on_error: bool = True,
         return_output: bool = False,
         silent: bool = False,
+        ignore_sigint: bool = False,
     ) -> dict:
         """
         Executes given command in shell as a process. This is a blocking call, process
@@ -169,10 +171,13 @@ class EastContext:
 
             return_output (bool):   Return stdout. Note that this will mean that there
                                     might be no colorcodes in the terminal output and
-                                    no strerr, due
-                                    to piping.
+                                    no strerr, due to piping.
 
             silent (bool):          Do not print command's output.
+
+            ignore_sigint (bool):   If true it does not pass SIGINT to the run process.
+                                    This means that the run process will handle SIGINT
+                                    by itself. This is useful for running gdb.
 
         Returns:
             Dict with two keys is always returned:
@@ -231,8 +236,14 @@ class EastContext:
                 out = subprocess.DEVNULL
                 err = subprocess.STDOUT
 
-            p = subprocess.Popen(command, stdout=out, stderr=err, shell=True)
-            p.communicate()
+            if ignore_sigint:
+                previous_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+                p = subprocess.Popen(command, stdout=out, stderr=err, shell=True)
+                p.wait()
+                signal.signal(signal.SIGINT, previous_handler)
+            else:
+                p = subprocess.Popen(command, stdout=out, stderr=err, shell=True)
+                p.wait()
 
             # Should we exit on the error?
             if exit_on_error and p.returncode:
