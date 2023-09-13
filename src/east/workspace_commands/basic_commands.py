@@ -309,7 +309,7 @@ def debug(east, extra_help, args):
     if extra_help:
         east.run_west("debug --help")
     else:
-        east.run_west("debug " + clean_up_extra_args(args))
+        east.run_west("debug " + clean_up_extra_args(args), ignore_sigint=True)
 
 
 @click.command(
@@ -339,7 +339,7 @@ def attach(east, extra_help, args):
     if extra_help:
         east.run_west("attach --help")
     else:
-        east.run_west("attach " + clean_up_extra_args(args))
+        east.run_west("attach " + clean_up_extra_args(args), ignore_sigint=True)
 
 
 @click.command(
