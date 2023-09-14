@@ -1105,3 +1105,21 @@ def test_building_app_that_is_not_in_east_yaml(
         "build -b native_posix",
         should_succed=True,
     )
+
+
+def test_empty_east_yml_is_valid(west_workplace_parametrized, monkeypatch, mocker):
+    """
+    Apps and sample keys are both optional in east.yaml, so empty east.yml is valid.
+    """
+
+    # Create empty east.yml
+    open(os.path.join(west_workplace_parametrized["project"], "east.yml"), "w").close()
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["app"],
+        "build -b native_posix",
+        "build -b native_posix",
+        should_succed=True,
+    )
