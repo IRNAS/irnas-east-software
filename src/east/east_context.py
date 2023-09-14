@@ -402,6 +402,7 @@ class EastContext:
         self,
         ignore_uninstalled_ncs: bool = False,
         ignore_unsupported_ncs: bool = True,
+        check_only_west_workspace: bool = False,
     ):
         """
         This function contains a list of checks that every workspace (not system)
@@ -418,25 +419,35 @@ class EastContext:
         west.
 
         Args:
-            ignore_uninstalled_ncs (bool):  When true, self.does not exit if detected
+            ignore_uninstalled_ncs (bool):  When true, do not exit if detected
                                             NCS version is not installed by the
                                             Toolchain Manager. Workspace commands such
                                             as build, flash, clean should set this to
                                             False. Update command should set this to
                                             True.
 
-            ignore_unsupported_ncs (bool):  When true, self.does not exit if detected
+            ignore_unsupported_ncs (bool):  When true, do not exit if detected
                                             NCS version is not supported by the
                                             Toolchain Manager. Workspace commands such
                                             as build, flash, clean should set this to
                                             True. Update command should set this to
                                             false.
+
+            check_only_west_workspace (bool): When true, only check if we are in the
+                                              west Workspace, do not check for the rest
+                                              of the things. This is useful for the
+                                              codechecker command, which should be run
+                                              inside the west workspace, but does not
+                                              need nrf toolchain manager.
         """
         # Workspace commands can only be run inside west workspace, so exit if that is
         # not the case.
         if not self.west_dir_path:
             self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
+
+        if check_only_west_workspace:
+            return
 
         # Exit if east.yml could not be loaded from the project dir; it is not an error
         # if it does not exist, we support that.
