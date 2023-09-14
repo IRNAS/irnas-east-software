@@ -8,6 +8,7 @@ from .workspace_commands import (
     build,
     bypass,
     clean,
+    codechecker,
     debug,
     flash,
     release,
@@ -33,6 +34,7 @@ rich_click.rich_click.COMMAND_GROUPS = {
                 "bypass",
                 "release",
                 "twister",
+                "codechecker",
             ],
         },
         {
@@ -42,6 +44,9 @@ rich_click.rich_click.COMMAND_GROUPS = {
     ],
     "east update": [{"name": "Subcommands", "commands": ["west", "env", "toolchain"]}],
     "east util": [{"name": "Subcommands", "commands": ["connect", "rtt"]}],
+    "east codechecker": [
+        {"name": "Subcommands", "commands": ["check", "fixit", "example-config"]}
+    ],
 }
 
 
@@ -91,6 +96,7 @@ cli.add_command(release)
 cli.add_command(debug)
 cli.add_command(attach)
 cli.add_command(twister)
+cli.add_command(codechecker)
 
 
 def main():
