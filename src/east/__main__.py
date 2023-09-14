@@ -45,7 +45,17 @@ rich_click.rich_click.COMMAND_GROUPS = {
     "east update": [{"name": "Subcommands", "commands": ["west", "env", "toolchain"]}],
     "east util": [{"name": "Subcommands", "commands": ["connect", "rtt"]}],
     "east codechecker": [
-        {"name": "Subcommands", "commands": ["check", "fixit", "example-config"]}
+        {
+            "name": "Subcommands",
+            "commands": [
+                "check",
+                "fixit",
+                "example-config",
+                "store",
+                "servdiff",
+                "bypass",
+            ],
+        }
     ],
 }
 

@@ -9,6 +9,7 @@ from rich_click import RichCommand
 from ..east_context import east_command_settings
 from ..helper_functions import clean_up_extra_args
 from .build_type_flag import construct_extra_cmake_arguments
+from .codechecker_helpers import create_codecheckerfile
 
 
 @click.command(**east_command_settings)
@@ -134,6 +135,8 @@ def build(ctx, east, build_type, extra_help, args):
         sh.copyfile(
             compile_file, os.path.join(east.west_dir_path, "compile_commands.json")
         )
+
+    create_codecheckerfile(east, opts.board, build_type, opts.build_dir, source_dir)
 
 
 def create_build_command(

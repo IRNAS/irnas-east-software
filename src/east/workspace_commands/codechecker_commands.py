@@ -1,9 +1,11 @@
 import os
+import shutil
 
 import click
 from rich.syntax import Syntax
 
 from ..east_context import east_command_settings, east_group_settings
+from ..helper_functions import clean_up_extra_args
 from .codechecker_helpers import (
     check_for_build_folder,
     check_for_codechecker_config_yaml,
@@ -11,9 +13,22 @@ from .codechecker_helpers import (
     cleanup_compile_commands_json,
     cleanup_plist_files,
     create_skip_file,
+    get_endpoint,
+    get_metadata_from_codecheckerfile,
 )
 
 CC_OUTPUT_DIR = os.path.join("build", "codechecker")
+CC_DIFF_OUTPUT_DIR = os.path.join("build", "codechecker_diff")
+
+# Print output of the parse and diff command,s with default rich highlighting, but without any
+# other wrapping, cropping.
+clean_print_args = {
+    "highlight": True,
+    "overflow": "ignore",
+    "crop": False,
+    "soft_wrap": False,
+    "no_wrap": True,
+}
 
 
 @click.command(**east_command_settings)
@@ -119,16 +134,7 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze):
 
     result = east.run(parse_cmd, exit_on_error=False, return_output=True, silent=True)
 
-    # Print output of the parse command, with default rich highlighting, but without any
-    # other wrapping, cropping.
-    print_args = {
-        "highlight": True,
-        "overflow": "ignore",
-        "crop": False,
-        "soft_wrap": False,
-        "no_wrap": True,
-    }
-    east.print(result["output"], **print_args)
+    east.print(result["output"], **clean_print_args)
 
 
 @click.option(
@@ -179,7 +185,45 @@ analyzer:
 parse:
   - --trim-path-prefix=/*/project
   - --print-steps
+
+store:
+  - --trim-path-prefix=/*/project
 """
+
+
+@click.option(
+    "--url",
+    type=str,
+    default=lambda: os.getenv("EAST_CODECHECKER_SERVER_URL"),
+    help="URL of the Codechecker server (port number is also required). "
+    "If not explicitly given then value is read from the EAST_CODECHECKER_SERVER_URL "
+    "env var.",
+)
+@click.command(**east_command_settings)
+@click.pass_obj
+def store(east, url):
+    """Store the results of the [magenta bold]Codechecker[/] analysis to a server.
+
+    \b
+    \n\n[bold]Note:[/] This command should be ran after the [bold cyan]east codechecker check[/] command.
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+
+    east.pre_workspace_command_check(check_only_west_workspace=True)
+
+    cc = east.consts["codechecker_path"]
+    cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
+
+    name, tag = get_metadata_from_codecheckerfile(east)
+    endpoint = get_endpoint(east)
+
+    store_cmd = (
+        f"{cc} store --name '{name}' --url {url}/{endpoint} "
+        f"--config {cfg} {CC_OUTPUT_DIR} --tag '{tag}'"
+    )
+
+    east.run(store_cmd)
 
 
 @click.option(
@@ -215,6 +259,129 @@ def example_config(east, create):
     east.print(syntax)
 
 
+@click.command(
+    **east_command_settings,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
+@click.pass_obj
+@click.option(
+    "--extra-help",
+    is_flag=True,
+    help="Print help of the given [bold magenta]Codechecker[/] command.",
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
+def bypass(east, extra_help, args):
+    """
+    Directly run any [magenta bold]CodeChecker[/] command.
+
+    \b
+    \n\nInternally runs [magenta bold]codechecker[/] command, all given arguments are passed directly to it.
+
+    \n\nTo learn more about possible [magenta bold]codechecker[/] arguments and options use --extra-help flag.
+
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+
+    east.pre_workspace_command_check(check_only_west_workspace=True)
+
+    cc = east.consts["codechecker_path"]
+
+    cmd = f"{cc} "
+
+    if args:
+        cmd += f"{clean_up_extra_args(args)} "
+
+    if extra_help:
+        cmd += "--help"
+
+    east.run(cmd)
+
+
+@click.option(
+    "--new",
+    is_flag=True,
+    help="Show results that don't exist in the last server analysis but exist in the "
+    "local one. These are new issues that have arisen since the last store to the "
+    "server.",
+)
+@click.option(
+    "--resolved",
+    is_flag=True,
+    help="Show results that exist in the server analysis but aren't present in the "
+    "local one. These are issues that have been resolved since the last store "
+    "to the server.",
+)
+@click.option(
+    "--unresolved",
+    is_flag=True,
+    help="Show results that appear both in the last server analysis and in the "
+    "local analysis. These are issues that were present when last stored on the "
+    "server and are still present locally.",
+)
+@click.option(
+    "--html",
+    is_flag=True,
+    help="Generate a html report instead of printing the results in the terminal. "
+    "Default: false.",
+)
+@click.option(
+    "--url",
+    type=str,
+    default=lambda: os.getenv("EAST_CODECHECKER_SERVER_URL"),
+    help="URL of the Codechecker server (port number is also required). "
+    "If not explicitly given then value is read from the EAST_CODECHECKER_SERVER_URL "
+    "env var.",
+)
+@click.command(**east_command_settings)
+@click.pass_obj
+def servdiff(east, new, resolved, unresolved, html, url):
+    """Compare local analysis against the last server analysis.
+
+    \b
+    \n\nUse one of the --new, --resolved, --unresolved flags to specify how to compare.
+
+    \n\n[bold]Note:[/] This command should be ran after the [bold cyan]east codechecker check[/] command.
+
+    \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
+    """
+
+    east.pre_workspace_command_check(check_only_west_workspace=True)
+
+    cc = east.consts["codechecker_path"]
+
+    name, _ = get_metadata_from_codecheckerfile(east)
+    endpoint = get_endpoint(east)
+
+    diff_cmd = (
+        f"{cc} cmd diff --basename {name} --newname {CC_OUTPUT_DIR} "
+        f"--url {url}/{endpoint} "
+    )
+
+    if [new, resolved, unresolved].count(True) != 1:
+        east.print(
+            "\nExactly one of the [bold cyan]--new[/], [bold cyan]--resolved[/], [bold cyan]--unresolved[/] flags must be given."
+        )
+        east.exit()
+
+    if new:
+        diff_cmd += "--new "
+
+    if resolved:
+        diff_cmd += "--resolved "
+
+    if unresolved:
+        diff_cmd += "--unresolved "
+
+    if html:
+        shutil.rmtree(CC_DIFF_OUTPUT_DIR, ignore_errors=True)
+        diff_cmd += f"--export {CC_DIFF_OUTPUT_DIR} --output html "
+
+    result = east.run(diff_cmd, exit_on_error=False, return_output=True, silent=True)
+
+    east.print(result["output"], **clean_print_args)
+
+
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
 @click.pass_obj
 def codechecker(east):
@@ -225,4 +392,6 @@ def codechecker(east):
 codechecker.add_command(check)
 codechecker.add_command(example_config)
 codechecker.add_command(fixit)
-# codechecker.add_command(store)
+codechecker.add_command(store)
+codechecker.add_command(bypass)
+codechecker.add_command(servdiff)

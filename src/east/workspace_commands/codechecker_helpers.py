@@ -5,6 +5,8 @@ import os
 import plistlib as plist
 import re
 
+from ..helper_functions import get_git_version
+
 
 def check_for_build_folder(east):
     """Check that build dir exists."""
@@ -240,3 +242,62 @@ def create_skip_file(east, output):
             f.write(f"-{east.west_dir_path}/*\n ")
 
     return skip_file
+
+
+def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
+    """Create a file in the build folder that contains all information needed for the
+    codechecker store command.
+
+    The intention is that east codechecker store reads the file and uses it for
+    creating the metadata of the run when storing to the server.
+    """
+
+    # Create a file in the build folder that contains the name of the artefact
+    filename = os.path.join(build_dir if build_dir else "build", "codecheckerfile.json")
+    name = os.path.basename(source_dir if source_dir else east.cwd)
+    version = get_git_version(east)
+
+    data = {
+        "name": name,
+        "board": board,
+        "build_type": build_type,
+        "version": version,
+    }
+
+    with open(filename, "w") as f:
+        json.dump(data, f)
+
+
+def get_metadata_from_codecheckerfile(east):
+    """Read the codecheckerfile.json file and construct the name and the tag, intended
+    to be used by codechecker store command."""
+
+    # WARN: We are blindly assuming user used the default build "build" folder location.
+
+    filename = os.path.join("build", "codecheckerfile.json")
+    with open(filename, "r") as f:
+        data = json.load(f)
+
+    build_type = data["build_type"]
+    build_type = "" if build_type == "release" or not build_type else f"-{build_type}"
+
+    name = f"{data['name']}-{data['board']}{build_type}"
+
+    tag = f"tag: {data['version']['tag']}"
+
+    if data["version"]["hash"]:
+        tag += f", commit: {data['version']['hash']}"
+
+    return name, tag
+
+
+def get_endpoint(east):
+
+    endpoint = (
+        east.run("git config --get remote.origin.url", return_output=True, silent=True)[
+            "output"
+        ]
+        .split("/")[-1]
+        .strip()
+    )
+    return endpoint
