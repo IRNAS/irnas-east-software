@@ -43,9 +43,7 @@ def toolchain(east, force):
     # We come to here if the detected ncs version is supported
     if east.use_toolchain_manager:
         if force:
-            shutil.rmtree(
-                f"{east.consts['east_dir']}/toolchain/{east.detected_ncs_version}"
-            )
+            east.run_manager(f"uninstall --ncs-version {east.detected_ncs_version}")
         else:
             east.print(ncs_installed_msg)
             east.exit()
