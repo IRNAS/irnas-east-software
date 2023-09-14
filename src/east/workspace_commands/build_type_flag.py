@@ -270,9 +270,10 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     else:
         if previous_cmake_args:
             msg = (
-                "[italic bold dim]💬 Old settings found in build folder, forcing CMake"
-                " rebuild[/]"
+                "[italic bold dim]💬 Old settings found in the build folder, deleting "
+                "it and rebuilding[/]"
             )
+            east.run(f"rm -rf {build_dir}")
         else:
             # Previous cmake args are empty string, no build folder was found
             msg = "[italic bold dim]💬 Build folder not found, running CMake build[/]"
