@@ -163,7 +163,44 @@ analyzer:
 parse:
   - --trim-path-prefix=/*/project
   - --print-steps
+
+store:
+  - --trim-path-prefix=/*/project
 """
+
+
+@click.option(
+    "--endpoint",
+    type=str,
+    default="Default",
+    help="Endpoint of the Codechecker server. Default: 'Default'",
+)
+@click.option(
+    "--url",
+    type=str,
+    default="http://localhost:8001",
+    help="URL of the Codechecker server. Default: 'http://localhost:8001'",
+)
+@click.command(**east_command_settings)
+@click.pass_obj
+def store(east, endpoint, url):
+    """Store the results of the [magenta bold]Codechecker[/] analysis to a server."""
+
+    # TODO: add better description, figure out how to generate the name
+
+    east.pre_workspace_command_check(check_only_west_workspace=True)
+
+    cc = east.consts["codechecker_path"]
+    cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
+
+    name = "testtest"
+
+    store_cmd = (
+        f"{cc} store --name {name} --url {url}/{endpoint} "
+        f"--config {cfg} {CC_OUTPUT_DIR}"
+    )
+
+    east.run(store_cmd)
 
 
 @click.option(
@@ -209,4 +246,4 @@ def codechecker(east):
 codechecker.add_command(check)
 codechecker.add_command(example_config)
 codechecker.add_command(fixit)
-# codechecker.add_command(store)
+codechecker.add_command(store)
