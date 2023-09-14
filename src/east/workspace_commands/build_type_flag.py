@@ -235,6 +235,11 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         else:
             # Get the folder name that we are in
             app = return_dict_on_match(app_array, "name", os.path.basename(cwd))
+
+            if not app:
+                # We are inside app folder that is not listed in east.yaml, we default
+                # to plain west behaviour: no cmake args.
+                return ("", "")
         path_prefix = ""
 
     # "release" is a special, implicit, default, build type. Samples can request to
