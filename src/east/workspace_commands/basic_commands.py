@@ -259,7 +259,7 @@ def bypass(east, shell, args):
     """
     east.pre_workspace_command_check()
 
-    if east.detected_ncs_version:
+    if not east.detected_ncs_version:
         east.print(
             "No version of [bold cyan]nRF Connect SDK[/] was detected in this "
             "[bold yellow]West workspace[/], can't run [bold magenta]east bypass[/]."
