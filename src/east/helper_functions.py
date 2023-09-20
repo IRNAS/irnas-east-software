@@ -333,3 +333,54 @@ def clean_up_extra_args(args):
         return arg
 
     return f"{' '.join(list(map(add_back_double_quotes, args)))}"
+
+
+def create_artefact_name(project, board, version, build_type):
+    """
+    Create an artefact name.
+
+    Board might be in form <west_board>@<hv_version>, in that case we modify it to fit
+    the artefact name.
+
+    We also add git hash at the end if the build was not done on the clean tagged
+    commit.
+    """
+    board = board.replace("@", "-hv")
+
+    # "release" or None build_type should not generate any build type qualifier.
+    build_type = "" if build_type == "release" or not build_type else f"-{build_type}"
+
+    git_hash = f"-{version['hash']}" if version["hash"] else ""
+
+    return f"{project}-{board}-{version['tag']}{build_type}{git_hash}"
+
+
+def get_git_version(east):
+    """
+    Return output from git describe command, see help string of release function for
+    more information.
+    """
+    result = east.run(
+        "git describe --tags --always --long --dirty=+", silent=True, return_output=True
+    )
+
+    output = result["output"].strip().split("-")
+
+    if len(output) == 1:
+        # No git tag, only hash was produced
+        version = {"tag": "v0.0.0", "hash": output[0]}
+    elif len(output) == 3:
+        if output[1] == "0" and not output[2].endswith("+"):
+            # Clean version commit, no hash needed
+            version = {"tag": output[0], "hash": ""}
+        else:
+            # Not on commit or dirty, both version and hash are needed
+            version = {"tag": output[0], "hash": output[2][1:]}
+
+    else:
+        east.print(
+            f"Unsupported git describe output ({result['output']}), contact developer!"
+        )
+        east.exit()
+
+    return version

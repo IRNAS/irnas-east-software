@@ -8,7 +8,7 @@ from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from ..east_context import east_command_settings
-from ..helper_functions import find_all_boards
+from ..helper_functions import find_all_boards, get_git_version
 from .basic_commands import create_build_command
 
 # This could be considered as a hack, but it is actually the cleanest way to test
@@ -76,37 +76,6 @@ def move_build_artefacts(art_name, art_dest, dry_run):
                 bin_path,
                 os.path.join(art_dest, ".".join([art_name, exten])),
             )
-
-
-def get_git_version(east):
-    """
-    Return output from git describe command, see help string of release function for
-    more information.
-    """
-    result = east.run(
-        "git describe --tags --always --long --dirty=+", silent=True, return_output=True
-    )
-
-    output = result["output"].strip().split("-")
-
-    if len(output) == 1:
-        # No git tag, only hash was produced
-        version = {"tag": "v0.0.0", "hash": output[0]}
-    elif len(output) == 3:
-        if output[1] == "0" and not output[2].endswith("+"):
-            # Clean version commit, no hash needed
-            version = {"tag": output[0], "hash": ""}
-        else:
-            # Not on commit or dirty, both version and hash are needed
-            version = {"tag": output[0], "hash": output[2][1:]}
-
-    else:
-        east.print(
-            f"Unsupported git describe output ({result['output']}), contact developer!"
-        )
-        east.exit()
-
-    return version
 
 
 def show_job_summary(east, jobs):
