@@ -17,8 +17,7 @@ from .codechecker_helpers import create_codecheckerfile
 def clean(east):
     """Clean the build folder in current directory.
 
-
-
+    \b
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
