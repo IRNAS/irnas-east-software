@@ -2,7 +2,7 @@ import click
 import rich_click
 
 from .east_context import EastContext, east_group_settings
-from .system_commands import init, sys_setup, util
+from .system_commands import init, install, update, util
 from .workspace_commands import (
     attach,
     build,
@@ -13,7 +13,6 @@ from .workspace_commands import (
     flash,
     release,
     twister,
-    update,
 )
 
 rich_click.rich_click.MAX_WIDTH = 80
@@ -30,7 +29,6 @@ rich_click.rich_click.COMMAND_GROUPS = {
                 "clean",
                 "debug",
                 "attach",
-                "update",
                 "bypass",
                 "release",
                 "twister",
@@ -39,11 +37,17 @@ rich_click.rich_click.COMMAND_GROUPS = {
         },
         {
             "name": "System commands",
-            "commands": ["init", "sys-setup", "util"],
+            "commands": ["init", "update", "install", "util"],
         },
     ],
     "east update": [{"name": "Subcommands", "commands": ["west", "env", "toolchain"]}],
     "east util": [{"name": "Subcommands", "commands": ["connect", "rtt"]}],
+    "east install": [
+        {
+            "name": "Packages",
+            "commands": ["nrfutil-toolchain-manager", "codechecker", "toolchain"],
+        }
+    ],
     "east codechecker": [
         {
             "name": "Subcommands",
@@ -99,9 +103,9 @@ cli.add_command(build)
 cli.add_command(bypass)
 cli.add_command(flash)
 cli.add_command(clean)
-cli.add_command(update)
 cli.add_command(init)
-cli.add_command(sys_setup)
+cli.add_command(update)
+cli.add_command(install)
 cli.add_command(util)
 cli.add_command(release)
 cli.add_command(debug)

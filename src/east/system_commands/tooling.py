@@ -6,7 +6,6 @@ import re
 import shutil
 import sys
 
-import click
 from rich.panel import Panel
 
 from ..constants import (
@@ -15,7 +14,7 @@ from ..constants import (
     CPPCHECK_PATH,
     NRF_TOOLCHAIN_MANAGER_PATH,
 )
-from ..east_context import EastContext, east_command_settings
+from ..east_context import EastContext
 from ..helper_functions import check_python_version, download_files
 
 
@@ -51,8 +50,13 @@ def _install_conda(east: EastContext, installer_path: str):
 def _install_toolchain_manager(east: EastContext, exe_path: str):
     """Installs toolchain manager to a proper location"""
 
+    nrfutil_dir = os.path.join(east.consts["tooling_dir"], "nrfutil")
+
+    shutil.rmtree(nrfutil_dir, ignore_errors=True)
+    os.mkdir(nrfutil_dir)
+
     # Move toolchain manager to its proper place
-    east.run(f"mv -f {exe_path} {east.consts['east_dir']}")
+    east.run(f"mv -f {exe_path} {east.consts['nrf_toolchain_manager_path']}")
 
     # That is octal, make it executable
     os.chmod(east.consts["nrf_toolchain_manager_path"], 0o777)
@@ -265,7 +269,7 @@ toolchain_installed_msg = """
 
 East will now smartly use Nordic's Toolchain Manager whenever it can.
 
-[bold]Note:[/] You still need to run [italic bold blue]east update toolchain[/] inside
+[bold]Note:[/] You still need to run [italic bold blue]east install toolchain[/] inside
 of a [yellow bold]West workspace[/] to get the actual toolchain.
 """
 
@@ -281,7 +285,7 @@ codechecker_installed_msg = """
 [bold green]codechecker install done![/]
 """
 
-packages = [
+supported_tools = [
     # Do not install Conda for now, it is not needed.
     # {
     #     "name": "Conda",
@@ -321,29 +325,14 @@ packages = [
 ]
 
 
-@click.command(**east_command_settings)
-@click.pass_obj
-def sys_setup(east):
-    """Perform system-wide setup for development.
+def tool_installer(east, tool_names):
 
-    \b
-    \n\nCheck if all required packages are available on the host system.
-
-    If not, download and install them.
-
-    \b
-    \n\nPackages:\n
-    - Conda Package Manager
-
-    - Nordic's nRF Toolchain Manager executable
-    """
+    tools = [tool for tool in supported_tools if tool["name"] in tool_names]
 
     check_python_version(east)
 
     # Construct a list of files that have to be downloaded.
-    east.print(
-        "[blue]Checking for required system packages and programs...", highlight=False
-    )
+    east.print("[blue]Checking for required tools...", highlight=False)
 
     files_to_download = []
     downloaded_files = os.listdir(east.consts["cache_dir"])
@@ -356,43 +345,42 @@ def sys_setup(east):
         "no_wrap": True,
     }
 
-    for package in packages:
-        package["installed"] = east.check_exe(package["exe"])
-        if package["installed"]:
-            east.print(f"{package['exe']} [green]found", **print_args)
-        elif package["name"] in downloaded_files:
+    for tool in tools:
+        tool["installed"] = east.check_exe(tool["exe"])
+        if tool["installed"]:
+            east.print(f"{tool['exe']} [green]found", **print_args)
+        elif tool["name"] in downloaded_files:
             east.print(
-                f"{package['exe']} [red]not installed[/], but download file is "
+                f"{tool['exe']} [red]not installed[/], but downloaded file is "
                 f"present in the {east.consts['cache_dir']}",
                 **print_args,
             )
         else:
-            east.print(f"{package['exe']} [red]not found", **print_args)
+            east.print(f"{tool['exe']} [red]not found", **print_args)
             files_to_download.append(
                 {
-                    "url": package["url"],
-                    "name": package["name"],
+                    "url": tool["url"],
+                    "name": tool["name"],
                 }
             )
 
-    if all([package["installed"] is True for package in packages]):
-        east.print("\n[green]All required system packages and programs are installed.")
-        east.exit(0)
+    if all([tool["installed"] is True for tool in tools]):
+        east.print("\n[green]All required tools are installed.")
 
     # Download all required files, which are actually programs or installer scripts
     download_files(files_to_download, east.consts["cache_dir"])
 
     # Run an installation method for packages that are not installed.
-    for package in packages:
-        if not package["installed"]:
-            exe_path = os.path.join(east.consts["cache_dir"], package["name"])
-            package["install_method"](east, exe_path)
+    for tool in tools:
+        if not tool["installed"]:
+            exe_path = os.path.join(east.consts["cache_dir"], tool["name"])
+            tool["install_method"](east, exe_path)
 
     # WARN: We assume that download_files will never fail. Depending on the urgency we
     # should implement better handling.
     # Print installed message for packages that were installed
-    for package in packages:
-        if not package["installed"]:
+    for tool in tools:
+        if not tool["installed"]:
             east.console.rule("", style="")
-            east.print(package["installed_msg"])
+            east.print(tool["installed_msg"])
     east.console.rule("", style="")
