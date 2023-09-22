@@ -17,7 +17,9 @@ EAST_DIR = os.path.join(HOME_DIR, ".local", "share", "east")
 TOOLING_DIR = os.path.join(EAST_DIR, "tooling")
 
 # Path to the toolchain executable, ignore the .exe extension, this works as it should
-NRF_TOOLCHAIN_MANAGER_PATH = os.path.join(EAST_DIR, "nrfutil-toolchain-manager.exe")
+NRF_TOOLCHAIN_MANAGER_PATH = os.path.join(
+    TOOLING_DIR, "nrfutil", "nrfutil-toolchain-manager.exe"
+)
 
 # Path to the cppcheck executable
 CPPCHECK_PATH = os.path.join(TOOLING_DIR, "cppcheck", "cppcheck")

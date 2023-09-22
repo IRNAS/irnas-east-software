@@ -223,7 +223,7 @@ no_toolchain_manager_msg = """
 
 To install it run:
 
-\t[italic bold blue]east sys-setup
+\t[italic bold blue]east install nrfutil-toolchain-manager
 """
 
 not_in_west_workspace_msg = """
