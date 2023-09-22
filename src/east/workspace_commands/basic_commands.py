@@ -50,6 +50,14 @@ class SpecialCommand(RichCommand):
     ),
 )
 @click.option(
+    "--spdx",
+    is_flag=True,
+    help=(
+        "Create an SPDX 2.2 tag-value bill of materials following the completion "
+        "of a Zephyr build."
+    ),
+)
+@click.option(
     "--extra-help",
     is_flag=True,
     help="Print help of the [bold magenta]west build[/] command.",
@@ -57,7 +65,7 @@ class SpecialCommand(RichCommand):
 @click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
 @click.pass_obj
 @click.pass_context
-def build(ctx, east, build_type, extra_help, args):
+def build(ctx, east, build_type, spdx, extra_help, args):
     """
     Build firmware in the current directory.
 
@@ -124,7 +132,15 @@ def build(ctx, east, build_type, extra_help, args):
         cmake_args,
     )
 
+    if spdx:
+        build_dir = opts.build_dir if opts.build_dir else "build"
+        east.run_west(f"spdx --init --build-dir {build_dir}")
+
     east.run_west(build_cmd)
+
+    if spdx:
+        build_dir = opts.build_dir if opts.build_dir else "build"
+        east.run_west(f"spdx --build-dir {build_dir} --analyze-includes --include-sdk")
 
     compile_file = os.path.join("build", "compile_commands.json")
     if os.path.isfile(compile_file):
