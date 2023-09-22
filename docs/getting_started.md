@@ -22,13 +22,16 @@ To install `west` refer to its
 
 ### First time system setup
 
-`east` needs some programs installed on the host system, to function.
+`east` needs some tools installed on the host system to function.
 
 This can be done with below command:
 
 ```
-east sys-setup
+east install nrfutil-toolchain-manager
 ```
+
+**Note**: You can install more tools with `east install --all` command, however
+this is not needed for this getting started guide.
 
 ## Example project walk-through
 
@@ -38,7 +41,7 @@ application] repository as a starting point.
 [example application]:
   https://github.com/zephyrproject-rtos/example-application/tree/v3.1.0
 
-**Note:** Above link and below `west init` both reference the `v3.1.0` version
+**Note:** Above link and below `east init` both reference the `v3.1.0` version
 of the example application. The `HEAD` of the `main` branch is currently broken
 / not compatible with this guide.
 
@@ -47,7 +50,7 @@ of the example application. The `HEAD` of the `main` branch is currently broken
 Initialize `my-workspace` folder for the `example-application`.
 
 ```bash
-west init -m https://github.com/zephyrproject-rtos/example-application --mr v3.1.0 my-workspace
+east init -m https://github.com/zephyrproject-rtos/example-application --mr v3.1.0 my-workspace
 cd my-workspace/example-application
 ```
 
@@ -83,7 +86,7 @@ imports NCS repo. Only `west update` is needed in that case.
 To install required toolchain run below command:
 
 ```bash
-east update toolchain
+east install toolchain
 ```
 
 East determines the correct version of the toolchain from the `west.yml`
