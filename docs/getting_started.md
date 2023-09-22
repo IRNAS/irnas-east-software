@@ -20,6 +20,15 @@ pip install --upgrade east-tool
 To install `west` refer to its
 [documentation](https://docs.zephyrproject.org/latest/develop/west/install.html).
 
+### External system packages
+
+Due to the tooling that East requires users need to install below packages via
+`apt`:
+
+```bash
+sudo apt install build-essential curl libncurses5
+```
+
 ### First time system setup
 
 `east` needs some tools installed on the host system to function.
