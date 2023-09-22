@@ -8,6 +8,7 @@ from ..east_context import east_command_settings, east_group_settings
 from ..helper_functions import clean_up_extra_args
 from .codechecker_helpers import (
     check_for_build_folder,
+    check_for_codechecker,
     check_for_codechecker_config_yaml,
     check_for_compile_commands_json,
     cleanup_compile_commands_json,
@@ -19,6 +20,7 @@ from .codechecker_helpers import (
 
 CC_OUTPUT_DIR = os.path.join("build", "codechecker")
 CC_DIFF_OUTPUT_DIR = os.path.join("build", "codechecker_diff")
+
 
 # Print output of the parse and diff command,s with default rich highlighting, but without any
 # other wrapping, cropping.
@@ -101,6 +103,7 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze):
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
     compile_commands = os.path.join("build", "compile_commands.json")
 
+    check_for_codechecker(east)
     check_for_build_folder(east)
     check_for_compile_commands_json(east, compile_commands)
     cleanup_compile_commands_json(compile_commands)
@@ -159,6 +162,8 @@ def fixit(east, apply):
 
     east.pre_workspace_command_check(check_only_west_workspace=True)
 
+    check_for_codechecker(east)
+
     cc = east.consts["codechecker_path"]
 
     fixit_cmd = f"{cc} fixit {CC_OUTPUT_DIR}"
@@ -211,6 +216,7 @@ def store(east, url):
     """
 
     east.pre_workspace_command_check(check_only_west_workspace=True)
+    check_for_codechecker(east)
 
     cc = east.consts["codechecker_path"]
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
@@ -238,6 +244,7 @@ def example_config(east, create):
     """Show example [bold magenta]codechecker_config.yaml[/] file."""
 
     east.pre_workspace_command_check(check_only_west_workspace=True)
+    check_for_codechecker(east)
 
     if create:
         with open(os.path.join(east.project_dir, "codechecker_config.yaml"), "w") as f:
@@ -284,6 +291,7 @@ def bypass(east, extra_help, args):
     """
 
     east.pre_workspace_command_check(check_only_west_workspace=True)
+    check_for_codechecker(east)
 
     cc = east.consts["codechecker_path"]
 
@@ -347,6 +355,7 @@ def servdiff(east, new, resolved, unresolved, html, url):
     """
 
     east.pre_workspace_command_check(check_only_west_workspace=True)
+    check_for_codechecker(east)
 
     cc = east.consts["codechecker_path"]
 
