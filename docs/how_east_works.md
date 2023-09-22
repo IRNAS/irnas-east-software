@@ -167,12 +167,12 @@ This check ensures that below statements are true:
 
 1. Workspace commands can only run from the inside of the West workspace.
 2. Workspace commands can only run if the nRF Toolchain Manager executable is
-   installed on the development machine (via the `east sys-setup` command).
+   installed on the development machine (via the `east install` command).
 3. Presence of the `east.yml` is optional, however, if present the contents of
    the file should be valid (see [configuration] for more info about this file).
 4. If detected NCS SDK version **is supported** by the nRF Toolchain Manager, it
    should also be installed (if that is not the case, tell the user to run
-   `east update toolchain` and exit).
+   `east install toolchain` and exit).
 5. If detected NCS SDK version **is not supported** by the nRF Toolchain Manager
    (or current West workspace does not use `sdk-nrf` one of the imported West
    modules), silently pass through.
@@ -214,6 +214,6 @@ in its `west.yml`).
 
 ## East storage location
 
-East stores downloaded nRF Toolchain Manager executable and installed toolchains
-in the `~/.local/share/east` folder. Deleting this folder would require you to
-rerun the `east sys-setup` and `east update toolchain` commands.
+East stores downloaded nRF Toolchain Manager executable, tools and installed
+toolchains in the `~/.local/share/east` folder in several subfolders. Deleting
+this folder would require you to rerun the `east install` commands.
