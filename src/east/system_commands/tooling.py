@@ -227,7 +227,9 @@ def _install_codechecker(east: EastContext, exe_path: str):
 
         msg = (
             "Compiling codechecker [bold red]failed[/]! Check build output above"
-            " to see what went wrong."
+            "to see what went wrong.\n"
+            "You probably need to install some extra packages:\n\n"
+            "\t[bold italic cyan]sudo apt install build-essential curl libncurses5[/]"
         )
         east.print(Panel(msg, padding=1, border_style="red"))
         east.exit()
