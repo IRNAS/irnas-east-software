@@ -8,6 +8,20 @@ import re
 from ..helper_functions import get_git_version
 
 
+def check_for_codechecker(east):
+    """Check if codechecker is installed and available in the path."""
+
+    if not east.check_exe(east.consts["codechecker_path"]):
+        msg = (
+            "\n[bold magenta]Codechecker[/] is [bold red]not installed[/] on this "
+            "system!\n\n"
+            "To install it run:\n\n"
+            "\t[italic bold blue] east install codechecker[/]"
+        )
+        east.print(msg)
+        east.exit()
+
+
 def check_for_build_folder(east):
     """Check that build dir exists."""
 
