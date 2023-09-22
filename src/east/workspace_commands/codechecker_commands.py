@@ -22,8 +22,8 @@ CC_OUTPUT_DIR = os.path.join("build", "codechecker")
 CC_DIFF_OUTPUT_DIR = os.path.join("build", "codechecker_diff")
 
 
-# Print output of the parse and diff command,s with default rich highlighting, but without any
-# other wrapping, cropping.
+# Print output of the parse and diff command,s with default rich highlighting, but
+# without any other wrapping, cropping.
 clean_print_args = {
     "highlight": True,
     "overflow": "ignore",
