@@ -230,7 +230,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             return ("", "")
 
         # Determine what kind of project it is, single or multi app
-        if len(app_array) == 1:
+        if os.path.basename(cwd) == "app":
             app = app_array[0]
         else:
             # Get the folder name that we are in

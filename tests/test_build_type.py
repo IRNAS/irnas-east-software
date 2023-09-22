@@ -1078,20 +1078,22 @@ def test_building_outside_of_app_and_samples(
 
 
 def test_building_app_that_is_not_in_east_yaml(
-    west_workplace_multi_app, monkeypatch, mocker
+    west_workplace_parametrized, monkeypatch, mocker
 ):
     """
     East shouldn't add extra flags to the west build call when building an app that
     isn't in the east.yaml.
     """
 
-    unlisted_app = os.path.join(west_workplace_multi_app, "app/test_three")
+    unlisted_app = os.path.join(
+        west_workplace_parametrized["project"], "app/test_three"
+    )
     os.makedirs(unlisted_app, exist_ok=True)
 
     helper_test_against_west_run(
         monkeypatch,
         mocker,
-        west_workplace_multi_app,
+        west_workplace_parametrized["project"],
         "build -b native_posix app/test_three",
         "build -b native_posix app/test_three",
         should_succed=True,
