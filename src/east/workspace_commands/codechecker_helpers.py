@@ -267,7 +267,8 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
     """
 
     # Create a file in the build folder that contains the name of the artefact
-    filename = os.path.join(build_dir if build_dir else "build", "codecheckerfile.json")
+    build_dir = build_dir if build_dir else "build"
+    filename = os.path.join(build_dir, "codecheckerfile.json")
     name = os.path.basename(source_dir if source_dir else east.cwd)
     version = get_git_version(east)
 
@@ -277,6 +278,8 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
         "build_type": build_type,
         "version": version,
     }
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir)
 
     with open(filename, "w") as f:
         json.dump(data, f)

@@ -359,6 +359,10 @@ def get_git_version(east):
     """
     Return output from git describe command, see help string of release function for
     more information.
+
+    Note to myself: If you use this function in some other place, make sure that you
+    patch it in the test files, otherwise pytest thinks that is the mocked call that it
+    should test against.
     """
     result = east.run(
         "git describe --tags --always --long --dirty=+", silent=True, return_output=True

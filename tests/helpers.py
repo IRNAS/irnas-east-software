@@ -314,6 +314,10 @@ def helper_test_against_west_run(
         "east.workspace_commands.release_commands.get_git_version",
         return_value={"tag": "v1.0.0.", "hash": ""},
     )
+    mocker.patch(
+        "east.workspace_commands.codechecker_helpers.get_git_version",
+        return_value={"tag": "v1.0.0.", "hash": ""},
+    )
 
     monkeypatch.chdir(path)
     mocker.patch(
