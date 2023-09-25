@@ -2,9 +2,7 @@ import glob
 import json
 import os
 import platform
-import re
 import shutil
-import sys
 
 from rich.panel import Panel
 
@@ -16,35 +14,6 @@ from ..constants import (
 )
 from ..east_context import EastContext
 from ..helper_functions import check_python_version, download_files
-
-
-def _get_conda_download_link():
-    """Construct download link for Conda installer script based on system python
-    version"""
-
-    # Link to the Conda installer script. Two big Xs will be later replaced with python
-    # version, like 39 or 38.
-    link = "https://repo.anaconda.com/miniconda/Miniconda3-pyXX_4.12.0-Linux-x86_64.sh"
-    py_ver = str(sys.version_info.major) + str(sys.version_info.minor)
-    return re.sub("XX", py_ver, link)
-
-
-def _install_conda(east: EastContext, installer_path: str):
-    """Installs Conda package manager"""
-
-    # Conda is not on path, but the miniconda dir could still exist.
-    # If we do not delete it now the installer will complain.
-    east.run(f"rm -fr {east.consts['miniconda_dir']}")
-
-    east.print("[bold blue]Started Conda installer...")
-    # -b flag stands for '[b]e silent', hahaha....
-    east.run(f"bash {installer_path} -b ")
-
-    # Conda is now installed, but not on the path yet (this will happen after
-    # sourcing .bashrc, .zshrc, .fishrc, etc..), so we talk to it with fullpath
-    # Do not activate base env.
-    east.run(f"{east.consts['conda_path']} config --set auto_activate_base false")
-    east.run(f"{east.consts['conda_path']} init")
 
 
 def _install_toolchain_manager(east: EastContext, exe_path: str):
@@ -256,16 +225,6 @@ def _install_codechecker(east: EastContext, exe_path: str):
         f.write(json.dumps(data, indent=2))
 
 
-conda_installed_msg = """
-[bold green]Conda install done![/]
-
-Close and reopen your terminal window or source your shell configuration file
-manually with one of the below commands for changes to take effect:
-• source ~/.bashrc
-• source ~/.zshrc
-• source ~/.config/fish/config.fish
-"""
-
 toolchain_installed_msg = """
 [bold green]Nordic's Toolchain Manager install done![/]
 
@@ -288,14 +247,6 @@ codechecker_installed_msg = """
 """
 
 supported_tools = [
-    # Do not install Conda for now, it is not needed.
-    # {
-    #     "name": "Conda",
-    #     "exe": "conda",
-    #     "url": _get_conda_download_link(),
-    #     "install_method": _install_conda,
-    #     "installed_msg": conda_installed_msg,
-    # },
     {
         "name": "nrfutil-toolchain-manager.exe",
         "exe": NRF_TOOLCHAIN_MANAGER_PATH,
