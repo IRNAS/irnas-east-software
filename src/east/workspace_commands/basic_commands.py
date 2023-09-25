@@ -92,6 +92,37 @@ def build(ctx, east, build_type, spdx, extra_help, args):
         east.run_west("build --help")
         east.exit(return_code=0)
 
+    build_cmd, opts = create_build_command_from_commandline(
+        east, ctx.raw_args, build_type
+    )
+    build_dir = opts.build_dir if opts.build_dir else "build"
+
+    if spdx:
+        east.run_west(f"spdx --init --build-dir {build_dir}")
+
+    east.run_west(build_cmd)
+
+    if spdx:
+        east.run_west(f"spdx --build-dir {build_dir} --analyze-includes --include-sdk")
+
+    compile_file = os.path.join("build", "compile_commands.json")
+    if os.path.isfile(compile_file):
+        for dest in [east.project_dir, east.west_dir_path]:
+            sh.copyfile(compile_file, os.path.join(dest, "compile_commands.json"))
+
+    create_codecheckerfile(
+        east, opts.board, build_type, opts.build_dir, opts.source_dir
+    )
+
+
+def create_build_command_from_commandline(east, raw_args, build_type):
+    """Helper for creating a build command.
+
+    It parses raw_args and creates two objects:
+    - build_cmd: a string with the build command, intended to be given to run_west()
+    - opts: an object with parsed arguments
+    """
+
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("-b", "--board")
     parser.add_argument("-d", "--build-dir")
@@ -101,7 +132,7 @@ def build(ctx, east, build_type, spdx, extra_help, args):
     source_dir = None
     option_flag = False
 
-    for arg in ctx.raw_args:
+    for arg in raw_args:
         if arg == "--":
             break
         if arg.startswith("-"):
@@ -115,12 +146,11 @@ def build(ctx, east, build_type, spdx, extra_help, args):
             break
 
     # find cmake_args in the args
-    cmake_args = (
-        ctx.raw_args[ctx.raw_args.index("--") + 1 :] if "--" in ctx.raw_args else None
-    )
+    cmake_args = raw_args[raw_args.index("--") + 1 :] if "--" in raw_args else None
 
     # Parse the rest of the args
-    opts, _ = parser.parse_known_args(ctx.raw_args)
+    opts, _ = parser.parse_known_args(raw_args)
+    opts.source_dir = source_dir
 
     build_cmd = create_build_command(
         east,
@@ -132,26 +162,7 @@ def build(ctx, east, build_type, spdx, extra_help, args):
         cmake_args,
     )
 
-    if spdx:
-        build_dir = opts.build_dir if opts.build_dir else "build"
-        east.run_west(f"spdx --init --build-dir {build_dir}")
-
-    east.run_west(build_cmd)
-
-    if spdx:
-        build_dir = opts.build_dir if opts.build_dir else "build"
-        east.run_west(f"spdx --build-dir {build_dir} --analyze-includes --include-sdk")
-
-    compile_file = os.path.join("build", "compile_commands.json")
-    if os.path.isfile(compile_file):
-        sh.copyfile(
-            compile_file, os.path.join(east.project_dir, "compile_commands.json")
-        )
-        sh.copyfile(
-            compile_file, os.path.join(east.west_dir_path, "compile_commands.json")
-        )
-
-    create_codecheckerfile(east, opts.board, build_type, opts.build_dir, source_dir)
+    return build_cmd, opts
 
 
 def create_build_command(
@@ -166,6 +177,9 @@ def create_build_command(
 ):
     """Helper for creating a build command. This extra helper is needed so it can also
     be reused by release command.
+
+    Returns:
+        build_cmd: a string with the build command, intended to be given to run_west()
     """
 
     build_type_args, diagnostic = construct_extra_cmake_arguments(
