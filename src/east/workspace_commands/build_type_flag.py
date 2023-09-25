@@ -165,6 +165,10 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             east.print(build_type_misuse_no_east_yml_msg)
             east.exit()
 
+    # Set to empty string, it will stay like that unless we are inside app that uses
+    # build types
+    cmake_build_type = ""
+
     # Modify current working dir, if source_dir is used, rstrip is needed cause
     # path.join adds one "/" if joining empty string.
     source_dir = source_dir if source_dir else ""
@@ -241,6 +245,8 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
                 # to plain west behaviour: no cmake args.
                 return ("", "")
         path_prefix = ""
+        build_types_str = build_type if build_type else "release"
+        cmake_build_type = f' -DEAST_BUILD_TYPE="{build_types_str}"'
 
     # "release" is a special, implicit, default, build type. Samples can request to
     # inherit from it, in that case only the common.conf is added to the build.
@@ -277,4 +283,4 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         else:
             # Previous cmake args are empty string, no build folder was found
             msg = "[italic bold dim]💬 Build folder not found, running CMake build[/]"
-        return required_cmake_args, msg
+        return required_cmake_args + cmake_build_type, msg
