@@ -9,6 +9,7 @@ from rich_click import RichCommand
 from ..east_context import east_command_settings
 from ..helper_functions import clean_up_extra_args
 from .build_type_flag import construct_extra_cmake_arguments
+from .codechecker_helpers import create_codecheckerfile
 
 
 @click.command(**east_command_settings)
@@ -16,8 +17,7 @@ from .build_type_flag import construct_extra_cmake_arguments
 def clean(east):
     """Clean the build folder in current directory.
 
-
-
+    \b
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
@@ -50,6 +50,14 @@ class SpecialCommand(RichCommand):
     ),
 )
 @click.option(
+    "--spdx",
+    is_flag=True,
+    help=(
+        "Create an SPDX 2.2 tag-value bill of materials following the completion "
+        "of a Zephyr build."
+    ),
+)
+@click.option(
     "--extra-help",
     is_flag=True,
     help="Print help of the [bold magenta]west build[/] command.",
@@ -57,7 +65,7 @@ class SpecialCommand(RichCommand):
 @click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
 @click.pass_obj
 @click.pass_context
-def build(ctx, east, build_type, extra_help, args):
+def build(ctx, east, build_type, spdx, extra_help, args):
     """
     Build firmware in the current directory.
 
@@ -84,6 +92,37 @@ def build(ctx, east, build_type, extra_help, args):
         east.run_west("build --help")
         east.exit(return_code=0)
 
+    build_cmd, opts = create_build_command_from_commandline(
+        east, ctx.raw_args, build_type
+    )
+    build_dir = opts.build_dir if opts.build_dir else "build"
+
+    if spdx:
+        east.run_west(f"spdx --init --build-dir {build_dir}")
+
+    east.run_west(build_cmd)
+
+    if spdx:
+        east.run_west(f"spdx --build-dir {build_dir} --analyze-includes --include-sdk")
+
+    compile_file = os.path.join("build", "compile_commands.json")
+    if os.path.isfile(compile_file):
+        for dest in [east.project_dir, east.west_dir_path]:
+            sh.copyfile(compile_file, os.path.join(dest, "compile_commands.json"))
+
+    create_codecheckerfile(
+        east, opts.board, build_type, opts.build_dir, opts.source_dir
+    )
+
+
+def create_build_command_from_commandline(east, raw_args, build_type):
+    """Helper for creating a build command.
+
+    It parses raw_args and creates two objects:
+    - build_cmd: a string with the build command, intended to be given to run_west()
+    - opts: an object with parsed arguments
+    """
+
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("-b", "--board")
     parser.add_argument("-d", "--build-dir")
@@ -93,7 +132,7 @@ def build(ctx, east, build_type, extra_help, args):
     source_dir = None
     option_flag = False
 
-    for arg in ctx.raw_args:
+    for arg in raw_args:
         if arg == "--":
             break
         if arg.startswith("-"):
@@ -107,12 +146,11 @@ def build(ctx, east, build_type, extra_help, args):
             break
 
     # find cmake_args in the args
-    cmake_args = (
-        ctx.raw_args[ctx.raw_args.index("--") + 1 :] if "--" in ctx.raw_args else None
-    )
+    cmake_args = raw_args[raw_args.index("--") + 1 :] if "--" in raw_args else None
 
     # Parse the rest of the args
-    opts, _ = parser.parse_known_args(ctx.raw_args)
+    opts, _ = parser.parse_known_args(raw_args)
+    opts.source_dir = source_dir
 
     build_cmd = create_build_command(
         east,
@@ -124,16 +162,7 @@ def build(ctx, east, build_type, extra_help, args):
         cmake_args,
     )
 
-    east.run_west(build_cmd)
-
-    compile_file = os.path.join("build", "compile_commands.json")
-    if os.path.isfile(compile_file):
-        sh.copyfile(
-            compile_file, os.path.join(east.project_dir, "compile_commands.json")
-        )
-        sh.copyfile(
-            compile_file, os.path.join(east.west_dir_path, "compile_commands.json")
-        )
+    return build_cmd, opts
 
 
 def create_build_command(
@@ -148,6 +177,9 @@ def create_build_command(
 ):
     """Helper for creating a build command. This extra helper is needed so it can also
     be reused by release command.
+
+    Returns:
+        build_cmd: a string with the build command, intended to be given to run_west()
     """
 
     build_type_args, diagnostic = construct_extra_cmake_arguments(
@@ -259,6 +291,13 @@ def bypass(east, shell, args):
     """
     east.pre_workspace_command_check()
 
+    if not east.detected_ncs_version:
+        east.print(
+            "No version of [bold cyan]nRF Connect SDK[/] was detected in this "
+            "[bold yellow]West workspace[/], can't run [bold magenta]east bypass[/]."
+        )
+        east.exit()
+
     if shell:
         east.enter_manager_shell()
         east.exit(return_code=0)
@@ -302,7 +341,7 @@ def debug(east, extra_help, args):
     if extra_help:
         east.run_west("debug --help")
     else:
-        east.run_west("debug " + clean_up_extra_args(args))
+        east.run_west("debug " + clean_up_extra_args(args), ignore_sigint=True)
 
 
 @click.command(
@@ -332,7 +371,7 @@ def attach(east, extra_help, args):
     if extra_help:
         east.run_west("attach --help")
     else:
-        east.run_west("attach " + clean_up_extra_args(args))
+        east.run_west("attach " + clean_up_extra_args(args), ignore_sigint=True)
 
 
 @click.command(

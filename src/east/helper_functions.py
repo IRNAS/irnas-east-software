@@ -4,7 +4,7 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import requests
 import yaml
@@ -95,20 +95,18 @@ def download_file(task_id: TaskID, url: str, path: str):
                 f.write(chunk)
 
 
-def download_files(urls: List[str], dest_dir: str) -> List[str]:
+def download_files(files_to_download: List[Dict], dest_dir: str) -> List[str]:
     """Download concurrently multiple files from the internet to the given directory.
 
-    Function expects a list of URLs that point to the files.
+    Function expects a list of dicts, where each dict has a key "url" that points to the
+    file that should be downloaded and a key "name" that is used for naming and printing
+    purposes.
 
     After all files were downloaded the function returns a list of paths to the
     downloaded files in the same order as they were given.
 
-    Downloaded files are not renamed, they have the same name as in the URL. Only
-    exception to this rule are raw files from the GitHub, they end with '?raw=true', so
-    that part is removed.
-
     Args:
-        urls (List[strl]):      URL that points to a file to be downloaded.
+        files_to_download (List[Dict]): Files to download.
 
     Return:
         files (List[str]):      List of paths to the downloaded files.
@@ -118,9 +116,8 @@ def download_files(urls: List[str], dest_dir: str) -> List[str]:
 
     with progress:
         with ThreadPoolExecutor(max_workers=4) as pool:
-            for url in urls:
-                filename = url.split("/")[-1]
-                filename = re.sub("\?raw=true$", "", filename)
+            for file in files_to_download:
+                filename = file["name"]
 
                 if not os.path.isdir(dest_dir):
                     os.mkdir(dest_dir)
@@ -129,7 +126,7 @@ def download_files(urls: List[str], dest_dir: str) -> List[str]:
                 file_paths.append(dest_path)
 
                 task_id = progress.add_task("download", filename=filename, start=False)
-                pool.submit(download_file, task_id, url, dest_path)
+                pool.submit(download_file, task_id, file["url"], dest_path)
 
     return file_paths
 
@@ -226,7 +223,7 @@ no_toolchain_manager_msg = """
 
 To install it run:
 
-\t[italic bold blue]east sys-setup
+\t[italic bold blue]east install nrfutil-toolchain-manager
 """
 
 not_in_west_workspace_msg = """
@@ -336,3 +333,58 @@ def clean_up_extra_args(args):
         return arg
 
     return f"{' '.join(list(map(add_back_double_quotes, args)))}"
+
+
+def create_artefact_name(project, board, version, build_type):
+    """
+    Create an artefact name.
+
+    Board might be in form <west_board>@<hv_version>, in that case we modify it to fit
+    the artefact name.
+
+    We also add git hash at the end if the build was not done on the clean tagged
+    commit.
+    """
+    board = board.replace("@", "-hv")
+
+    # "release" or None build_type should not generate any build type qualifier.
+    build_type = "" if build_type == "release" or not build_type else f"-{build_type}"
+
+    git_hash = f"-{version['hash']}" if version["hash"] else ""
+
+    return f"{project}-{board}-{version['tag']}{build_type}{git_hash}"
+
+
+def get_git_version(east):
+    """
+    Return output from git describe command, see help string of release function for
+    more information.
+
+    Note to myself: If you use this function in some other place, make sure that you
+    patch it in the test files, otherwise pytest thinks that is the mocked call that it
+    should test against.
+    """
+    result = east.run(
+        "git describe --tags --always --long --dirty=+", silent=True, return_output=True
+    )
+
+    output = result["output"].strip().split("-")
+
+    if len(output) == 1:
+        # No git tag, only hash was produced
+        version = {"tag": "v0.0.0", "hash": output[0]}
+    elif len(output) == 3:
+        if output[1] == "0" and not output[2].endswith("+"):
+            # Clean version commit, no hash needed
+            version = {"tag": output[0], "hash": ""}
+        else:
+            # Not on commit or dirty, both version and hash are needed
+            version = {"tag": output[0], "hash": output[2][1:]}
+
+    else:
+        east.print(
+            f"Unsupported git describe output ({result['output']}), contact developer!"
+        )
+        east.exit()
+
+    return version

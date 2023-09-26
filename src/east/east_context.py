@@ -1,5 +1,6 @@
 import inspect
 import os
+import signal
 import subprocess
 import sys
 from shutil import which
@@ -65,8 +66,10 @@ class EastContext:
         self.echo = echo
         self.consts = const_paths
 
-        # Create EAST_DIR and its parents, if they do not exist
+        # Create east, tooling and cache dirs, if they do not exist.
         os.makedirs(self.consts["east_dir"], exist_ok=True)
+        os.makedirs(self.consts["tooling_dir"], exist_ok=True)
+        os.makedirs(self.consts["cache_dir"], exist_ok=True)
 
         self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
         self.use_toolchain_manager = False
@@ -154,6 +157,7 @@ class EastContext:
         exit_on_error: bool = True,
         return_output: bool = False,
         silent: bool = False,
+        ignore_sigint: bool = False,
     ) -> dict:
         """
         Executes given command in shell as a process. This is a blocking call, process
@@ -167,10 +171,13 @@ class EastContext:
 
             return_output (bool):   Return stdout. Note that this will mean that there
                                     might be no colorcodes in the terminal output and
-                                    no strerr, due
-                                    to piping.
+                                    no strerr, due to piping.
 
             silent (bool):          Do not print command's output.
+
+            ignore_sigint (bool):   If true it does not pass SIGINT to the run process.
+                                    This means that the run process will handle SIGINT
+                                    by itself. This is useful for running gdb.
 
         Returns:
             Dict with two keys is always returned:
@@ -229,8 +236,14 @@ class EastContext:
                 out = subprocess.DEVNULL
                 err = subprocess.STDOUT
 
-            p = subprocess.Popen(command, stdout=out, stderr=err, shell=True)
-            p.communicate()
+            if ignore_sigint:
+                previous_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+                p = subprocess.Popen(command, stdout=out, stderr=err, shell=True)
+                p.wait()
+                signal.signal(signal.SIGINT, previous_handler)
+            else:
+                p = subprocess.Popen(command, stdout=out, stderr=err, shell=True)
+                p.wait()
 
             # Should we exit on the error?
             if exit_on_error and p.returncode:
@@ -389,6 +402,7 @@ class EastContext:
         self,
         ignore_uninstalled_ncs: bool = False,
         ignore_unsupported_ncs: bool = True,
+        check_only_west_workspace: bool = False,
     ):
         """
         This function contains a list of checks that every workspace (not system)
@@ -405,25 +419,35 @@ class EastContext:
         west.
 
         Args:
-            ignore_uninstalled_ncs (bool):  When true, self.does not exit if detected
+            ignore_uninstalled_ncs (bool):  When true, do not exit if detected
                                             NCS version is not installed by the
                                             Toolchain Manager. Workspace commands such
                                             as build, flash, clean should set this to
                                             False. Update command should set this to
                                             True.
 
-            ignore_unsupported_ncs (bool):  When true, self.does not exit if detected
+            ignore_unsupported_ncs (bool):  When true, do not exit if detected
                                             NCS version is not supported by the
                                             Toolchain Manager. Workspace commands such
                                             as build, flash, clean should set this to
                                             True. Update command should set this to
                                             false.
+
+            check_only_west_workspace (bool): When true, only check if we are in the
+                                              west Workspace, do not check for the rest
+                                              of the things. This is useful for the
+                                              codechecker command, which should be run
+                                              inside the west workspace, but does not
+                                              need nrf toolchain manager.
         """
         # Workspace commands can only be run inside west workspace, so exit if that is
         # not the case.
         if not self.west_dir_path:
             self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
+
+        if check_only_west_workspace:
+            return
 
         # Exit if east.yml could not be loaded from the project dir; it is not an error
         # if it does not exist, we support that.

@@ -35,7 +35,12 @@ def load_east_yml(project_dir: str):
 
     # Validate yaml
     schema_yml = os.path.join(os.path.dirname(__file__), "configuration-schema.yaml")
-    c = pykwalify.core.Core(source_file=east_yml, schema_files=[schema_yml])
+    try:
+        c = pykwalify.core.Core(source_file=east_yml, schema_files=[schema_yml])
+    except pykwalify.errors.CoreError:
+        # This error is raised when east.yml is empty, which is allowed.
+        return None
+
     try:
         c.validate(raise_exception=True)
     except pykwalify.core.SchemaError as e:

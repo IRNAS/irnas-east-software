@@ -165,6 +165,10 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             east.print(build_type_misuse_no_east_yml_msg)
             east.exit()
 
+    # Set to empty string, it will stay like that unless we are inside app that uses
+    # build types
+    cmake_build_type = ""
+
     # Modify current working dir, if source_dir is used, rstrip is needed cause
     # path.join adds one "/" if joining empty string.
     source_dir = source_dir if source_dir else ""
@@ -230,12 +234,19 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             return ("", "")
 
         # Determine what kind of project it is, single or multi app
-        if len(app_array) == 1:
+        if os.path.basename(cwd) == "app":
             app = app_array[0]
         else:
             # Get the folder name that we are in
             app = return_dict_on_match(app_array, "name", os.path.basename(cwd))
+
+            if not app:
+                # We are inside app folder that is not listed in east.yaml, we default
+                # to plain west behaviour: no cmake args.
+                return ("", "")
         path_prefix = ""
+        build_types_str = build_type if build_type else "release"
+        cmake_build_type = f' -DEAST_BUILD_TYPE="{build_types_str}"'
 
     # "release" is a special, implicit, default, build type. Samples can request to
     # inherit from it, in that case only the common.conf is added to the build.
@@ -265,10 +276,11 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     else:
         if previous_cmake_args:
             msg = (
-                "[italic bold dim]💬 Old settings found in build folder, forcing CMake"
-                " rebuild[/]"
+                "[italic bold dim]💬 Old settings found in the build folder, deleting "
+                "it and rebuilding[/]"
             )
+            east.run(f"rm -rf {build_dir}")
         else:
             # Previous cmake args are empty string, no build folder was found
             msg = "[italic bold dim]💬 Build folder not found, running CMake build[/]"
-        return required_cmake_args, msg
+        return required_cmake_args + cmake_build_type, msg

@@ -6,6 +6,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.15.0] - 2023-09-26
+
+### Breaking interface changes
+
+-   This version of East created breaking changes in the interface. This was 
+    done due to the consistency with existing `west` interface.
+    Changes:
+    -   `east sys-setup` was removed and replaced with `east install`.
+    -   `east install` now contains several subcommands, which can be used to 
+        install `codechecker`, `toolchain`, `nrfutil-toolchain-manager`, etc.
+    -   `east update` is now just a wrapper around `west update` command.
+    -   Newly added `east init` is now just a wrapper around `west init` command.
+
+### Added
+
+-   Support for Codechecker, a static analysis infrastructure. Newly added 
+    command `east codechecker` contains several subcommands: 
+    -   Users can now `check` their Zephyr projects with `clang-tidy` and 
+        `clangsa`,
+    -   apply suggested fixes with `fixit`,
+    -   `store` the results of the Codechecker analysis to a server,
+    -   `servdiff` - compare the local analysis against the last server analysis,
+    -   See example `codechecker_config.yaml` file with `example-config`,
+    -   or directly run any Codechecker command with `bypass`.
+        An effort was made to make the `east codechecker check` command most useful:
+    -   Most of the warnings that are reported because of the Zephyr's macros are 
+        filtered out. 
+    -   Installation of Codechecker and all its dependencies is seamless, you only 
+        need to run `east install codechecker`.
+-   Support for generating the Software Bill of Materials (SBOM) in SPDX format.
+    To generate SPDX files add `--spdx` or `--spdx-app-only` flags to 
+    `east build` or `east release` respectively. `east build` command will place 
+    SPDX files in the build folder, while `east release` will generate them for 
+    each combination of parameters and place them next to the respective 
+    artefacts.
+-   Add `EAST_BUILD_TYPE` CMake define to the build and release commands.
+    This define is emitted only if we are building an app with build type 
+    functionality (so, it is not emitted for samples). It contains a string, 
+    identical to the given `--build-type` flag.
+
+### Fixed
+
+-   Build type issue when building app not listed in the east.yaml (#85)
+-   `pykwalify` error caused by an empty east.yml (#85)
+-   Always delete build folder when build settings do not match. (#85)
+-   Incorrect removal of toolchain when using `--force` flag. (#85)
+-   Improve error message when running bypass in non NCS repo. (#85)
+-   Correctly handle ctrl+c when running `east debug`. Previously everything 
+    broke (yes, everything), when user wanted to stop a running program inside 
+    `gdb`. Essentially the ctrl+c combination was passed twice to `gdb`, which 
+    caused all sort of problems.
+
+### Removed
+
+-   Conda from list of installed tools. Conda was originally intended to be used 
+    as bootstrapping environment, however there was never need for it.
+
 ## [0.14.0] - 2023-08-24
 
 ### Added
@@ -285,7 +342,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.0...HEAD
+
+[0.15.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.14.0...v0.15.0
 
 [0.14.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.13.0...v0.14.0
 

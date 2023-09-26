@@ -62,17 +62,14 @@ def test_build_type_outside_project_dir(west_workplace, monkeypatch):
 @pytest.mark.parametrize(
     "build_type_flag, cmake_arg",
     [
-        ("", "-DCONF_FILE=conf/common.conf"),
+        ("", '-DCONF_FILE=conf/common.conf -DEAST_BUILD_TYPE="release"'),
         (
             "--build-type debug",
-            '-DCONF_FILE=conf/common.conf -DOVERLAY_CONFIG="conf/debug.conf"',
+            '-DCONF_FILE=conf/common.conf -DOVERLAY_CONFIG="conf/debug.conf" -DEAST_BUILD_TYPE="debug"',
         ),
         (
             "--build-type uart",
-            (
-                "-DCONF_FILE=conf/common.conf"
-                ' -DOVERLAY_CONFIG="conf/debug.conf;conf/uart.conf"'
-            ),
+            '-DCONF_FILE=conf/common.conf -DOVERLAY_CONFIG="conf/debug.conf;conf/uart.conf" -DEAST_BUILD_TYPE="uart"',
         ),
     ],
 )
@@ -98,11 +95,14 @@ def test_build_type_single_app_behaviour(
 @pytest.mark.parametrize(
     "multiapp, build_type_flag, cmake_arg",
     [
-        ("test_one", "", "-DCONF_FILE=conf/common.conf"),
+        ("test_one", "", '-DCONF_FILE=conf/common.conf -DEAST_BUILD_TYPE="release"'),
         (
             "test_one",
             "--build-type debug",
-            '-DCONF_FILE=conf/common.conf -DOVERLAY_CONFIG="conf/debug.conf"',
+            (
+                '-DCONF_FILE=conf/common.conf -DOVERLAY_CONFIG="conf/debug.conf"'
+                ' -DEAST_BUILD_TYPE="debug"'
+            ),
         ),
         (
             "test_one",
@@ -110,13 +110,17 @@ def test_build_type_single_app_behaviour(
             (
                 "-DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/debug.conf;conf/uart.conf"'
+                ' -DEAST_BUILD_TYPE="uart"'
             ),
         ),
-        ("test_two", "", "-DCONF_FILE=conf/common.conf"),
+        ("test_two", "", '-DCONF_FILE=conf/common.conf -DEAST_BUILD_TYPE="release"'),
         (
             "test_two",
             "--build-type rtt",
-            '-DCONF_FILE=conf/common.conf -DOVERLAY_CONFIG="conf/rtt.conf"',
+            (
+                '-DCONF_FILE=conf/common.conf -DOVERLAY_CONFIG="conf/rtt.conf"'
+                ' -DEAST_BUILD_TYPE="rtt"'
+            ),
         ),
         (
             "test_two",
@@ -124,6 +128,7 @@ def test_build_type_single_app_behaviour(
             (
                 "-DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/debug.conf;conf/rtt.conf"'
+                ' -DEAST_BUILD_TYPE="debug-rtt"'
             ),
         ),
     ],
@@ -235,7 +240,8 @@ def test_build_type_build_folder_behaviour_different_flags(
         f"build {build_type_flag}",
         expected_west_cmd=(
             "build -- -DCONF_FILE=conf/common.conf"
-            f' -DOVERLAY_CONFIG="{overlay_configs}"'
+            f' -DOVERLAY_CONFIG="{overlay_configs}" '
+            f'-DEAST_BUILD_TYPE="{build_type_flag.split(" ")[1]}"'
         ),
     )
 
@@ -645,6 +651,7 @@ def test_duplicated_names_in_east_yml(
             (
                 "build -b nrf52840dk_nrf52840 -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+                ' -DEAST_BUILD_TYPE="release"'
             ),
         ),
         (
@@ -653,6 +660,7 @@ def test_duplicated_names_in_east_yml(
                 "build -b nrf52840dk_nrf52840 -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;'
                 'conf/debug.conf;conf/uart.conf"'
+                ' -DEAST_BUILD_TYPE="uart"'
             ),
         ),
         (
@@ -660,6 +668,7 @@ def test_duplicated_names_in_east_yml(
             (
                 "build -b nrf52840dk_nrf52840@1.0.0 -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+                ' -DEAST_BUILD_TYPE="release"'
             ),
         ),
         (
@@ -668,17 +677,20 @@ def test_duplicated_names_in_east_yml(
                 "build -b nrf52840dk_nrf52840@1.0.0 -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;'
                 'conf/debug.conf;conf/uart.conf"'
+                ' -DEAST_BUILD_TYPE="uart"'
             ),
         ),
         (
             "build -b nonexisting_board",
-            "build -b nonexisting_board -- -DCONF_FILE=conf/common.conf",
+            "build -b nonexisting_board -- -DCONF_FILE=conf/common.conf"
+            ' -DEAST_BUILD_TYPE="release"',
         ),
         (
             "build -b nonexisting_board --build-type debug",
             (
                 "build -b nonexisting_board -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/debug.conf"'
+                ' -DEAST_BUILD_TYPE="debug"'
             ),
         ),
     ],
@@ -723,7 +735,8 @@ def test_different_build_dir_path_empty_dir(
         mocker,
         project_path,
         f"build -d {build_dir}",
-        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf",
+        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf "
+        '-DEAST_BUILD_TYPE="release"',
         should_succed=True,
     )
 
@@ -732,8 +745,8 @@ def test_different_build_dir_path_full_dir_same_build_type(
     west_workplace_parametrized, monkeypatch, mocker
 ):
     """With different build dir path and build folder that has same previous build type
-    files as current ones the west command should just include -d option and nothing
-    else.
+    files as current ones the west command should just include -d option,
+    EAST_BUILD_TYPE and nothing else.
     """
 
     project_path = west_workplace_parametrized["app"]
@@ -754,8 +767,8 @@ def test_different_build_dir_path_full_dir_same_build_type(
         mocker,
         project_path,
         f"build -d {build_dir} --build-type uart",
-        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf"
-        f' -DOVERLAY_CONFIG="{overlay_configs}"',
+        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf "
+        f'-DOVERLAY_CONFIG="{overlay_configs}" -DEAST_BUILD_TYPE="uart"',
         should_succed=True,
     )
 
@@ -789,7 +802,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
         project_path,
         f"build -d {build_dir} --build-type debug",
         f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf"
-        f' -DOVERLAY_CONFIG="{new_overlay_configs}"',
+        f' -DOVERLAY_CONFIG="{new_overlay_configs}" -DEAST_BUILD_TYPE="debug"',
         should_succed=True,
     )
 
@@ -799,17 +812,24 @@ def test_different_build_dir_path_full_dir_different_build_type(
     [
         (
             "build app/test_one",
-            "build app/test_one -- -DCONF_FILE=conf/common.conf",
+            (
+                "build app/test_one -- -DCONF_FILE=conf/common.conf "
+                '-DEAST_BUILD_TYPE="release"'
+            ),
         ),
         (
             "build app/test_two",
-            "build app/test_two -- -DCONF_FILE=conf/common.conf",
+            (
+                "build app/test_two -- -DCONF_FILE=conf/common.conf "
+                '-DEAST_BUILD_TYPE="release"'
+            ),
         ),
         (
             "build app/test_one --build-type debug",
             (
                 "build app/test_one -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/debug.conf"'
+                ' -DEAST_BUILD_TYPE="debug"'
             ),
         ),
         (
@@ -817,6 +837,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
             (
                 "build app/test_two -- -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/debug.conf"'
+                ' -DEAST_BUILD_TYPE="debug"'
             ),
         ),
         (
@@ -825,6 +846,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
                 "build -b nrf52840dk_nrf52840 app/test_one --"
                 " -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+                ' -DEAST_BUILD_TYPE="release"'
             ),
         ),
         (
@@ -834,6 +856,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
                 " -DCONF_FILE=conf/common.conf"
                 ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;'
                 'conf/debug.conf;conf/uart.conf"'
+                ' -DEAST_BUILD_TYPE="uart"'
             ),
         ),
     ],
@@ -1071,6 +1094,56 @@ def test_building_outside_of_app_and_samples(
         monkeypatch,
         mocker,
         west_workplace_parametrized[build_path],
+        "build -b native_posix",
+        "build -b native_posix",
+        should_succed=True,
+    )
+
+
+def test_building_app_that_is_not_in_east_yaml(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """
+    East shouldn't add extra flags to the west build call when building an app that
+    isn't in the east.yaml.
+    """
+
+    unlisted_app = os.path.join(
+        west_workplace_parametrized["project"], "app/test_three"
+    )
+    os.makedirs(unlisted_app, exist_ok=True)
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["project"],
+        "build -b native_posix app/test_three",
+        "build -b native_posix app/test_three",
+        should_succed=True,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        unlisted_app,
+        "build -b native_posix",
+        "build -b native_posix",
+        should_succed=True,
+    )
+
+
+def test_empty_east_yml_is_valid(west_workplace_parametrized, monkeypatch, mocker):
+    """
+    Apps and sample keys are both optional in east.yaml, so empty east.yml is valid.
+    """
+
+    # Create empty east.yml
+    open(os.path.join(west_workplace_parametrized["project"], "east.yml"), "w").close()
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["app"],
         "build -b native_posix",
         "build -b native_posix",
         should_succed=True,

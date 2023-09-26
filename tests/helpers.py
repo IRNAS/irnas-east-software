@@ -314,6 +314,10 @@ def helper_test_against_west_run(
         "east.workspace_commands.release_commands.get_git_version",
         return_value={"tag": "v1.0.0.", "hash": ""},
     )
+    mocker.patch(
+        "east.workspace_commands.codechecker_helpers.get_git_version",
+        return_value={"tag": "v1.0.0.", "hash": ""},
+    )
 
     monkeypatch.chdir(path)
     mocker.patch(
@@ -331,7 +335,7 @@ def helper_test_against_west_run(
 
         # This conversion is needed due to assert_has_calls interface
         calls = [
-            mocker.call(cmd, silent=True, return_output=True, exit_on_error=False)
+            mocker.call(cmd, exit_on_error=False, silent=True, return_output=True)
             for cmd in expected_west_cmds
         ]
         run_west.assert_has_calls(calls)

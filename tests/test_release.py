@@ -90,41 +90,59 @@ expected_app_release_west_commands = [
     (
         "build -b custom_nrf52840dk@1.0.0 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/debug.conf"'
+        ' -DEAST_BUILD_TYPE="debug"'
     ),
     (
         "build -b custom_nrf52840dk@1.0.0 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/debug.conf;conf/uart.conf"'
+        ' -DEAST_BUILD_TYPE="uart"'
     ),
-    "build -b custom_nrf52840dk@1.0.0 app -- -DCONF_FILE=conf/common.conf",
+    (
+        "build -b custom_nrf52840dk@1.0.0 app -- -DCONF_FILE=conf/common.conf"
+        ' -DEAST_BUILD_TYPE="release"'
+    ),
     (
         "build -b custom_nrf52840dk@1.1.0 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/debug.conf"'
+        ' -DEAST_BUILD_TYPE="debug"'
     ),
     (
         "build -b custom_nrf52840dk@1.1.0 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/debug.conf;conf/uart.conf"'
+        ' -DEAST_BUILD_TYPE="uart"'
     ),
-    "build -b custom_nrf52840dk@1.1.0 app -- -DCONF_FILE=conf/common.conf",
+    (
+        "build -b custom_nrf52840dk@1.1.0 app -- -DCONF_FILE=conf/common.conf"
+        ' -DEAST_BUILD_TYPE="release"'
+    ),
     (
         "build -b custom_nrf52840dk@2.20.1 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/debug.conf"'
+        ' -DEAST_BUILD_TYPE="debug"'
     ),
     (
         "build -b custom_nrf52840dk@2.20.1 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/debug.conf;conf/uart.conf"'
+        ' -DEAST_BUILD_TYPE="uart"'
     ),
-    "build -b custom_nrf52840dk@2.20.1 app -- -DCONF_FILE=conf/common.conf",
+    (
+        "build -b custom_nrf52840dk@2.20.1 app -- -DCONF_FILE=conf/common.conf"
+        ' -DEAST_BUILD_TYPE="release"'
+    ),
     (
         "build -b nrf52840dk_nrf52840 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;conf/debug.conf"'
+        ' -DEAST_BUILD_TYPE="debug"'
     ),
     (
         "build -b nrf52840dk_nrf52840 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;conf/debug.conf;conf/uart.conf"'
+        ' -DEAST_BUILD_TYPE="uart"'
     ),
     (
         "build -b nrf52840dk_nrf52840 app -- -DCONF_FILE=conf/common.conf"
         ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+        ' -DEAST_BUILD_TYPE="release"'
     ),
 ]
 

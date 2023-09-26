@@ -8,12 +8,23 @@ from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from ..east_context import east_command_settings
-from ..helper_functions import find_all_boards
+from ..helper_functions import find_all_boards, get_git_version
 from .basic_commands import create_build_command
 
 # This could be considered as a hack, but it is actually the cleanest way to test
 # release command.
 RUNNING_TESTS = False
+
+
+clean_print_args = {
+    "markup": False,
+    "style": "",
+    "overflow": "ignore",
+    "crop": False,
+    "highlight": False,
+    "soft_wrap": False,
+    "no_wrap": True,
+}
 
 
 def create_artefact_name(project, board, version, build_type):
@@ -36,7 +47,7 @@ def create_artefact_name(project, board, version, build_type):
     return f"{project}-{board}-{version['tag']}{build_type}{git_hash}"
 
 
-def move_build_artefacts(art_name, art_dest, dry_run):
+def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
     """
     Moves build artefacts to art_dest and renames them to art_name.
     """
@@ -77,36 +88,10 @@ def move_build_artefacts(art_name, art_dest, dry_run):
                 os.path.join(art_dest, ".".join([art_name, exten])),
             )
 
-
-def get_git_version(east):
-    """
-    Return output from git describe command, see help string of release function for
-    more information.
-    """
-    result = east.run(
-        "git describe --tags --always --long --dirty=+", silent=True, return_output=True
-    )
-
-    output = result["output"].strip().split("-")
-
-    if len(output) == 1:
-        # No git tag, only hash was produced
-        version = {"tag": "v0.0.0", "hash": output[0]}
-    elif len(output) == 3:
-        if output[1] == "0" and not output[2].endswith("+"):
-            # Clean version commit, no hash needed
-            version = {"tag": output[0], "hash": ""}
-        else:
-            # Not on commit or dirty, both version and hash are needed
-            version = {"tag": output[0], "hash": output[2][1:]}
-
-    else:
-        east.print(
-            f"Unsupported git describe output ({result['output']}), contact developer!"
-        )
-        east.exit()
-
-    return version
+    if spdx_app_only and job_type == "apps":
+        spdx_src = os.path.join("build", "spdx")
+        spdx_dest = os.path.join(art_dest, "sbom-spdx")
+        sh.move(spdx_src, spdx_dest)
 
 
 def show_job_summary(east, jobs):
@@ -134,7 +119,7 @@ def show_job_summary(east, jobs):
     east.print()
 
 
-def run_job(east, progress, job, dry_run, verbose):
+def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
     """Runs the job with a west
 
     east ():            East context.
@@ -142,6 +127,7 @@ def run_job(east, progress, job, dry_run, verbose):
     dry_run ():         If true then don't actually build, only show what commands
                         would run.
     verbose():          If true the Cmake output is shown.
+    spdx_app_only():    If true then only apps are scanned for SPDX tags.
 
     Return:
         Bool            True, if job succeeded, false if it did not.
@@ -184,29 +170,33 @@ def run_job(east, progress, job, dry_run, verbose):
         overflow="ignore",
         crop=False,
     )
-    result = east.run_west(build_cmd, **kwargs)
 
-    if result["returncode"]:
-        # Build failed, report to the user.
-        progress.stop()
-        if not verbose:
-            east.print(
-                result["output"],
-                markup=False,
-                style="",
-                overflow="ignore",
-                crop=False,
-                highlight=False,
-                soft_wrap=False,
-                no_wrap=True,
+    def on_failure(result):
+        """Handle job failure."""
+
+        if result["returncode"]:
+            msg = (
+                "Last build command [bold red]failed[/]! Check build output above"
+                " to see what went wrong."
             )
+            progress.stop()
+            if not verbose:
+                east.print(result["output"], clean_print_args)
+            east.print(Panel(msg, padding=1, border_style="red"))
+            east.exit()
 
-        msg = (
-            "Last build command [bold red]failed[/]! Check build output above"
-            " to see what went wrong."
-        )
-        east.print(Panel(msg, padding=1, border_style="red"))
-        east.exit()
+    if spdx_app_only and job["subdir"] == "apps":
+        cmd = "spdx --init --build-dir build"
+        result = east.run_west(cmd, **kwargs)
+        on_failure(result)
+
+    result = east.run_west(build_cmd, **kwargs)
+    on_failure(result)
+
+    if spdx_app_only and job["subdir"] == "apps":
+        cmd = "spdx --build-dir build --analyze-includes --include-sdk"
+        result = east.run_west(cmd, **kwargs)
+        on_failure(result)
 
 
 release_misuse_no_east_yml_msg = """
@@ -243,8 +233,16 @@ def non_existing_sample_msg_fmt(sample_name):
     is_flag=True,
     help="Show west/Cmake build output. Default: false.",
 )
+@click.option(
+    "--spdx-app-only",
+    is_flag=True,
+    help=(
+        "Create an SPDX 2.2 tag-value bill of materials following the completion "
+        "of a Zephyr build. This will be only done for the apps, not for the samples."
+    ),
+)
 @click.pass_obj
-def release(east, dry_run, verbose):
+def release(east, dry_run, verbose, spdx_app_only):
     """
     Create a release folder with release artefacts.
 
@@ -386,11 +384,15 @@ def release(east, dry_run, verbose):
             sh.rmtree("build", ignore_errors=True)
 
             # Run job build
-            run_job(east, progress, job, dry_run, verbose)
+            run_job(east, progress, job, dry_run, verbose, spdx_app_only)
 
             # Move and rename created artefacts
             move_build_artefacts(
-                job["artefact_name"], job["artefact_destination"], dry_run
+                job["artefact_name"],
+                job["artefact_destination"],
+                job["subdir"],
+                spdx_app_only,
+                dry_run,
             )
 
             # Update progress
