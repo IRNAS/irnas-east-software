@@ -103,7 +103,7 @@ def _get_clang_download_link():
 
     version = "16.0.0"
 
-    arch = platform.processor().lower()
+    arch = platform.machine().lower()
 
     if arch == "x86_64":
         arch = "x86_64-linux-gnu-ubuntu-18.04"
@@ -221,7 +221,6 @@ def _install_codechecker(east: EastContext, exe_path: str):
     data["runtime"]["clang-apply-replacements"] = east.consts["clang_replace_path"]
 
     with open(config_file, "w") as f:
-
         f.write(json.dumps(data, indent=2))
 
 
@@ -279,7 +278,6 @@ supported_tools = [
 
 
 def tool_installer(east, tool_names):
-
     tools = [tool for tool in supported_tools if tool["name"] in tool_names]
 
     check_python_version(east)
