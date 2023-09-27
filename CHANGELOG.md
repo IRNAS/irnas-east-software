@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.15.1] - 2023-09-27
+
 ### Removed
 
 -   Python version check. This was mostly needed due to Conda binary, which is 
@@ -14,7 +16,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 -   Platform detection for clang tooling.
-
 
 ## [0.15.0] - 2023-09-26
 
@@ -352,7 +353,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.1...HEAD
+
+[0.15.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.0...v0.15.1
 
 [0.15.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.14.0...v0.15.0
 
