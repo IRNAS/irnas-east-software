@@ -54,31 +54,6 @@ class WestYmlNotFound(RuntimeError):
     """west.yml file does not exist."""
 
 
-def check_python_version(east):
-    """Checks if current python version is supported. If not it exists with an error
-    message."""
-
-    current_py_ver = {
-        "major": sys.version_info.major,
-        "minor": sys.version_info.minor,
-    }
-
-    if current_py_ver not in supported_python_versions:
-        vers = supported_python_versions
-
-        east.print(
-            f"You are running Python {sys.version.split(' ')[0]} which is not"
-            " supported.\n"
-            "Supported versions are:",
-            end="",
-        )
-
-        # Nicely print a list of supported python version in markdown
-        vers_str = [f"- v{ver['major']}.{ver['minor']}.x" for ver in vers]
-        east.print_markdown("\n".join(vers_str))
-        east.exit()
-
-
 def download_file(task_id: TaskID, url: str, path: str):
     file_size = requests.head(url, allow_redirects=True).headers.get(
         "content-length", -1

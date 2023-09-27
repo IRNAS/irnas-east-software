@@ -13,7 +13,7 @@ from ..constants import (
     NRF_TOOLCHAIN_MANAGER_PATH,
 )
 from ..east_context import EastContext
-from ..helper_functions import check_python_version, download_files
+from ..helper_functions import download_files
 
 
 def _install_toolchain_manager(east: EastContext, exe_path: str):
@@ -103,7 +103,7 @@ def _get_clang_download_link():
 
     version = "16.0.0"
 
-    arch = platform.processor().lower()
+    arch = platform.machine().lower()
 
     if arch == "x86_64":
         arch = "x86_64-linux-gnu-ubuntu-18.04"
@@ -221,7 +221,6 @@ def _install_codechecker(east: EastContext, exe_path: str):
     data["runtime"]["clang-apply-replacements"] = east.consts["clang_replace_path"]
 
     with open(config_file, "w") as f:
-
         f.write(json.dumps(data, indent=2))
 
 
@@ -279,10 +278,7 @@ supported_tools = [
 
 
 def tool_installer(east, tool_names):
-
     tools = [tool for tool in supported_tools if tool["name"] in tool_names]
-
-    check_python_version(east)
 
     # Construct a list of files that have to be downloaded.
     east.print("[blue]Checking for required tools...", highlight=False)
