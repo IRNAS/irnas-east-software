@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 
 -   Python version check. This was mostly needed due to Conda binary, which is 
-    not used anymore.
+    not used any more.
 
 ### Fixed
 
