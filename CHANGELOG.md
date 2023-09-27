@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Removed
+
+-   Python version check. This was mostly needed due to Conda binary, which is 
+    not used anymore.
+
 ### Fixed
 
 -   Platform detection for clang tooling.
+
 
 ## [0.15.0] - 2023-09-26
 
