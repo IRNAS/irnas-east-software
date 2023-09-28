@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 -   Incorrect message that was shown when toolchain was not installed.
-
+-   Fix east release for driver projects, which do not have `app` folder.
 
 ## [0.15.1] - 2023-09-27
 

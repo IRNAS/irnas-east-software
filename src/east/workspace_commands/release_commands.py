@@ -294,7 +294,8 @@ def release(east, dry_run, verbose, spdx_app_only):
     # We also do some existence checks.
 
     # Small adjustment for projects which only have one single app
-    apps_in_dir = apps[0]["name"] if len(apps) == 1 else os.listdir("app")
+    listed_apps = os.listdir("app") if os.path.isdir("app") else []
+    apps_in_dir = apps[0]["name"] if len(apps) == 1 else listed_apps
 
     for app in apps:
         # Check, if the app even exists before building for it
