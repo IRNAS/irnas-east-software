@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.15.2] - 2023-09-28
+
+### Fixed
+
+-   Incorrect message that was shown when toolchain was not installed.
+-   Fix east release for driver projects, which do not have `app` folder.
+
 ## [0.15.1] - 2023-09-27
 
 ### Removed
@@ -353,7 +360,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.1...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.2...HEAD
+
+[0.15.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.1...v0.15.2
 
 [0.15.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.0...v0.15.1
 
