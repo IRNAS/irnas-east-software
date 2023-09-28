@@ -22,12 +22,12 @@ def check_for_codechecker(east):
         east.exit()
 
 
-def check_for_build_folder(east):
+def check_for_build_folder(east, build_dir):
     """Check that build dir exists."""
 
-    if not os.path.isdir("build"):
+    if not os.path.isdir(build_dir):
         east.print(
-            "\nFolder [magenta bold italic]build[/] was [bold red]not found[/] in current working directory.\n\n"
+            f"\nBuild folder [magenta bold italic]{build_dir}[/] was [bold red]not found[/].\n\n"
             "Build your project first and rerun this command."
         )
         east.exit()
@@ -38,7 +38,7 @@ def check_for_compile_commands_json(east, compile_commands):
 
     if not os.path.exists(compile_commands):
         east.print(
-            "\nFile [cyan bold]build/compile_commands.json[/] was [bold red]not found[/].\n"
+            f"\nFile [cyan bold]{compile_commands}[/] was [bold red]not found[/].\n"
             "Check if your project's [cyan bold]CMakelists.txt[/] file contains the below line:\n\n"
             "[bold]set(CMAKE_EXPORT_COMPILE_COMMANDS ON)[/]\n"
         )
@@ -205,7 +205,6 @@ def cleanup_plist_files(east, output):
     hash = "issue_hash_content_of_line_in_context"
 
     for file in glob.glob(os.path.join(output, "*.plist")):
-
         with open(file, "rb") as f:
             data = plist.load(f)
 
@@ -235,7 +234,7 @@ def cleanup_plist_files(east, output):
             plist.dump(data, f)
 
 
-def create_skip_file(east, output):
+def create_skip_file(east, build_dir, output):
     """Create skip file for CodeChecker.
 
     Generated skip file skips analysis of Zephyr, NCS, external repositories and
@@ -249,9 +248,15 @@ def create_skip_file(east, output):
 
     os.makedirs(output, exist_ok=True)
 
+    filename = os.path.join(build_dir, "codecheckerfile.json")
+
+    # Read the build_dir from the codecheckerfile.json file
+    with open(filename, "r") as f:
+        build_dir = json.load(f)["build_dir"]
+
     if not os.path.exists(skip_file):
         with open(skip_file, "w") as f:
-            f.write(f"-{east.project_dir}/*/build/*\n")
+            f.write(f"-{build_dir}/*\n")
             f.write(f"+{east.project_dir}/*\n")
             f.write(f"-{east.west_dir_path}/*\n ")
 
@@ -267,9 +272,10 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
     """
 
     # Create a file in the build folder that contains the name of the artefact
-    build_dir = build_dir if build_dir else "build"
-    filename = os.path.join(build_dir, "codecheckerfile.json")
     name = os.path.basename(source_dir if source_dir else east.cwd)
+    build_dir = os.path.join(east.cwd, build_dir if build_dir else "build")
+    source_dir = os.path.join(east.cwd, source_dir if source_dir else "")
+    filename = os.path.join(build_dir, "codecheckerfile.json")
     version = get_git_version(east)
 
     data = {
@@ -277,6 +283,8 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
         "board": board,
         "build_type": build_type,
         "version": version,
+        "build_dir": build_dir,
+        "source_dir": source_dir,
     }
     if not os.path.exists(build_dir):
         os.makedirs(build_dir)
@@ -285,13 +293,11 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
         json.dump(data, f)
 
 
-def get_metadata_from_codecheckerfile(east):
+def get_metadata_from_codecheckerfile(east, build_dir):
     """Read the codecheckerfile.json file and construct the name and the tag, intended
     to be used by codechecker store command."""
 
-    # WARN: We are blindly assuming user used the default build "build" folder location.
-
-    filename = os.path.join("build", "codecheckerfile.json")
+    filename = os.path.join(build_dir, "codecheckerfile.json")
     with open(filename, "r") as f:
         data = json.load(f)
 

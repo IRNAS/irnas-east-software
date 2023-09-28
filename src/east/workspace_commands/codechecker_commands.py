@@ -18,10 +18,6 @@ from .codechecker_helpers import (
     get_metadata_from_codecheckerfile,
 )
 
-CC_OUTPUT_DIR = os.path.join("build", "codechecker")
-CC_DIFF_OUTPUT_DIR = os.path.join("build", "codechecker_diff")
-
-
 # Print output of the parse and diff command,s with default rich highlighting, but
 # without any other wrapping, cropping.
 clean_print_args = {
@@ -69,8 +65,15 @@ clean_print_args = {
     is_flag=True,
     help="Only perfrom analyze step and cleanup plist (if enabled). Default: false.",
 )
-def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze):
-    """Run [magenta bold]Codechecker[/] analysis for a project in current working directory.
+@click.option(
+    "-d",
+    "--build-dir",
+    default="build",
+    type=str,
+    help="Build directory to use for analysis. Default: 'build'.",
+)
+def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze, build_dir):
+    """Run [magenta bold]Codechecker[/] analysis for a built project.
 
     \b
     \n\nExpects that a CodeChecker config file (codechecker_config.yaml) exists in the
@@ -101,20 +104,21 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze):
 
     cc = east.consts["codechecker_path"]
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
-    compile_commands = os.path.join("build", "compile_commands.json")
+    cc_output_dir = os.path.join(build_dir, "codechecker")
+    compile_commands = os.path.join(build_dir, "compile_commands.json")
 
     check_for_codechecker(east)
-    check_for_build_folder(east)
+    check_for_build_folder(east, build_dir)
     check_for_compile_commands_json(east, compile_commands)
     cleanup_compile_commands_json(compile_commands)
     check_for_codechecker_config_yaml(east, cfg)
 
     if not skip_file:
-        skip_file = create_skip_file(east, CC_OUTPUT_DIR)
+        skip_file = create_skip_file(east, build_dir, cc_output_dir)
 
     # Run analyze command
     analyze_cmd = (
-        f"{cc} analyze --skip {skip_file} --output {CC_OUTPUT_DIR} "
+        f"{cc} analyze --skip {skip_file} --output {cc_output_dir} "
         f"{compile_commands} --config {cfg} "
     )
 
@@ -124,16 +128,16 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze):
     east.run(analyze_cmd)
 
     if not dont_cleanup_plist:
-        cleanup_plist_files(east, CC_OUTPUT_DIR)
+        cleanup_plist_files(east, cc_output_dir)
 
     if only_analyze:
         return
 
     # Run parse command
-    parse_cmd = f"{cc} parse --config {cfg} {CC_OUTPUT_DIR } "
+    parse_cmd = f"{cc} parse --config {cfg} {cc_output_dir} "
 
     if html:
-        parse_cmd += f"--output {CC_OUTPUT_DIR } --export html "
+        parse_cmd += f"--output {cc_output_dir} --export html "
 
     result = east.run(parse_cmd, exit_on_error=False, return_output=True, silent=True)
 
@@ -147,9 +151,16 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze):
     help="Apply the available automatic fixes. "
     "This causes the modification of the source code. Default: false",
 )
+@click.option(
+    "-d",
+    "--build-dir",
+    default="build",
+    type=str,
+    help="Analysed build directory. Default: 'build'.",
+)
 @click.command(**east_command_settings)
 @click.pass_obj
-def fixit(east, apply):
+def fixit(east, apply, build_dir):
     """Apply fixes suggested by the [magenta bold]Codechecker[/].
 
     \b
@@ -163,10 +174,11 @@ def fixit(east, apply):
     east.pre_workspace_command_check(check_only_west_workspace=True)
 
     check_for_codechecker(east)
+    cc_output_dir = os.path.join(build_dir, "codechecker")
 
     cc = east.consts["codechecker_path"]
 
-    fixit_cmd = f"{cc} fixit {CC_OUTPUT_DIR}"
+    fixit_cmd = f"{cc} fixit {cc_output_dir}"
 
     if apply:
         fixit_cmd += " --apply"
@@ -204,9 +216,16 @@ store:
     "If not explicitly given then value is read from the EAST_CODECHECKER_SERVER_URL "
     "env var.",
 )
+@click.option(
+    "-d",
+    "--build-dir",
+    default="build",
+    type=str,
+    help="Analysed build directory that should be stored. Default: 'build'.",
+)
 @click.command(**east_command_settings)
 @click.pass_obj
-def store(east, url):
+def store(east, url, build_dir):
     """Store the results of the [magenta bold]Codechecker[/] analysis to a server.
 
     \b
@@ -220,13 +239,14 @@ def store(east, url):
 
     cc = east.consts["codechecker_path"]
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
+    cc_output_dir = os.path.join(build_dir, "codechecker")
 
-    name, tag = get_metadata_from_codecheckerfile(east)
+    name, tag = get_metadata_from_codecheckerfile(east, build_dir)
     endpoint = get_endpoint(east)
 
     store_cmd = (
         f"{cc} store --name '{name}' --url {url}/{endpoint} "
-        f"--config {cfg} {CC_OUTPUT_DIR} --tag '{tag}'"
+        f"--config {cfg} {cc_output_dir} --tag '{tag}'"
     )
 
     east.run(store_cmd)
@@ -341,9 +361,16 @@ def bypass(east, extra_help, args):
     "If not explicitly given then value is read from the EAST_CODECHECKER_SERVER_URL "
     "env var.",
 )
+@click.option(
+    "-d",
+    "--build-dir",
+    default="build",
+    type=str,
+    help="Local build directory to use for analysis. Default: 'build'.",
+)
 @click.command(**east_command_settings)
 @click.pass_obj
-def servdiff(east, new, resolved, unresolved, html, url):
+def servdiff(east, new, resolved, unresolved, html, url, build_dir):
     """Compare local analysis against the last server analysis.
 
     \b
@@ -358,12 +385,14 @@ def servdiff(east, new, resolved, unresolved, html, url):
     check_for_codechecker(east)
 
     cc = east.consts["codechecker_path"]
+    cc_diff_output_dir = os.path.join(build_dir, "codechecker_diff")
+    cc_output_dir = os.path.join(build_dir, "codechecker")
 
-    name, _ = get_metadata_from_codecheckerfile(east)
+    name, _ = get_metadata_from_codecheckerfile(east, build_dir)
     endpoint = get_endpoint(east)
 
     diff_cmd = (
-        f"{cc} cmd diff --basename {name} --newname {CC_OUTPUT_DIR} "
+        f"{cc} cmd diff --basename {name} --newname {cc_output_dir} "
         f"--url {url}/{endpoint} "
     )
 
@@ -383,8 +412,8 @@ def servdiff(east, new, resolved, unresolved, html, url):
         diff_cmd += "--unresolved "
 
     if html:
-        shutil.rmtree(CC_DIFF_OUTPUT_DIR, ignore_errors=True)
-        diff_cmd += f"--export {CC_DIFF_OUTPUT_DIR} --output html "
+        shutil.rmtree(cc_diff_output_dir, ignore_errors=True)
+        diff_cmd += f"--export {cc_diff_output_dir} --output html "
 
     result = east.run(diff_cmd, exit_on_error=False, return_output=True, silent=True)
 

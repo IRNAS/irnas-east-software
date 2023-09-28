@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     clang, clang-tidy and cppcheck programs. way users can leverage the programs    
     provided by continuous integration environment and not by `east`, which is usually 
     faster due to caching.
+-   Add `--build-dir` option to the `east codechecker` commands. From now on, you do not 
+    need to run `east codechecker` command from the same directory where `build` folder 
+    is located. The default is still `build`, however you can specify a different one 
+    with `--build-dir` option.
+-   `east codechecker` commands now also take build directory location into account when
+    generating a skip file.
 
 ## [0.15.2] - 2023-09-28
 
