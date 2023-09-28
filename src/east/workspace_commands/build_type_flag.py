@@ -70,43 +70,46 @@ def _construct_required_cmake_args(
     return f"{cmake_args}"
 
 
-def _construct_previous_cmake_args(build_dir: str) -> str:
-    """
-    Constructs previous cmake args by extracting them from the build file that was
-    created in the previous build.
+def _check_previous_build(east, build_dir, build_type_str):
+    """Checks if rebuild is needed by looking at the contents of the
+    last_build_type_flag file.
 
-        build_dir (str):    Location of the build directory.
+    Args:
+        east ():            East context
+        build_type_str ():  Build type in string format
 
     Returns:
-        Cmake args
+        one of the following strings:
+        - "nobuild" if there is no build directory.
+        - "rebuild" if rebuild is needed.
+        - "just_build" if rebuild is not needed.
     """
-    build_location = build_dir.strip("/") if build_dir else "build"
-    build_file = f"{build_location}/image_preload.cmake"
 
-    try:
-        with open(build_file, "r", encoding="utf-8") as f:
-            content = f.read()
-    except FileNotFoundError:
-        # Just return empty string in this case, this will trigger rebuild in any case.
-        return ""
+    build_dir = build_dir.strip("/") if build_dir else "build"
+    check_file = os.path.join(build_dir, "last_build_type_flag")
 
-    def extract(pattern, content):
-        """
-        Performs specific extract from content, based on pattern. If pattern is not
-        found None is returned.
-        """
-        hit = re.search(pattern, content)
-        return hit.group().split(" ")[1].replace('"', "") if hit else None
+    if not os.path.isdir(build_dir):
+        os.mkdir(build_dir)
+        with open(check_file, "w") as f:
+            f.write(build_type_str)
+        return "nobuild"
 
-    # This hit should always be found, I do not know in what case it is not.
-    conf_file = extract(".*CACHED_CONF_FILE.*", content)
-    cmake_args = f"-DCONF_FILE={conf_file}"
+    # This one handles a edge case where user might have deleted the check_file
+    if not os.path.isfile(check_file):
+        with open(check_file, "w") as f:
+            f.write(build_type_str)
+        return "rebuild"
 
-    overlay_config = extract(".*OVERLAY_CONFIG.*", content)
-    if overlay_config:
-        cmake_args += f' -DOVERLAY_CONFIG="{overlay_config}"'
+    with open(check_file, "r") as f:
+        last_build_type = f.read()
 
-    return cmake_args
+    with open(check_file, "w") as f:
+        f.write(build_type_str)
+
+    if last_build_type == build_type_str:
+        return "just_build"
+    else:
+        return "rebuild"
 
 
 build_type_misuse_no_east_yml_msg = """
@@ -227,6 +230,8 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         else:
             path_prefix = os.path.join(path_to_project_dir, "app", inherited_app)
 
+    build_types_str = build_type if build_type else "release"
+
     if inside_app:
         # If we do not have an app array and we there is no build type, we default to
         # plaing west behaviour: no cmake args.
@@ -245,7 +250,6 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
                 # to plain west behaviour: no cmake args.
                 return ("", "")
         path_prefix = ""
-        build_types_str = build_type if build_type else "release"
         cmake_build_type = f' -DEAST_BUILD_TYPE="{build_types_str}"'
 
     # "release" is a special, implicit, default, build type. Samples can request to
@@ -268,19 +272,20 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         conf_files, board, path_prefix, source_dir
     )
 
-    # If build file exists then construct previous cmake_args
-    previous_cmake_args = _construct_previous_cmake_args(build_dir)
+    # Check build type of previous build
+    result = _check_previous_build(east, build_dir, build_types_str)
 
-    if required_cmake_args == previous_cmake_args:
+    if result == "just_build":
+        # Just build, no need to construct previous cmake args
         return ("", "")
-    else:
-        if previous_cmake_args:
-            msg = (
-                "[italic bold dim]💬 Old settings found in the build folder, deleting "
-                "it and rebuilding[/]"
-            )
-            east.run(f"rm -rf {build_dir}")
-        else:
-            # Previous cmake args are empty string, no build folder was found
-            msg = "[italic bold dim]💬 Build folder not found, running CMake build[/]"
-        return required_cmake_args + cmake_build_type, msg
+
+    if result == "rebuild":
+        msg = (
+            "[italic bold dim]💬 Old settings found in the build folder, deleting "
+            "it and rebuilding[/]"
+        )
+        east.run(f"rm -rf {build_dir}")
+    elif result == "nobuild":
+        # Previous cmake args are empty string, no build folder was found
+        msg = "[italic bold dim]💬 Build folder not found, running CMake build[/]"
+    return required_cmake_args + cmake_build_type, msg

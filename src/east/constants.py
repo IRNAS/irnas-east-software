@@ -35,6 +35,11 @@ CODECHECKER_PATH = os.path.join(
     TOOLING_DIR, "codechecker", "build", "CodeChecker", "bin", "CodeChecker"
 )
 
+if os.environ.get("EAST_CODECHECKER_CI_MODE", "0") == "1":
+    # In CI mode, the CodeChecker executable is not in the tooling directory, but in
+    # the system path.
+    CODECHECKER_PATH = "CodeChecker"
+
 # Directory will all Conda stuff
 MINICONDA_DIR = os.path.join(HOME_DIR, "miniconda3")
 

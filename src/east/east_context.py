@@ -1,12 +1,16 @@
+import importlib.metadata
 import inspect
 import os
 import signal
 import subprocess
 import sys
+import time
 from shutil import which
 
+import requests
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.panel import Panel
 from rich_click import RichCommand, RichGroup
 
 from .constants import const_paths
@@ -85,6 +89,8 @@ class EastContext:
             self.west_dir_path = None
             self.detected_ncs_version = None
             self.project_dir = None
+
+        self.check_for_new_east_version()
 
     def chdir(self, path: str):
         """Change directory.
@@ -496,3 +502,52 @@ class EastContext:
                 ncs_version_not_supported_msg(self, result["output"]), highlight=False
             )
             self.exit()
+
+    def check_for_new_east_version(self):
+        """Occasionally check if there is a new version of east available.
+
+        If there is print a message to the user.
+        """
+
+        # Check if the file exists
+        check_file = os.path.join(self.consts["cache_dir"], "last_version_check")
+        if not os.path.isfile(check_file):
+            # File does not exist, create it and write current time to it
+            with open(check_file, "w") as f:
+                f.write(str(time.time()))
+            return
+
+        # File exists, read the time from it
+        with open(check_file, "r") as f:
+            last_check = float(f.read())
+
+        # Check if the time difference is more than 2 hours
+        if (time.time() - last_check) < 2 * 3600:
+            return
+
+        # More than 2 hours, send a request
+        try:
+            response = requests.get("https://pypi.org/pypi/east-tool/json", timeout=1)
+        except requests.exceptions.RequestException:
+            # Something went wrong, do not do anything
+            return
+
+        # Check if the request was successful
+        if response.status_code != 200:
+            # Something went wrong, do not do anything
+            return
+
+        # Check if the version is different
+        pypi_version = response.json()["info"]["version"]
+        current_version = importlib.metadata.version("east-tool")
+        if pypi_version != current_version:
+            # Print a message that there is a new version available
+            msg = (
+                "\n[bold yellow]New version of east is available![/]\n"
+                "Run [bold]pip install --upgrade east-tool[/] to update.\n"
+            )
+            self.print(Panel(msg))
+
+        # Write current time to the file to track when the last check was performed
+        with open(check_file, "w") as f:
+            f.write(str(time.time()))

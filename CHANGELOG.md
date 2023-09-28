@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.16.0] - 2023-09-28
+
+### Added
+
+-   Version check. East will now occasionally check for the latest version and notify
+    the user when it is available.
+-   Add `EAST_CODECHECKER_CI_MODE` environment variable. If running CodeChecker inside 
+    continuous integration environment, run `export EAST_CODECHECKER_CI_MODE=1` before
+    running any `east codechecker` commands. This will make `east` use the `CodeChecker` 
+    executable that is on the system path instead of the one in the tooling directory. 
+    System provided `CodeChecker` will normally also want to use the system provided 
+    clang, clang-tidy and cppcheck programs. way users can leverage the programs  
+    provided by continuous integration environment and not by `east`, which is usually 
+    faster due to caching.
+-   Add `--build-dir` option to the `east codechecker` commands. From now on, you do not 
+    need to run `east codechecker` command from the same directory where `build` folder 
+    is located. The default is still `build`, however you can specify a different one 
+    with `--build-dir` option.
+-   `east codechecker` commands now also take build directory location into account when
+    generating a skip file.
+
+### Changed
+
+-   How previous build type of previously run build is detected. Previously `east`
+    looked into the `image_preload.cmake` file and parsed its content to figure out the
+    used build type. This approach worked well until someone wanted to append extra
+    `.conf` files to the `CONFIG_OVERLAY`. To support this use case east now just
+    creates a single file in the `build` dir and writes build type to it.
+
 ## [0.15.2] - 2023-09-28
 
 ### Fixed
@@ -360,7 +389,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.2...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.0...HEAD
+
+[0.16.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.2...v0.16.0
 
 [0.15.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.1...v0.15.2
 
