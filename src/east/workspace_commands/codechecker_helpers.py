@@ -315,12 +315,6 @@ def get_metadata_from_codecheckerfile(east, build_dir):
 
 
 def get_endpoint(east):
-
-    endpoint = (
-        east.run("git config --get remote.origin.url", return_output=True, silent=True)[
-            "output"
-        ]
-        .split("/")[-1]
-        .strip()
-    )
-    return endpoint
+    cmd = "git config --get remote.origin.url"
+    result = east.run(cmd, return_output=True, silent=True)
+    return result["output"].split("/")[-1].split(".")[0]
