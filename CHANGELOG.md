@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.16.0] - 2023-09-28
+
 ### Added
 
 -   Version check. East will now occasionally check for the latest version and notify
@@ -15,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     running any `east codechecker` commands. This will make `east` use the `CodeChecker` 
     executable that is on the system path instead of the one in the tooling directory. 
     System provided `CodeChecker` will normally also want to use the system provided 
-    clang, clang-tidy and cppcheck programs. way users can leverage the programs    
+    clang, clang-tidy and cppcheck programs. way users can leverage the programs  
     provided by continuous integration environment and not by `east`, which is usually 
     faster due to caching.
 -   Add `--build-dir` option to the `east codechecker` commands. From now on, you do not 
@@ -387,7 +389,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.2...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.0...HEAD
+
+[0.16.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.2...v0.16.0
 
 [0.15.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.1...v0.15.2
 
