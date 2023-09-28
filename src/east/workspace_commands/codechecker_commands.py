@@ -394,7 +394,16 @@ def servdiff(east, new, resolved, unresolved, html, url):
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
 @click.pass_obj
 def codechecker(east):
-    """Command with several subcommands related to the [magenta bold]CodeChecker[/]."""
+    """Command with several subcommands related to [magenta bold]CodeChecker[/].
+
+    \b
+    \n\nIf running CodeChecker inside continuous integration environment, run [bold cyan]export EAST_CODECHECKER_CI_MODE=1[/] before running any [bold cyan]east codechecker[/] commands.
+    This will make [bold cyan]east[/] use the [magenta bold]CodeChecker[/] executable that is on the system path instead of the one in the tooling directory. The system provided [magenta bold]CodeChecker[/] will normally also want to use the system provided clang, clang-tidy and cppcheck.
+
+    \b
+    \n\nThis way users can leverage the programs provided by continuous integration
+    environment and not by [bold cyan]east[/], which is usually faster due to caching.
+    """
     pass
 
 

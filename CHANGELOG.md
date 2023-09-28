@@ -10,6 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 -   Version check. East will now occasionally check for the latest version and notify
     the user when it is available.
+-   Add `EAST_CODECHECKER_CI_MODE` environment variable. If running CodeChecker inside 
+    continuous integration environment, run `export EAST_CODECHECKER_CI_MODE=1` before
+    running any `east codechecker` commands. This will make `east` use the `CodeChecker` 
+    executable that is on the system path instead of the one in the tooling directory. 
+    System provided `CodeChecker` will normally also want to use the system provided 
+    clang, clang-tidy and cppcheck programs. way users can leverage the programs    
+    provided by continuous integration environment and not by `east`, which is usually 
+    faster due to caching.
 
 ## [0.15.2] - 2023-09-28
 
