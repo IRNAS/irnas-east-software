@@ -213,7 +213,7 @@ def no_toolchain_msg(east):
         f"Current [bold cyan]NCS[/] [bold]{east.detected_ncs_version}[/] version is "
         "supported but toolchain is [bold red]not installed![/]"
         "\n\nTo install it run:"
-        "\n\n\t[italic bold blue]east update toolchain\n"
+        "\n\n\t[italic bold blue]east install toolchain\n"
     )
 
 
