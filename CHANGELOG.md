@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   Version check. East will now occasionally check for the latest version and notify
+    the user when it is available.
+
 ## [0.15.2] - 2023-09-28
 
 ### Fixed
