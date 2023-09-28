@@ -153,53 +153,35 @@ def test_build_type_multi_app_behaviour(
     )
 
 
-def create_image_preload_file(
-    app_path, path_prefix="", overlay_configs=None, build_dir="build"
-):
-    """create image_preload.cmake file inside build folder."""
+def create_last_build_type_file(app_path, build_type, build_dir="build"):
+    """create last_build_type_file file inside build folder."""
 
-    image_preload_file = (
-        "# Generated file that can be used to preload variant"
-        f' images\nset(CACHED_CONF_FILE "{path_prefix}conf/common.conf" CACHE INTERNAL'
-        ' "NCS child image controlled")\nset(DTC_OVERLAY_FILE "" CACHE INTERNAL "NCS'
-        ' child image controlled")\nset(WEST_PYTHON "/usr/bin/python3" CACHE INTERNAL'
-        ' "NCS child image controlled")\n'
-    )
-
-    if overlay_configs:
-        image_preload_file += (
-            f'set(OVERLAY_CONFIG "{path_prefix}{overlay_configs}" CACHE INTERNAL "NCS'
-            ' child image controlled")\n'
-        )
+    build_type_str = build_type.split(" ")[-1]
+    if build_type_str == "":
+        build_type_str = "release"
 
     helpers.create_and_write(
-        app_path, f"{build_dir}/image_preload.cmake", image_preload_file
+        app_path, f"{build_dir}/last_build_type_flag", build_type_str
     )
 
 
 @pytest.mark.parametrize(
-    "build_type_flag, overlay_configs",
+    "build_type_flag",
     [
-        ("", None),
-        (
-            "--build-type debug",
-            "conf/debug.conf",
-        ),
-        (
-            "--build-type uart",
-            "conf/debug.conf;conf/uart.conf",
-        ),
+        "",
+        "--build-type debug",
+        "--build-type uart",
     ],
 )
 def test_build_type_build_folder_behaviour_same_flags(
-    west_workplace_parametrized, monkeypatch, mocker, build_type_flag, overlay_configs
+    west_workplace_parametrized, monkeypatch, mocker, build_type_flag
 ):
     """
     If the build folder with same conf files with that --build-type expects exits then
     no cmake args are added to the build command to avoid cmake rebuilds.
     """
     app_path = west_workplace_parametrized["app"]
-    create_image_preload_file(app_path, overlay_configs=overlay_configs)
+    create_last_build_type_file(app_path, build_type_flag)
 
     helper_test_against_west_run(
         monkeypatch,
@@ -227,11 +209,12 @@ def test_build_type_build_folder_behaviour_different_flags(
     west_workplace_parametrized, monkeypatch, mocker, build_type_flag, overlay_configs
 ):
     """
-    If the build folder exsits but it has build flags that are not expected by the east
+    If the build folder exists but it has build flags that are not expected by the east
     then rebuild is triggered.
     """
     app_path = west_workplace_parametrized["app"]
-    create_image_preload_file(app_path)
+
+    create_last_build_type_file(app_path, "--build-type release")
 
     helper_test_against_west_run(
         monkeypatch,
@@ -314,12 +297,8 @@ def test_build_type_samples_inherit_build_folder_same_flag(
 
     sample_path = os.path.join(project_path, "samples", "settings")
 
-    overlay_configs = "conf/debug.conf"
-    create_image_preload_file(
-        sample_path,
-        path_prefix=west_workplace_parametrized["prefix"],
-        overlay_configs=overlay_configs,
-    )
+    create_last_build_type_file(sample_path, "--build-type debug")
+
     helper_test_against_west_run(
         monkeypatch,
         mocker,
@@ -746,29 +725,22 @@ def test_different_build_dir_path_full_dir_same_build_type(
 ):
     """With different build dir path and build folder that has same previous build type
     files as current ones the west command should just include -d option,
-    EAST_BUILD_TYPE and nothing else.
+    and nothing else.
     """
 
     project_path = west_workplace_parametrized["app"]
 
     build_dir = "../different_build_dir"
+    build_type = "--build-type uart"
 
-    # Config for uart build type
-    overlay_configs = "conf/debug.conf;conf/uart.conf"
-
-    create_image_preload_file(
-        os.path.join(project_path, build_dir),
-        path_prefix=west_workplace_parametrized["prefix"],
-        overlay_configs=overlay_configs,
-    )
+    create_last_build_type_file(project_path, build_type, build_dir=build_dir)
 
     helper_test_against_west_run(
         monkeypatch,
         mocker,
         project_path,
-        f"build -d {build_dir} --build-type uart",
-        f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf "
-        f'-DOVERLAY_CONFIG="{overlay_configs}" -DEAST_BUILD_TYPE="uart"',
+        f"build -d {build_dir} {build_type}",
+        f"build -d {build_dir}",
         should_succed=True,
     )
 
@@ -785,22 +757,19 @@ def test_different_build_dir_path_full_dir_different_build_type(
 
     build_dir = "../different_build_dir"
 
-    # Config for uart build type
-    old_overlay_configs = "conf/debug.conf;conf/uart.conf"
-    # Config for debug build type
+    old_build_type = "--build-type uart"
+    new_build_type = "--build-type debug"
     new_overlay_configs = "conf/debug.conf"
 
-    create_image_preload_file(
-        os.path.join(project_path, build_dir),
-        path_prefix=west_workplace_parametrized["prefix"],
-        overlay_configs=old_overlay_configs,
+    create_last_build_type_file(
+        project_path, build_type=old_build_type, build_dir=build_dir
     )
 
     helper_test_against_west_run(
         monkeypatch,
         mocker,
         project_path,
-        f"build -d {build_dir} --build-type debug",
+        f"build -d {build_dir} {new_build_type}",
         f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf"
         f' -DOVERLAY_CONFIG="{new_overlay_configs}" -DEAST_BUILD_TYPE="debug"',
         should_succed=True,

@@ -25,6 +25,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   `east codechecker` commands now also take build directory location into account when
     generating a skip file.
 
+### Changed
+
+-   How previous build type of previously run build is detected. Previously `east`
+    looked into the `image_preload.cmake` file and parsed its content to figure out the
+    used build type. This approach worked well until someone wanted to append extra
+    `.conf` files to the `CONFIG_OVERLAY`. To support this use case east now just
+    creates a single file in the `build` dir and writes build type to it.
+
 ## [0.15.2] - 2023-09-28
 
 ### Fixed
