@@ -10,6 +10,11 @@ on:
 jobs:
   publish-new-release:
     runs-on: ubuntu-22.04
+    environment:
+      name: pypi
+      url: https://pypi.org/p/east-tool
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     # runs-on: self-hosted
 
     steps:
@@ -36,10 +41,10 @@ jobs:
           name: dist
           path: dist
 
+      # You wonder how there isn't any token? east is configured to use OIDC,
+      # check on pypi under Publishing section what is that.
       - name: Publish distribution to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.5.1
-        with:
-          password: ${{ secrets.PYPI_UPLOAD_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@release/v1
 
       - name: Publish Release
         if: ${{ !env.ACT }}
