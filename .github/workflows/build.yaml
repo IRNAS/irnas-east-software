@@ -48,5 +48,5 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v3
         with:
-          name: dists
-          path: dists/*
+          name: dist
+          path: dist/*
