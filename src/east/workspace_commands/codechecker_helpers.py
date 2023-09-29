@@ -317,4 +317,4 @@ def get_metadata_from_codecheckerfile(east, build_dir):
 def get_endpoint(east):
     cmd = "git config --get remote.origin.url"
     result = east.run(cmd, return_output=True, silent=True)
-    return result["output"].split("/")[-1].split(".")[0]
+    return result["output"].split("/")[-1].split(".")[0].strip()
