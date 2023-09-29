@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+-   Transition to the trunk-based development model.
+
 ### Fixed
 
 -   Incorrect conversion of output of a git command into endpoint in 
