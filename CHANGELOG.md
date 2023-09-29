@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.16.1] - 2023-09-29
+
 ### Changed
 
 -   Transition to the trunk-based development model.
@@ -398,7 +400,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.1...HEAD
+
+[0.16.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.0...v0.16.1
 
 [0.16.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.15.2...v0.16.0
 
