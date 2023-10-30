@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.16.3] - 2023-10-30
+
 ### Fixed
 
 -   Error build message in `east release` command. It was also prettified.
@@ -406,7 +408,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.1...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.3...HEAD
+
+[0.16.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.1...v0.16.3
 
 [0.16.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.0...v0.16.1
 
