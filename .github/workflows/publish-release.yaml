@@ -15,6 +15,7 @@ jobs:
       url: https://pypi.org/p/east-tool
     permissions:
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+      contents: write
     # runs-on: self-hosted
 
     steps:
