@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   error build message in `east release` command. It was also prettified.
+
 ## [0.16.1] - 2023-09-29
 
 ### Changed

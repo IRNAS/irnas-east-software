@@ -4,6 +4,7 @@ import shutil as sh
 import click
 from rich.box import ROUNDED
 from rich.panel import Panel
+from rich.rule import Rule
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
@@ -176,12 +177,19 @@ def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
 
         if result["returncode"]:
             msg = (
-                "Last build command [bold red]failed[/]! Check build output above"
+                "Last build command [bold red]failed[/]! Check build log above"
                 " to see what went wrong."
             )
             progress.stop()
             if not verbose:
-                east.print(result["output"], clean_print_args)
+                # Nicely print the build log, surounded by the rules and newlines for
+                # paddings.  
+                east.print("")
+                east.print(Rule(title="Captured build log", style="red"))
+                east.print("")
+                east.print(result["output"], **clean_print_args)
+                east.print(Rule(title="Captured build log", style="red"))
+                east.print("")
             east.print(Panel(msg, padding=1, border_style="red"))
             east.exit()
 
