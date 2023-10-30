@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from click.testing import CliRunner
 
@@ -157,7 +158,14 @@ def create_and_write(path: str, filename: str, content: str = None):
 dummy_config = """
 CONFIG_DEBUG=y
 """
+dummy_cmakelists_txt="""
+cmake_minimum_required(VERSION 3.20.0)
 
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project(test_project)
+
+target_sources(app PRIVATE src/main.c)
+"""
 
 def _create_good_west_workspace(west_top_dir):
     """
@@ -181,6 +189,7 @@ def _create_good_west_workspace(west_top_dir):
     create_and_write(
         west_top_dir, "project/app/conf/nrf52840dk_nrf52840.conf", dummy_config
     )
+    create_and_write(west_top_dir, "project/app/CMakeLists.txt", dummy_cmakelists_txt)
 
     # Board files, just create them, you do not need to write anything.
     board_path = "project/boards/arm/custom_nrf52840dk"
@@ -242,6 +251,9 @@ def create_good_west_multi_app(west_top_dir):
         Path to the project inside west top dir.
     """
     create_and_write(west_top_dir, "project/east.yml", east_yaml_multiple_apps)
+
+    # We need this to clean any files left by create_good_west
+    shutil.rmtree(os.path.join(west_top_dir, "project/app"))
     os.makedirs(os.path.join(west_top_dir, "project/app/test_one"), exist_ok=True)
     os.makedirs(os.path.join(west_top_dir, "project/app/test_two"), exist_ok=True)
     create_and_write(

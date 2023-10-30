@@ -1,4 +1,5 @@
 import os
+import re
 import shutil as sh
 
 import click
@@ -207,6 +208,31 @@ def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
         on_failure(result)
 
 
+def check_if_single_app_repo(east, apps):
+    """Return True if this repo has just a single app project in the 'app' folder.
+
+
+    Return False in any other case.
+    """
+
+    cmakelists = os.path.join("app", "CMakeLists.txt")
+
+    # If there is no CMakeLists.txt file directly in the 'app' folder, than we are
+    # certain that this is not a single app repo.
+    if not os.path.isfile(cmakelists):
+        return False
+
+    # Only a "project(<something>)" is a valid indication that this is a single app repo,
+    # CMakeLists without "project(<something>)" could still exist for some other
+    # purpose.
+    with open(cmakelists, "r") as f:
+        for line in f:
+            if(re.match("project\(.*\)", line)):
+                return True
+        return False
+
+
+
 release_misuse_no_east_yml_msg = """
 [bold yellow]east.yml[/] not found in project's root directory, [bold yellow]east release[/] needs it to determine required build steps, exiting!"""
 
@@ -301,9 +327,16 @@ def release(east, dry_run, verbose, spdx_app_only):
     # so the logic afterwards for detection of jobs can be common/simpler.
     # We also do some existence checks.
 
-    # Small adjustment for projects which only have one single app
+    # Small adjustment for projects which only have one single app.
     listed_apps = os.listdir("app") if os.path.isdir("app") else []
-    apps_in_dir = apps[0]["name"] if len(apps) == 1 else listed_apps
+    
+    # Magical heuristic to determine if this is single app repo or not.
+    is_single_app = check_if_single_app_repo(east, apps)
+
+    # cleaned_apps is here just in case if there is no app key to prevent out of bounds
+    # index access when doing apps[0]
+    cleaned_apps = apps[0]["name"] if len(apps) else []
+    apps_in_dir = cleaned_apps if is_single_app else listed_apps
 
     for app in apps:
         # Check, if the app even exists before building for it
@@ -346,7 +379,7 @@ def release(east, dry_run, verbose, spdx_app_only):
                     if target["parent"] == "apps":
                         # Create destination path where artefact should be placed into
                         destination = os.path.join(common_dest, build_type, board)
-                        if len(apps) == 1:
+                        if is_single_app:
                             src_dir = "app"
                         else:
                             src_dir = os.path.join("app", target["name"])

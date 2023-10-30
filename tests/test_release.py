@@ -173,13 +173,13 @@ def test_basic_app_release_behaviour(west_workplace, monkeypatch, mocker):
 
 
 def test_basic_app_release_behaviour_no_samples_folder(
-    west_workplace_parametrized, monkeypatch, mocker
+    west_workplace, monkeypatch, mocker
 ):
     """
     Running east release with no samples key and no samples folder should skip build
     process for samples and build apps.
     """
-    project = west_workplace_parametrized["project"]
+    project = west_workplace
 
     helpers.create_and_write(
         project,
@@ -364,4 +364,55 @@ def test_east_yml_with_non_existant_apps(west_workplace_multi_app, monkeypatch, 
         project,
         "release",
         should_succed=False,
+    )
+
+east_yaml_single_app_simple = """
+apps:
+  - name: test_one
+    west-boards:
+      - nrf52840dk_nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+"""
+
+expected_single_app_release_west_commands = [
+    (
+        "build -b nrf52840dk_nrf52840 app/test_one -- -DCONF_FILE=conf/common.conf"
+        ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;conf/debug.conf"'
+        ' -DEAST_BUILD_TYPE="debug"'
+    ),
+    (
+        "build -b nrf52840dk_nrf52840 app/test_one -- -DCONF_FILE=conf/common.conf"
+        ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+        ' -DEAST_BUILD_TYPE="release"'
+    ),
+]
+
+
+def test_building_app_that_is_not_on_the_first_level(west_workplace_multi_app, monkeypatch, mocker):
+    """
+    Usecase: you have an `app` folder, with two projects inside it. `app_one`,
+    is listed in east.yml, `app_two` is not. East should be able to build `app_one`
+    without a problem.
+    """
+
+    project = west_workplace_multi_app
+
+    helpers.create_and_write(
+        project,
+        "east.yml",
+        east_yaml_single_app_simple,
+    )
+
+    monkeypatch.setattr(east.workspace_commands.release_commands, "RUNNING_TESTS", True)
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project,
+        "release",
+        expected_west_cmds=expected_single_app_release_west_commands,
     )

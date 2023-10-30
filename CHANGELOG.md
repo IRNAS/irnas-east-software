@@ -8,7 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
--   error build message in `east release` command. It was also prettified.
+-   Error build message in `east release` command. It was also prettified.
+-   Build type issue when building app not listed in the east.yaml, again. 
+    See (#85) for the start of the issue and 7243ee4 for solution and rationale.
 
 ## [0.16.1] - 2023-09-29
 
