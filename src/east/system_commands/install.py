@@ -39,7 +39,8 @@ def toolchain(east, force):
             )
             east.print(msg)
 
-            east.exit()
+            # Exit with 0 error code, we do that so it makes usage of East in CI easier.
+            east.exit(0)
 
     east.print(
         "Starting install of [bold cyan]NCS[/] toolchain,"

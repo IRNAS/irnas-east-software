@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+-   `east install toolchain` will now exit with 0 error code, if the toolchain is
+    already installed. This makes CI logic using East simpler.
+
 ## [0.16.3] - 2023-10-30
 
 ### Fixed
