@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.16.4] - 2023-11-02
+
 ### Changed
 
 -   `east install toolchain` will now exit with 0 error code, if the toolchain is
@@ -413,7 +415,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.3...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.4...HEAD
+
+[0.16.4]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.3...v0.16.4
 
 [0.16.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.1...v0.16.3
 
