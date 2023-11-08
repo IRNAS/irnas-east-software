@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Addedd
+
+-   `--append` flag to the `east util rtt` command. If you use this option, then 
+    new RTT logs will not overwrite old logfile, but the will be appended to it.
+
 ### Fixed
 
 -   Fix handling of extra args. Some commands that just pass through args to the 
