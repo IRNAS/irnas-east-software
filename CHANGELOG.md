@@ -6,9 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Newly added `--append` option was not properly added.
+
 ## [0.17.0] - 2023-11-08
 
-### Addedd
+### Added
 
 -   `--append` flag to the `east util rtt` command. If you use this option, then 
     new RTT logs will not overwrite old logfile, but the will be appended to it.

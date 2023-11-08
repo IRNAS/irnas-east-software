@@ -69,7 +69,6 @@ def get_device(runner_yaml):
 )
 @click.pass_obj
 def connect(east, device, jlink_id, rtt_port, speed):
-
     """Connects to a device and creates a RTT server with [bold cyan]JLinkExe[/].
 
 
@@ -113,8 +112,14 @@ def connect(east, device, jlink_id, rtt_port, speed):
     type=str,
     help="Relative path to a log file into which to save RTT output.",
 )
+@click.option(
+    "-a",
+    "--append",
+    type=str,
+    help="Appends RTT output to a log file, instead of overwriting it. Requires --logfile option.",
+)
 @click.pass_obj
-def rtt(east, local_echo, rtt_port, logfile):
+def rtt(east, local_echo, rtt_port, logfile, append):
     """Runs a RTT client which connects to a running RTT server.
 
 
