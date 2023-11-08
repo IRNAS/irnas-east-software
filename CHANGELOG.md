@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.17.1] - 2023-11-08
+
 ### Fixed
 
 -   Newly added `--append` option was not properly added.
@@ -433,7 +435,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.1...HEAD
+
+[0.17.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.0...v0.17.1
 
 [0.17.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.4...v0.17.0
 
