@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.17.0] - 2023-11-08
+
 ### Addedd
 
 -   `--append` flag to the `east util rtt` command. If you use this option, then 
@@ -427,7 +429,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.4...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.0...HEAD
+
+[0.17.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.4...v0.17.0
 
 [0.16.4]: https://github.com/IRNAS/irnas-east-software/compare/v0.16.3...v0.16.4
 
