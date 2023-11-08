@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Fix handling of extra args. Some commands that just pass through args to the 
+    `west` (like `east twister`) would incorrectly parse argument values with 
+    spaces, for example, `east twister --west-flash="--tool-opt=ip 192.168.76.247:7778"` 
+    would become `east twister --west-flash="--tool-opt"`.
+
 ## [0.16.4] - 2023-11-02
 
 ### Changed

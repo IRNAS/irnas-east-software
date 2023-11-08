@@ -295,6 +295,9 @@ def clean_up_extra_args(args):
     If this line gets to Cmake without double quotes, it will not be parsed
     correctly.
 
+    We also take care of the case where there is a space in the argument, in that case
+    we add double quotes around the whole argument.
+
         args ():    Extra args, passed after '--' as Click argument.
 
     Returns:
@@ -302,9 +305,16 @@ def clean_up_extra_args(args):
     """
 
     def add_back_double_quotes(arg):
-        if (arg.startswith("-D") or arg.startswith("--")) and "=" in arg:
+        if arg.startswith("-") and "=" in arg:
             split = arg.split("=")
-            arg = f'{split[0]}="{split[1]}"'
+            # Since there could be a "=" in the value, we need to join the
+            # remaining part of the split
+            arg = f'{split[0]}="{"".join(split[1:])}"'
+        else:
+            # The arg is not an option of any kind, just add double quotes if it
+            # contains a space
+            if " " in arg:
+                arg = f'"{arg}"'
         return arg
 
     return f"{' '.join(list(map(add_back_double_quotes, args)))}"
