@@ -131,6 +131,7 @@ def var_never_read_before_disabled_macro_found(files, diag):
     desc_regexes = [
         "Value stored to '(.*)' during its initialization is never read",
         "Value stored to '(.*)' is never read",
+        "unused variable '(.*)'",
     ]
 
     for desc_regex in desc_regexes:

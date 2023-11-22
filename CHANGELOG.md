@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Filter out `unused variable 'var_name'` warnings when `var_name` is used in
+    the disabled macro.
+
 ## [0.17.2] - 2023-11-09
 
 ### Fixed
