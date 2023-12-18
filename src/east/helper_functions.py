@@ -357,14 +357,15 @@ def get_git_version(east):
     if len(output) == 1:
         # No git tag, only hash was produced
         version = {"tag": "v0.0.0", "hash": output[0]}
-    elif len(output) == 3:
-        if output[1] == "0" and not output[2].endswith("+"):
+    elif len(output) >= 3:
+        # Some tags have '-' in them, like the ncs ones (eg. v3.3.99-ncs1)
+        tag = "-".join(output[:-2])
+        if output[-2] == "0" and not output[-1].endswith("+"):
             # Clean version commit, no hash needed
-            version = {"tag": output[0], "hash": ""}
+            version = {"tag": tag, "hash": ""}
         else:
             # Not on commit or dirty, both version and hash are needed
-            version = {"tag": output[0], "hash": output[2][1:]}
-
+            version = {"tag": tag, "hash": output[-1][1:]}
     else:
         east.print(
             f"Unsupported git describe output ({result['output']}), contact developer!"
