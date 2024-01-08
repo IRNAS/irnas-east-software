@@ -136,9 +136,9 @@ def rtt(east, local_echo, rtt_port, logfile, append):
     rtt_cmd = f"JLinkRTTClient -LocalEcho {local_echo} -RTTTelnetPort {rtt_port} "
 
     if logfile and append:
-        rtt_cmd += f"| tee -a {logfile}"
+        rtt_cmd += f"ansi2txt | tee -a {logfile}"
     elif logfile:
-        rtt_cmd += f"| tee {logfile}"
+        rtt_cmd += f"ansi2txt | tee {logfile}"
     elif append:
         east.print(
             "Cannot use [bold cyan]--append[/] flag without "
