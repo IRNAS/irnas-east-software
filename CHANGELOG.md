@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Filter out ANSI escape sequences, fix #105.
+-   Fix parsing of git describe outside project repos.
+
 ## [0.17.3] - 2023-11-22
 
 ### Fixed
