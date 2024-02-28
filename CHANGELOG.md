@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.17.5] - 2024-02-28
+
 ### Fixed
 
 -   Strip away trailing slashes from Codechecker server URL that could cause 
@@ -463,7 +465,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.4...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.5...HEAD
+
+[0.17.5]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.4...v0.17.5
 
 [0.17.4]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.3...v0.17.4
 
