@@ -245,7 +245,7 @@ def store(east, url, build_dir):
     endpoint = get_endpoint(east)
 
     store_cmd = (
-        f"{cc} store --name '{name}' --url {url}/{endpoint} "
+        f"{cc} store --name '{name}' --url {url.strip('/')}/{endpoint} "
         f"--config {cfg} {cc_output_dir} --tag '{tag}'"
     )
 
@@ -393,7 +393,7 @@ def servdiff(east, new, resolved, unresolved, html, url, build_dir):
 
     diff_cmd = (
         f"{cc} cmd diff --basename {name} --newname {cc_output_dir} "
-        f"--url {url}/{endpoint} "
+        f"--url {url.strip('/')}/{endpoint} "
     )
 
     if [new, resolved, unresolved].count(True) != 1:

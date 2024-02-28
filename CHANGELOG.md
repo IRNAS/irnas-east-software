@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Strip away trailing slashes from Codechecker server URL that could cause 
+    problems when creating the endpoint URL. This affects the 
+    `east codechecker store` and `east codechecker servdiff`, which get the URL
+    either as a command line argument or from the environmental variable 
+    `EAST_CODECHECKER_SERVER_URL`
+
 ## [0.17.4] - 2024-01-08
 
 ### Fixed
