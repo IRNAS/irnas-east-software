@@ -34,3 +34,9 @@ version_scheme = "post-release"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff.lint]
+select = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
