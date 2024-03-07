@@ -67,7 +67,7 @@ def codechecker(east):
     \b
     \n\nCurrent dependencies are [bold cyan]clang-tidy[/] and [bold cyan]clang[/], both are contained in the [bold cyan]clang+llvm[/] package.
     """
-    tool_installer(east, ["codechecker", "clang+llvm"])
+    tool_installer(east, ["codechecker", "clang+llvm", "cppcheck"])
 
 
 @click.option(
