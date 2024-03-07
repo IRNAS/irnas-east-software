@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   The issue with -fno-printf-return-value.
+    `east codechecker check` command would fail due to this flag, as the flags
+    comes from the GCC, but clang doesn't know about it.
+    There is no way to ignore this on the `clang` level, but for some reason
+    `clangd` knows how to ignore this. So the only solution was to remove this
+    from the `compile_commands.json` (this is not the only flag that was causing 
+    the problems).
+-   Add back `cppcheck` to the Codechecker install list.
+    Although `cppcheck` is not used, the `codechecker --help` command (and a lot
+    of other commands) fails a version check if `cppcheck` binary is not
+    present. Installing the binary solves that.
+
 ## [0.17.5] - 2024-02-28
 
 ### Fixed
