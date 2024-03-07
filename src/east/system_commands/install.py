@@ -86,14 +86,13 @@ def install(ctx, east, all):
     """Install one or more tools.
 
     \b
-    \n\nPTools are always installed in the [bold magenta]~/.local/share/east/tooling[/] directory.
+    \n\nTools are always installed in the [bold magenta]~/.local/share/east/tooling[/] directory.
 
     \n\nTo install a single tool run [bold cyan]east install tool_name[/].
     \n\nTo install all tools run [bold cyan]east install --all[/].
     \n\nTo learn more about a tool run [bold cyan]east install tool_name --help[/].
 
     """
-
     # Since we want to call commands in code and not through cli, we need to use
     # .callback method which is actually the original funciton without click's
     # infrastructure.
