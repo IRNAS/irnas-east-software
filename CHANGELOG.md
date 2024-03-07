@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.17.6] - 2024-03-07
+
 ### Fixed
 
 -   The issue with -fno-printf-return-value.
@@ -479,7 +481,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.5...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.6...HEAD
+
+[0.17.6]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.5...v0.17.6
 
 [0.17.5]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.4...v0.17.5
 
