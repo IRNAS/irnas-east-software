@@ -50,8 +50,7 @@ def cleanup_compile_commands_json(compile_commands):
 
     Otherwise clangsa fails to analyze the files.
     """
-
-    args = ["-fno-reorder-functions", "-fno-freestanding", "-mfp16-format=ieee"]
+    args = ["-fno-reorder-functions", "-fno-freestanding", "-mfp16-format=ieee","-fno-printf-return-value"]
 
     # Create matching regex for all arguments
     args_regex = "|".join([f"({arg})" for arg in args])
