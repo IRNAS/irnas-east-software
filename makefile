@@ -1,7 +1,4 @@
 install:
-	@pip install --editable .
-
-install-dev:
 	@pip install --editable ".[dev]"
 
 # With -s option the printf's are actually printed, otherwise they are
@@ -10,8 +7,8 @@ test:
 	pytest -s
 
 format:
-	isort --profile black .
-	black .
+	ruff . --fix
+	ruff format .
 
 build:
 	@python3 -m build

@@ -1,0 +1,14 @@
+[lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Enable pydocstyle (`D`)
+# Enable isort (`I`)
+select = ["E4", "E7", "E9", "D", "F", "I"]
+
+# Disable "Missing docstring in public module" (`D100`)
+# Disable "Missing docstring in public package" (`D104`)
+# Disable "D205 1 blank line required between summary line and description" (`D205`)
+# Disable "D301 Use r""" if any backslashes in a docstring" (`D301`)
+ignore = ["D100", "D104", "D205", "D301"]
+
+[lint.pydocstyle]
+convention = "google"
