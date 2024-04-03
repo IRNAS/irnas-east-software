@@ -16,8 +16,7 @@ from ..helper_functions import clean_up_extra_args
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
 def init(east, extra_help, args):
-    """
-    Create a [bold yellow]West workspace[/].
+    """Create a [bold yellow]West workspace[/].
 
     \b
     \n\nInternally runs [magenta bold]west init[/] command, all given arguments are passed directly to it.
@@ -27,7 +26,6 @@ def init(east, extra_help, args):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     cmd = "init "
 
     if extra_help:
@@ -53,8 +51,7 @@ def init(east, extra_help, args):
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
 def update(east, extra_help, args):
-    """
-    Update a [bold yellow]West workspace[/].
+    """Update a [bold yellow]West workspace[/].
 
     \b
     \n\nInternally runs [magenta bold]west update[/] command, all given arguments are passed directly to it.
@@ -64,7 +61,6 @@ def update(east, extra_help, args):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     cmd = "update "
 
     if extra_help:

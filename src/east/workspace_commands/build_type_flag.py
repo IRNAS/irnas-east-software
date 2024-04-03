@@ -1,5 +1,4 @@
 import os
-import re
 from typing import List
 
 from ..helper_functions import return_dict_on_match
@@ -11,7 +10,6 @@ def is_child_in_parent(parent, child):
         child ():  path
     Returns: True if yes, otherwise False.
     """
-
     # Smooth out relative path names, note: if you are concerned about symbolic
     # links, you should use os.path.realpath too
     parent = os.path.abspath(parent)
@@ -27,8 +25,7 @@ def is_child_in_parent(parent, child):
 def _construct_required_cmake_args(
     conf_files: List[str], board: str, path_prefix: str, source_dir: str
 ) -> str:
-    """
-    Constructs required cmake args from conf_files. Adds board specific conf file if it
+    """Constructs required cmake args from conf_files. Adds board specific conf file if it
     is found.
     Path prefix is applied, for cases where sample inherits a list conf_files.
 
@@ -76,6 +73,7 @@ def _check_previous_build(east, build_dir, build_type_str):
 
     Args:
         east ():            East context
+        build_dir ():       Location of build_dir
         build_type_str ():  Build type in string format
 
     Returns:
@@ -84,7 +82,6 @@ def _check_previous_build(east, build_dir, build_type_str):
         - "rebuild" if rebuild is needed.
         - "just_build" if rebuild is not needed.
     """
-
     build_dir = build_dir.strip("/") if build_dir else "build"
     check_file = os.path.join(build_dir, "last_build_type_flag")
 
@@ -125,6 +122,7 @@ application entry!"""
 
 
 def no_build_type_msg(build_type):
+    """Returns a message that a given build type does not exist in east.yml."""
     return (
         f"\nGiven --build-type [bold]{build_type}[/] does [bold red]not"
         " exist[/] for this app!"
@@ -158,7 +156,6 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
                 Second string is diagnostic message that can be printed. It might not be
                 given so it should be checked first.
     """
-
     if not east.east_yml:
         if not build_type:
             # east.yml is optional, if it is not present present then default to plain

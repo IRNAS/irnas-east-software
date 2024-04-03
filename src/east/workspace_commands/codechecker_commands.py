@@ -170,7 +170,6 @@ def fixit(east, apply, build_dir):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     east.pre_workspace_command_check(check_only_west_workspace=True)
 
     check_for_codechecker(east)
@@ -233,7 +232,6 @@ def store(east, url, build_dir):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     east.pre_workspace_command_check(check_only_west_workspace=True)
     check_for_codechecker(east)
 
@@ -241,7 +239,7 @@ def store(east, url, build_dir):
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
     cc_output_dir = os.path.join(build_dir, "codechecker")
 
-    name, tag = get_metadata_from_codecheckerfile(east, build_dir)
+    name, tag = get_metadata_from_codecheckerfile(build_dir)
     endpoint = get_endpoint(east)
 
     store_cmd = (
@@ -262,7 +260,6 @@ def store(east, url, build_dir):
 @click.pass_obj
 def example_config(east, create):
     """Show example [bold magenta]codechecker_config.yaml[/] file."""
-
     east.pre_workspace_command_check(check_only_west_workspace=True)
     check_for_codechecker(east)
 
@@ -298,8 +295,7 @@ def example_config(east, create):
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
 def bypass(east, extra_help, args):
-    """
-    Directly run any [magenta bold]CodeChecker[/] command.
+    """Directly run any [magenta bold]CodeChecker[/] command.
 
     \b
     \n\nInternally runs [magenta bold]codechecker[/] command, all given arguments are passed directly to it.
@@ -309,7 +305,6 @@ def bypass(east, extra_help, args):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     east.pre_workspace_command_check(check_only_west_workspace=True)
     check_for_codechecker(east)
 
@@ -380,7 +375,6 @@ def servdiff(east, new, resolved, unresolved, html, url, build_dir):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     east.pre_workspace_command_check(check_only_west_workspace=True)
     check_for_codechecker(east)
 
@@ -388,7 +382,7 @@ def servdiff(east, new, resolved, unresolved, html, url, build_dir):
     cc_diff_output_dir = os.path.join(build_dir, "codechecker_diff")
     cc_output_dir = os.path.join(build_dir, "codechecker")
 
-    name, _ = get_metadata_from_codecheckerfile(east, build_dir)
+    name, _ = get_metadata_from_codecheckerfile(build_dir)
     endpoint = get_endpoint(east)
 
     diff_cmd = (

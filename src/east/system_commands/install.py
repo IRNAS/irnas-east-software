@@ -31,7 +31,6 @@ def toolchain(east, force):
         if force:
             east.run_manager(f"uninstall --ncs-version {east.detected_ncs_version}")
         else:
-
             msg = (
                 f"\nVersion of [bold cyan]{east.detected_ncs_version} NCS[/] toolchain "
                 "is [bold]already[/] installed! \n\n"

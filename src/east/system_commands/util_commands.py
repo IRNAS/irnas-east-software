@@ -7,6 +7,7 @@ from ..east_context import east_command_settings, east_group_settings
 
 
 def no_jlink_tool_msg(tool):
+    """Returns a message that a required JLink tool was not found."""
     return (
         f"The required program [bold cyan]{tool}[/] was [bold red]not found,[/]"
         " exiting!"
@@ -19,7 +20,6 @@ def get_device(runner_yaml):
     If runner.yaml is not found or the correct flag could not be fetched then None is
     returned.
     """
-
     if os.path.isfile(runner_yaml):
         with open(runner_yaml, "r") as file:
             try:
@@ -71,12 +71,10 @@ def get_device(runner_yaml):
 def connect(east, device, jlink_id, rtt_port, speed):
     """Connects to a device and creates a RTT server with [bold cyan]JLinkExe[/].
 
-
     \b
     \n\nRTT server will emit any RTT messages produced by the device over its dedicated port. Execute [bold magenta]east util rtt[/] command in the separate window to observe these messages.
 
     """
-
     if not east.check_exe("JLinkExe"):
         east.print(no_jlink_tool_msg("JLinkExe"), highlight=False)
         east.exit()
@@ -122,11 +120,9 @@ def connect(east, device, jlink_id, rtt_port, speed):
 def rtt(east, local_echo, rtt_port, logfile, append):
     """Runs a RTT client which connects to a running RTT server.
 
-
     \b
     \n\nAny messages that RTT server creates are printed. RTT server can be created with an [bold magenta]east util connect[/] command.
     """
-
     if not east.check_exe("JLinkRTTClient"):
         east.print(no_jlink_tool_msg("JLinkRTTClient"), highlight=False)
         east.exit()

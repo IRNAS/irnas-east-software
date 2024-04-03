@@ -1,10 +1,7 @@
 import os
 import shutil as sh
 
-from click.testing import CliRunner
-
 import east
-from east.__main__ import cli
 from east.east_context import EastContext
 from east.helper_functions import find_all_boards
 
@@ -30,6 +27,7 @@ apps:
 
 
 def test_finding_hardware_versions(west_workplace):
+    """Test finding hardware versions."""
     _ = west_workplace
     east = EastContext()
 
@@ -54,10 +52,7 @@ def test_finding_hardware_versions(west_workplace):
 
 
 def test_no_east_yml_with_release(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    Running east release with not east.yml should abort.
-    """
-
+    """Running east release with not east.yml should abort."""
     os.remove("east.yml")
 
     helper_test_against_west_run(
@@ -148,11 +143,9 @@ expected_app_release_west_commands = [
 
 
 def test_basic_app_release_behaviour(west_workplace, monkeypatch, mocker):
-    """
-    Running east release with no samples key, should skip build process for samples and
+    """Running east release with no samples key, should skip build process for samples and
     build apps.
     """
-
     project_path = west_workplace
 
     helpers.create_and_write(
@@ -175,8 +168,7 @@ def test_basic_app_release_behaviour(west_workplace, monkeypatch, mocker):
 def test_basic_app_release_behaviour_no_samples_folder(
     west_workplace, monkeypatch, mocker
 ):
-    """
-    Running east release with no samples key and no samples folder should skip build
+    """Running east release with no samples key and no samples folder should skip build
     process for samples and build apps.
     """
     project = west_workplace
@@ -226,11 +218,9 @@ expected_samples_release_west_commands = [
 def test_basic_samples_release_behaviour(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    Running east release with no apps key, should skip build process for apps and build
+    """Running east release with no apps key, should skip build process for apps and build
     samples.
     """
-
     helpers.create_and_write(
         west_workplace_parametrized["project"],
         "east.yml",
@@ -249,9 +239,7 @@ def test_basic_samples_release_behaviour(
 
 
 def test_basic_release_behaviour(west_workplace, monkeypatch, mocker):
-    """
-    Running east release with both apps and samples keys should run normally.
-    """
+    """Running east release with both apps and samples keys should run normally."""
     project_path = west_workplace
 
     helpers.create_and_write(
@@ -293,11 +281,9 @@ samples:
 def test_east_yml_with_non_existant_samples(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    Running east release when east.yml contains non-existing samples should abort before
+    """Running east release when east.yml contains non-existing samples should abort before
     issuing any of the west build commands.
     """
-
     helpers.create_and_write(
         west_workplace_parametrized["project"],
         "east.yml",
@@ -345,8 +331,7 @@ apps:
 
 
 def test_east_yml_with_non_existant_apps(west_workplace_multi_app, monkeypatch, mocker):
-    """
-    Running east release when east.yml contains non-existing apps should abort before
+    """Running east release when east.yml contains non-existing apps should abort before
     issuing any of the west build commands. This only make sense in multi app
     workspaces.
     """
@@ -365,6 +350,7 @@ def test_east_yml_with_non_existant_apps(west_workplace_multi_app, monkeypatch, 
         "release",
         should_succed=False,
     )
+
 
 east_yaml_single_app_simple = """
 apps:
@@ -392,13 +378,13 @@ expected_single_app_release_west_commands = [
 ]
 
 
-def test_building_app_that_is_not_on_the_first_level(west_workplace_multi_app, monkeypatch, mocker):
-    """
-    Usecase: you have an `app` folder, with two projects inside it. `app_one`,
+def test_building_app_that_is_not_on_the_first_level(
+    west_workplace_multi_app, monkeypatch, mocker
+):
+    """Usecase: you have an `app` folder, with two projects inside it. `app_one`,
     is listed in east.yml, `app_two` is not. East should be able to build `app_one`
     without a problem.
     """
-
     project = west_workplace_multi_app
 
     helpers.create_and_write(

@@ -1,8 +1,7 @@
 import os
 
-import pytest
-
 import east.east_context
+import pytest
 
 from . import helpers
 
@@ -61,14 +60,9 @@ def west_workplace_fixture_common(west_top_dir, monkeypatch, mocker):
 
     It is not expected that tests will directly use this fixture.
 
-    Args:
-        tmp_path_factory ():
-        monkeypatch ():
-
     Returns:
         Project path
     """
-
     project_path = helpers.create_good_west(west_top_dir)
 
     # # We pretend that
@@ -149,7 +143,6 @@ def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
     Returns:
         Dict with project, app and prefix paths for testing.
     """
-
     west_top_dir = tmp_path_factory.mktemp("west_workplace")
     project_path = west_workplace_fixture_common(west_top_dir, monkeypatch, mocker)
 

@@ -5,8 +5,8 @@ import shutil as sh
 import click
 from rich.box import ROUNDED
 from rich.panel import Panel
-from rich.rule import Rule
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
+from rich.rule import Rule
 from rich.table import Table
 
 from ..east_context import east_command_settings
@@ -30,8 +30,7 @@ clean_print_args = {
 
 
 def create_artefact_name(project, board, version, build_type):
-    """
-    Create an artefact name.
+    """Create an artefact name.
 
     Board might be in form <west_board>@<hv_version>, in that case we modify it to fit
     the artefact name.
@@ -50,10 +49,7 @@ def create_artefact_name(project, board, version, build_type):
 
 
 def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
-    """
-    Moves build artefacts to art_dest and renames them to art_name.
-    """
-
+    """Moves build artefacts to art_dest and renames them to art_name."""
     # Create artefact destination
     os.makedirs(art_dest, exist_ok=True)
 
@@ -97,6 +93,7 @@ def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
 
 
 def show_job_summary(east, jobs):
+    """Prints a summary of jobs to be run."""
     table = Table(
         show_header=True,
         header_style="bold magenta",
@@ -122,7 +119,7 @@ def show_job_summary(east, jobs):
 
 
 def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
-    """Runs the job with a west
+    """Runs the job with west.
 
     east ():            East context.
     job ():             Job to run.
@@ -134,7 +131,6 @@ def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
     Return:
         Bool            True, if job succeeded, false if it did not.
     """
-
     build_cmd = create_build_command(
         east,
         board=job["board"],
@@ -175,7 +171,6 @@ def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
 
     def on_failure(result):
         """Handle job failure."""
-
         if result["returncode"]:
             msg = (
                 "Last build command [bold red]failed[/]! Check build log above"
@@ -184,7 +179,7 @@ def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
             progress.stop()
             if not verbose:
                 # Nicely print the build log, surounded by the rules and newlines for
-                # paddings.  
+                # paddings.
                 east.print("")
                 east.print(Rule(title="Captured build log", style="red"))
                 east.print("")
@@ -208,13 +203,11 @@ def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
         on_failure(result)
 
 
-def check_if_single_app_repo(east, apps):
+def check_if_single_app_repo():
     """Return True if this repo has just a single app project in the 'app' folder.
-
 
     Return False in any other case.
     """
-
     cmakelists = os.path.join("app", "CMakeLists.txt")
 
     # If there is no CMakeLists.txt file directly in the 'app' folder, than we are
@@ -227,10 +220,9 @@ def check_if_single_app_repo(east, apps):
     # purpose.
     with open(cmakelists, "r") as f:
         for line in f:
-            if(re.match("project\(.*\)", line)):
+            if re.match(r"project\(.*\)", line):
                 return True
         return False
-
 
 
 release_misuse_no_east_yml_msg = """
@@ -238,6 +230,7 @@ release_misuse_no_east_yml_msg = """
 
 
 def non_existing_app_msg_fmt(app_name):
+    """Return a message."""
     return (
         f"Incorrect [bold yellow]east.yml[/], app [bold]{app_name}[/] was not"
         " found in app folder, exiting!"
@@ -245,6 +238,7 @@ def non_existing_app_msg_fmt(app_name):
 
 
 def non_existing_sample_msg_fmt(sample_name):
+    """Return a message."""
     return (
         f"Incorrect [bold yellow]east.yml[/], sample [bold]{sample_name}[/] was not"
         " found in samples folder, exiting!"
@@ -277,8 +271,7 @@ def non_existing_sample_msg_fmt(sample_name):
 )
 @click.pass_obj
 def release(east, dry_run, verbose, spdx_app_only):
-    """
-    Create a release folder with release artefacts.
+    """Create a release folder with release artefacts.
 
     \b
     \n\n[bold yellow]east release[/] command runs a release process consisting of a series of [bold yellow]east build[/] commands to build applications and samples listed in the [bold yellow]east.yml[/]. Created build artefacts are then renamed and placed into [bold magenta]release[/] folder in project's root directory.
@@ -293,7 +286,6 @@ def release(east, dry_run, verbose, spdx_app_only):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     east.pre_workspace_command_check()
 
     if not east.east_yml:
@@ -329,9 +321,9 @@ def release(east, dry_run, verbose, spdx_app_only):
 
     # Small adjustment for projects which only have one single app.
     listed_apps = os.listdir("app") if os.path.isdir("app") else []
-    
+
     # Magical heuristic to determine if this is single app repo or not.
-    is_single_app = check_if_single_app_repo(east, apps)
+    is_single_app = check_if_single_app_repo()
 
     # cleaned_apps is here just in case if there is no app key to prevent out of bounds
     # index access when doing apps[0]

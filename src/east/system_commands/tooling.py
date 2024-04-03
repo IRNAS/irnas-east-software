@@ -17,8 +17,7 @@ from ..helper_functions import download_files
 
 
 def _install_toolchain_manager(east: EastContext, exe_path: str):
-    """Installs toolchain manager to a proper location"""
-
+    """Installs toolchain manager to a proper location."""
     nrfutil_dir = os.path.join(east.consts["tooling_dir"], "nrfutil")
 
     shutil.rmtree(nrfutil_dir, ignore_errors=True)
@@ -38,8 +37,7 @@ def _install_toolchain_manager(east: EastContext, exe_path: str):
 
 
 def _get_toolchain_download_link():
-    """Just a convenience function for getting the link for the Nordic's toolchain
-    manager executable.
+    """Return link for the Nordic's toolchain manager executable.
 
     This link will be updated regularly to follow the progress on the Nordic's repo.
 
@@ -52,7 +50,6 @@ def _get_toolchain_download_link():
     build-timestamp: 2023-05-26T13:54:13.429101305Z
     classification: nrf-internal
     """
-
     link = (
         "https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager/"
         "blob/7dda8ba815a0c9df52a22c943a25cb43cd622bcb/resources/"
@@ -66,14 +63,12 @@ def _get_cppcheck_download_link():
     This link will be updated regularly.
 
     """
-
     link = "https://github.com/danmar/cppcheck/archive/refs/tags/2.12.0.tar.gz"
     return link
 
 
 def _install_cppcheck(east: EastContext, exe_path: str):
-    """Installs cppcheck to a proper location"""
-
+    """Install cppcheck to a proper location."""
     cppcheck_dir = os.path.join(east.consts["tooling_dir"], "cppcheck")
 
     # Remove old cppcheck dir if it exists
@@ -96,11 +91,10 @@ def _install_cppcheck(east: EastContext, exe_path: str):
 
 
 def _get_clang_download_link():
-    """Just a convenience function for getting the link for the clang+llvm binaries.
+    """Return link for the clang+llvm binaries.
 
     This link will be updated regularly.
     """
-
     version = "16.0.0"
 
     arch = platform.machine().lower()
@@ -127,8 +121,7 @@ def _get_clang_download_link():
 
 
 def _install_clang_llvm(east: EastContext, exe_path: str):
-    """Installs clang+llvm to a proper location"""
-
+    """Install clang+llvm to a proper location."""
     clang_dir = os.path.join(east.consts["tooling_dir"], "clang+llvm")
 
     # Remove old clang dir if it exists
@@ -148,7 +141,6 @@ def _get_codechecker_download_link():
 
     This link will be updated regularly.
     """
-
     version = "v6.22.2"
 
     link = f"https://github.com/Ericsson/codechecker/archive/refs/tags/{version}.tar.gz"
@@ -157,8 +149,7 @@ def _get_codechecker_download_link():
 
 
 def _install_codechecker(east: EastContext, exe_path: str):
-    """Installs codechecker to a proper location"""
-
+    """Install codechecker to a proper location."""
     codechecker_dir = os.path.join(east.consts["tooling_dir"], "codechecker")
 
     # Remove old cppcheck dir if it exists
@@ -278,6 +269,7 @@ supported_tools = [
 
 
 def tool_installer(east, tool_names):
+    """Install tools that are passed in the tool_names list."""
     tools = [tool for tool in supported_tools if tool["name"] in tool_names]
 
     # Construct a list of files that have to be downloaded.
@@ -316,7 +308,7 @@ def tool_installer(east, tool_names):
     if all([tool["installed"] is True for tool in tools]):
         east.print("\n[green]All required tools are installed.")
 
-    # Download all required files, which are actually programs or installer scripts
+    # Download all required files, which are actually programs or installer scripts.
     download_files(files_to_download, east.consts["cache_dir"])
 
     # Run an installation method for packages that are not installed.
@@ -327,7 +319,6 @@ def tool_installer(east, tool_names):
 
     # WARN: We assume that download_files will never fail. Depending on the urgency we
     # should implement better handling.
-    # Print installed message for packages that were installed
     for tool in tools:
         if not tool["installed"]:
             east.console.rule("", style="")

@@ -2,9 +2,8 @@ import os
 import shutil
 
 from click.testing import CliRunner
-
-import east
 from east.__main__ import cli
+from east.east_context import EastContext
 
 west_config_content = """
 [manifest]
@@ -158,7 +157,7 @@ def create_and_write(path: str, filename: str, content: str = None):
 dummy_config = """
 CONFIG_DEBUG=y
 """
-dummy_cmakelists_txt="""
+dummy_cmakelists_txt = """
 cmake_minimum_required(VERSION 3.20.0)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
@@ -167,9 +166,9 @@ project(test_project)
 target_sources(app PRIVATE src/main.c)
 """
 
+
 def _create_good_west_workspace(west_top_dir):
-    """
-    Main function, which will create correct west workspace. All other 'bad'
+    """Main function, which will create correct west workspace. All other 'bad'
     functions will just delete from it.
     """
     folders = [
@@ -242,7 +241,7 @@ def create_good_west(west_top_dir):
 
 
 def create_good_west_multi_app(west_top_dir):
-    """Creates a correct west workspace in west_top_dir, with multi app east yaml
+    """Creates a correct west workspace in west_top_dir, with multi app east yaml.
 
     Args:
         west_top_dir (str): Path to west top dir.
@@ -262,7 +261,7 @@ def create_good_west_multi_app(west_top_dir):
 
 
 def west_no_nrf_sdk_in_yaml(west_top_dir):
-    """Creates a west workspace without nrf-sdk in west.yaml
+    """Creates a west workspace without nrf-sdk in west.yaml.
 
     Args:
         west_top_dir (): Path to west top dir.
@@ -275,10 +274,6 @@ def assert_strings_equal(string1: str, string2: str):
     """Helper that should be used when comparing strings that come from east's stdout
     and east's internal hardcoded strings.
 
-    Args:
-        string1 (str):
-        string2 (str):
-
     Returns:
         Asserts if strings are different
     """
@@ -286,7 +281,8 @@ def assert_strings_equal(string1: str, string2: str):
     def clear_rich(string):
         """Output from runner.invoke and hard-coded messages can contain different
         number of newlines, and indent characters, this is preventing comparisons in
-        asserts."""
+        asserts.
+        """
         return string.replace("\n", "").replace("\t", 8 * " ")
 
     assert clear_rich(string1) == clear_rich(string2)
@@ -301,8 +297,7 @@ def helper_test_against_west_run(
     expected_west_cmds=None,
     should_succed=True,
 ):
-    """
-    Helper function for making tests easier to read.
+    """Helper function for making tests easier to read.
 
     Args:
         monkeypatch ():         fixture
@@ -341,10 +336,9 @@ def helper_test_against_west_run(
     # code
     result = runner.invoke(cli, east_cmd.strip().split(" "), catch_exceptions=False)
 
-    run_west = east.east_context.EastContext.run_west
+    run_west = EastContext.run_west
 
     if expected_west_cmds:
-
         # This conversion is needed due to assert_has_calls interface
         calls = [
             mocker.call(cmd, exit_on_error=False, silent=True, return_output=True)
@@ -355,7 +349,6 @@ def helper_test_against_west_run(
     elif expected_west_cmd:
         run_west.assert_called_once_with(expected_west_cmd)
     else:
-
         run_west.assert_not_called()
 
     expected_return_code = 0 if should_succed else 1
@@ -364,7 +357,7 @@ def helper_test_against_west_run(
     return result
 
 
-def helper_test_against_west_run1(
+def helper_test_against_west_dbg(
     monkeypatch,
     mocker,
     path,
@@ -373,8 +366,8 @@ def helper_test_against_west_run1(
     expected_west_cmds=None,
     should_succed=True,
 ):
-    """
-    Helper function for tests easier to debug.
+    """Helper function for tests easier to debug.
+
     Running this instead of the real helper will just make sure that the correct command
     runs, but it will not execute any east.run_west() calls.
 
@@ -384,6 +377,7 @@ def helper_test_against_west_run1(
         path ():                To which path should we change
         east_cmd ():            which east command should be called
         expected_west_cmd ():   Not used
+        expected_west_cmds ():  Not used
         should_succed ():       Not used
     """
     _ = expected_west_cmd

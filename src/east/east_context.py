@@ -63,7 +63,6 @@ class EastContext:
             echo (bool): If True `.run` prints the command string to local stdout prior
             to executing it. Default: ``False``.
         """
-
         # This init will be called on true command invocation, --help flag or similar
         # do not count.
         self.cwd = os.getcwd()
@@ -139,7 +138,6 @@ class EastContext:
         passed to the Markdown object or to the internal self.print function which uses
         Console object.
         """
-
         markdown_kwargs = {}
         print_kwargs = {}
 
@@ -154,7 +152,7 @@ class EastContext:
         self.print(Markdown(*objects, **markdown_kwargs), **print_kwargs)
 
     def exit(self, return_code: int = 1):
-        """Exit program with given return_code"""
+        """Exit program with given return_code."""
         sys.exit(return_code)
 
     def run(
@@ -165,9 +163,9 @@ class EastContext:
         silent: bool = False,
         ignore_sigint: bool = False,
     ) -> dict:
-        """
-        Executes given command in shell as a process. This is a blocking call, process
-        needs to finish before this command can return;
+        """Executes given command in shell as a process.
+
+        This is a blocking call, process needs to finish before this command can return;
 
         Args:
             command (str):  Command to execute.
@@ -191,7 +189,6 @@ class EastContext:
                                     return_output is True, otherwise empty string.
                 returncode(int):    Return code of the process that run
         """
-
         if self.echo:
             self.print_info(command)
 
@@ -204,7 +201,6 @@ class EastContext:
                 """Helper function that correctly executes the process and returns
                 output.
                 """
-
                 popen = subprocess.Popen(
                     cmd,
                     shell=True,
@@ -271,7 +267,6 @@ class EastContext:
         Returns:
             Check .run
         """
-
         cmd = f"west {west_command}"
 
         if self.use_toolchain_manager:
@@ -282,7 +277,6 @@ class EastContext:
 
     def enter_manager_shell(self):
         """Enters Nordic's Toolchain Manager shell using detected NCS version."""
-
         cmd = (
             f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
             f" {self.detected_ncs_version} --shell"
@@ -297,8 +291,8 @@ class EastContext:
         For that run_cmd_in_manager should be used.
 
         Args:
-            manager_command (str):      Manager command to execute
-            kwargs:                     Anything that is supported by .run method
+            command (str):      Command to execute.
+            kwargs:             Anything that is supported by .run method.
 
         Returns:
             Check .run
@@ -307,10 +301,8 @@ class EastContext:
 
         return self.run(cmd, **kwargs)
 
-    def run_cmd_in_manager(
-        self, arbitrary_command: str, exit_on_error: bool = True, **kwargs
-    ):
-        """Run an arbitrary command through Nordic's Toolchain Manager
+    def run_cmd_in_manager(self, command: str, exit_on_error: bool = True, **kwargs):
+        """Run an arbitrary command through Nordic's Toolchain Manager.
 
         This method should be used when passing any arbitrary command, like west command.
 
@@ -319,7 +311,7 @@ class EastContext:
         does not do this for some commands (if west build fails then return code is not
         propagated, but issuing non-existing command does propagate up).
 
-        What we do is that we run as a total arbitrary command following:
+        What we do is that we run the arbitrary command the following way:
 
             bash -c '{arbitrary_command} && touch success.txt'
 
@@ -331,18 +323,19 @@ class EastContext:
         We also need to be careful what quotes we are using.
 
         Args:
-            arbitrary_command (str):
-            **kwargs:
+            command (str):          Command to execute.
+            exit_on_error (bool):   If true the program is exited if the return code of
+                                    the ran command is not 0.
+            **kwargs:               Anything that is supported by .run method.
 
         Returns:
             Check .run
         """
-
-        arbitrary_command = arbitrary_command.replace("'", '"')
+        command = command.replace("'", '"')
 
         cmd = (
             f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
-            f" {self.detected_ncs_version} -- bash -c '{arbitrary_command} "
+            f" {self.detected_ncs_version} -- bash -c '{command} "
             "&& touch success.txt'"
         )
 
@@ -372,8 +365,7 @@ class EastContext:
         return result
 
     def check_exe(self, exe: str, on_fail_exit: bool = False) -> bool:
-        """
-        Checks if the given executable can be found by the which command.
+        """Checks if the given executable can be found by the which command.
 
         If on_fail_exit is true it exits the program.
 
@@ -392,12 +384,10 @@ class EastContext:
         return True
 
     def check_version(self, exe, expected_version, version_cmd="--version"):
-        """
-        Checks for version of provided exe program and compares it against
+        """Checks for version of provided exe program and compares it against
         provided one.
 
         """
-
         # WARN: Check version is not yet used anywhere, behaviour yet needs to be
         # verified
         response = self.run(f"{exe} {version_cmd}", silent=True, return_output=True)
@@ -410,8 +400,7 @@ class EastContext:
         ignore_unsupported_ncs: bool = True,
         check_only_west_workspace: bool = False,
     ):
-        """
-        This function contains a list of checks that every workspace (not system)
+        """This function contains a list of checks that every workspace (not system)
         command should call before executing its actual command.
 
         In current implementation it does general things:
@@ -508,7 +497,6 @@ class EastContext:
 
         If there is print a message to the user.
         """
-
         # Check if the file exists
         check_file = os.path.join(self.consts["cache_dir"], "last_version_check")
         if not os.path.isfile(check_file):

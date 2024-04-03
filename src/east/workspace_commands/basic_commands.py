@@ -4,7 +4,7 @@ import os
 import shutil as sh
 
 import click
-from rich_click import RichCommand
+from rich_click.rich_command import RichCommand
 
 from ..east_context import east_command_settings
 from ..helper_functions import clean_up_extra_args
@@ -26,12 +26,14 @@ def clean(east):
 
 
 class SpecialCommand(RichCommand):
+    """Special command that allows to access the raw args."""
     def parse_args(self, ctx, args):
+        """Parse the args and store a copy of them in the context."""
         # Before parsing the args, make a copy of them so they can be used later.
         # This is needed because "--" is silently removed from the args by the click,
         # but it is needed to determine the source dir.
         ctx.raw_args = copy.deepcopy(args)
-        super(SpecialCommand, self).parse_args(ctx, args)
+        return super(SpecialCommand, self).parse_args(ctx, args)
 
 
 @click.command(
@@ -66,8 +68,7 @@ class SpecialCommand(RichCommand):
 @click.pass_obj
 @click.pass_context
 def build(ctx, east, build_type, spdx, extra_help, args):
-    """
-    Build firmware in the current directory.
+    """Build firmware in the current directory.
 
     \b
     \n\nInternally runs [magenta bold]west build[/] command, all given arguments are passed directly to it. To learn more about possible [magenta bold]west build[/] arguments and options use --extra-help flag.
@@ -122,7 +123,6 @@ def create_build_command_from_commandline(east, raw_args, build_type):
     - build_cmd: a string with the build command, intended to be given to run_west()
     - opts: an object with parsed arguments
     """
-
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("-b", "--board")
     parser.add_argument("-d", "--build-dir")
@@ -181,7 +181,6 @@ def create_build_command(
     Returns:
         build_cmd: a string with the build command, intended to be given to run_west()
     """
-
     build_type_args, diagnostic = construct_extra_cmake_arguments(
         east,
         build_type,
@@ -229,8 +228,7 @@ def create_build_command(
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED, metavar="")
 def flash(east, extra_help, args):
-    """
-    Flash binary to the board's flash.
+    """Flash binary to the board's flash.
 
     \b
     \n\nInternally runs [magenta bold]west flash[/] command, all given arguments are passed directly to it.
@@ -240,7 +238,6 @@ def flash(east, extra_help, args):
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
-
     east.pre_workspace_command_check()
 
     cmd = "flash "
@@ -271,8 +268,7 @@ def flash(east, extra_help, args):
 @click.argument("args", nargs=-1, type=str, metavar="-- [args]")
 @click.pass_obj
 def bypass(east, shell, args):
-    """
-    Bypass any set of commands directly to the [magenta bold]Nordic's nRF Toolchain Manager[/].
+    """Bypass any set of commands directly to the [magenta bold]Nordic's nRF Toolchain Manager[/].
 
     \b
     \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to

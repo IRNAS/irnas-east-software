@@ -75,8 +75,7 @@ rich_click.rich_click.COMMAND_GROUPS = {
 )
 @click.pass_context
 def cli(ctx, echo):
-    """
-    [bold]East[/] is a command line meta-tool, useful for creating, managing and
+    """[bold]East[/] is a command line meta-tool, useful for creating, managing and
     deploying [bold cyan]nRF Connect SDK[/] projects.
 
     \b
@@ -91,7 +90,6 @@ def cli(ctx, echo):
 
     - [bold]System:[/] Can be run from anywhere.
     """
-
     # EastContext object is passed to other subcommands due to the @click.pass_context
     # decorator. Additionally, the subcommands need to be decorated with @click.pass_obj
     # so they directly access the EastContext object.
@@ -115,6 +113,7 @@ cli.add_command(codechecker)
 
 
 def main():
+    """Main entry point for the CLI."""
     cli()
 
 

@@ -1,7 +1,6 @@
 import os
 import pathlib
 import re
-import sys
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
 from typing import Dict, List, Optional, Tuple, Union
@@ -55,6 +54,7 @@ class WestYmlNotFound(RuntimeError):
 
 
 def download_file(task_id: TaskID, url: str, path: str):
+    """Download a file from the internet to the given path."""
     file_size = requests.head(url, allow_redirects=True).headers.get(
         "content-length", -1
     )
@@ -81,12 +81,12 @@ def download_files(files_to_download: List[Dict], dest_dir: str) -> List[str]:
     downloaded files in the same order as they were given.
 
     Args:
-        files_to_download (List[Dict]): Files to download.
+        files_to_download (List[Dict]):     Files to download.
+        dest_dir (List[Dict]):              Directory where to download the files.
 
     Return:
         files (List[str]):      List of paths to the downloaded files.
     """
-
     file_paths = []
 
     with progress:
@@ -107,8 +107,7 @@ def download_files(files_to_download: List[Dict], dest_dir: str) -> List[str]:
 
 
 def west_topdir(start: Optional[PathType] = None) -> str:
-    """
-    Returns the path to the parent directory of the .west/
+    """Returns the path to the parent directory of the .west/
     directory instead, where project repositories are stored.
 
     Args:
@@ -134,8 +133,7 @@ def west_topdir(start: Optional[PathType] = None) -> str:
 
 
 def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
-    """
-    Returns version of nrf-sdk project and absolute path to the projects directory.
+    """Returns version of nrf-sdk project and absolute path to the projects directory.
 
     This is combined, so we avoid reading .west/config file twice.
 
@@ -146,10 +144,9 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     Returns:
         Revision string of nrf-sdk project, absolute
 
-    Raises
+    Raises:
         WestConfigNotFound or WestYamlNotFound
     """
-
     config = ConfigParser()
     config_path = os.path.join(west_dir_path, ".west", "config")
 
@@ -185,8 +182,7 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
 
 
 def return_dict_on_match(array_of_dicts, key, value):
-    """
-    Search through array of dicts and return the first one where the given key matches
+    """Search through array of dicts and return the first one where the given key matches
     the given value.
     If none are found return None.
     """
@@ -209,6 +205,7 @@ This command can only be run [bold]inside[/] of a [bold yellow]West workspace[/]
 
 
 def no_toolchain_msg(east):
+    """Return message that informs user that toolchain is not installed."""
     return (
         f"Current [bold cyan]NCS[/] [bold]{east.detected_ncs_version}[/] version is "
         "supported but toolchain is [bold red]not installed![/]"
@@ -218,6 +215,7 @@ def no_toolchain_msg(east):
 
 
 def ncs_version_not_supported_msg(east, supported_versions):
+    """Return message that informs user that detected NCS version is not supported."""
     vers = "\n".join(
         [f"[bold yellow]•[/] {ver}" for ver in supported_versions.strip().split("\n")]
     )
@@ -233,7 +231,7 @@ def ncs_version_not_supported_msg(east, supported_versions):
 
 
 def find_all_boards(east, west_board: str) -> List[str]:
-    """Find all west board names by searching the boards directory
+    """Find all west board names by searching the boards directory.
 
     Search for directory that contains *_defconfig file with given west_board name,
     (this is the same process that west uses to determine the boards).
@@ -282,8 +280,7 @@ def find_all_boards(east, west_board: str) -> List[str]:
 
 
 def clean_up_extra_args(args):
-    """
-    Clean up extra args, by adding back double quotes to the define assignments.
+    """Clean up extra args, by adding back double quotes to the define assignments.
 
     Click argument automatically strips double quotes from anything that is given
     after "--". We can not know for sure from where double quotes were removed,
@@ -320,8 +317,7 @@ def clean_up_extra_args(args):
 
 
 def create_artefact_name(project, board, version, build_type):
-    """
-    Create an artefact name.
+    """Create an artefact name.
 
     Board might be in form <west_board>@<hv_version>, in that case we modify it to fit
     the artefact name.
@@ -340,9 +336,9 @@ def create_artefact_name(project, board, version, build_type):
 
 
 def get_git_version(east):
-    """
-    Return output from git describe command, see help string of release function for
-    more information.
+    """Return structured output from git describe command.
+
+    Note: See help string of release function for more information.
 
     Note to myself: If you use this function in some other place, make sure that you
     patch it in the test files, otherwise pytest thinks that is the mocked call that it
@@ -356,20 +352,22 @@ def get_git_version(east):
 
     if len(output) == 1:
         # No git tag, only hash was produced
-        version = {"tag": "v0.0.0", "hash": output[0]}
-    elif len(output) >= 3:
+        return {"tag": "v0.0.0", "hash": output[0]}
+
+    if len(output) >= 3:
         # Some tags have '-' in them, like the ncs ones (eg. v3.3.99-ncs1)
-        tag = "-".join(output[:-2])
+        version = {"tag": "-".join(output[:-2])}
+
         if output[-2] == "0" and not output[-1].endswith("+"):
             # Clean version commit, no hash needed
-            version = {"tag": tag, "hash": ""}
+            version["hash"] = ""
         else:
             # Not on commit or dirty, both version and hash are needed
-            version = {"tag": tag, "hash": output[-1][1:]}
-    else:
-        east.print(
-            f"Unsupported git describe output ({result['output']}), contact developer!"
-        )
-        east.exit()
+            version["hash"] = output[-1][1:]
 
-    return version
+        return version
+
+    east.print(
+        f"Unsupported git describe output ({result['output']}), contact developer!"
+    )
+    east.exit()

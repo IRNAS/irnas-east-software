@@ -2,19 +2,16 @@ import os
 
 import pytest
 from click.testing import CliRunner
-
 from east.__main__ import cli
 
 from . import helpers
-from .helpers import helper_test_against_west_run, helper_test_against_west_run1
+from .helpers import helper_test_against_west_run
 
 
 def test_build_type_with_no_east_yml(west_workplace_parametrized, monkeypatch):
-    """
-    --build-type option can not be used if east.yml is not found in the project root.
+    """--build-type option can not be used if east.yml is not found in the project root.
     East needs to exit with error and message.
     """
-
     os.remove("east.yml")
 
     monkeypatch.chdir(west_workplace_parametrized["app"])
@@ -31,13 +28,11 @@ def test_build_type_with_no_east_yml(west_workplace_parametrized, monkeypatch):
 # we are assuming that user might be trying to run build on tests or zephyr's samples or
 # something else
 def test_build_type_outside_project_dir(west_workplace, monkeypatch):
-    """
-    No --build-type should be given if east is called:
+    """No --build-type should be given if east is called:
     - inside of project dir, but not in app
     - outside of project dir
     East needs to exit with error and message.
     """
-
     project_path = west_workplace
     runner = CliRunner()
 
@@ -76,8 +71,7 @@ def test_build_type_outside_project_dir(west_workplace, monkeypatch):
 def test_build_type_single_app_behaviour(
     west_workplace, monkeypatch, mocker, build_type_flag, cmake_arg
 ):
-    """
-    build command needs to parse the --build-type flag into appopriate command line
+    """Build command needs to parse the --build-type flag into appopriate command line
     arguments.
 
     This test case is for a single app behaviour.
@@ -136,8 +130,7 @@ def test_build_type_single_app_behaviour(
 def test_build_type_multi_app_behaviour(
     west_workplace_multi_app, monkeypatch, mocker, multiapp, build_type_flag, cmake_arg
 ):
-    """
-    build command needs to parse the --build-type flag into appopriate command line
+    """Build command needs to parse the --build-type flag into appopriate command line
     arguments.
 
     This test case is for a multi app behaviour.
@@ -154,8 +147,7 @@ def test_build_type_multi_app_behaviour(
 
 
 def create_last_build_type_file(app_path, build_type, build_dir="build"):
-    """create last_build_type_file file inside build folder."""
-
+    """Create last_build_type_file file inside build folder."""
     build_type_str = build_type.split(" ")[-1]
     if build_type_str == "":
         build_type_str = "release"
@@ -176,8 +168,7 @@ def create_last_build_type_file(app_path, build_type, build_dir="build"):
 def test_build_type_build_folder_behaviour_same_flags(
     west_workplace_parametrized, monkeypatch, mocker, build_type_flag
 ):
-    """
-    If the build folder with same conf files with that --build-type expects exits then
+    """If the build folder with same conf files with that --build-type expects exits then
     no cmake args are added to the build command to avoid cmake rebuilds.
     """
     app_path = west_workplace_parametrized["app"]
@@ -208,8 +199,7 @@ def test_build_type_build_folder_behaviour_same_flags(
 def test_build_type_build_folder_behaviour_different_flags(
     west_workplace_parametrized, monkeypatch, mocker, build_type_flag, overlay_configs
 ):
-    """
-    If the build folder exists but it has build flags that are not expected by the east
+    """If the build folder exists but it has build flags that are not expected by the east
     then rebuild is triggered.
     """
     app_path = west_workplace_parametrized["app"]
@@ -230,9 +220,7 @@ def test_build_type_build_folder_behaviour_different_flags(
 
 
 def test_build_type_non_existant_type(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    If given --build-type does not exists then east needs to exit and throw message.
-    """
+    """If given --build-type does not exists then east needs to exit and throw message."""
     app_path = west_workplace_parametrized["app"]
 
     helper_test_against_west_run(
@@ -247,9 +235,7 @@ def test_build_type_non_existant_type(west_workplace_parametrized, monkeypatch, 
 def test_build_type_samples_with_build_type_option(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    Running east build with --build-type inside samples should fail.
-    """
+    """Running east build with --build-type inside samples should fail."""
     project_path = west_workplace_parametrized["project"]
     sample_path = os.path.join(project_path, "samples", "settings")
 
@@ -263,10 +249,7 @@ def test_build_type_samples_with_build_type_option(
 
 
 def test_build_type_samples_inherit(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    Test inherit key normal use.
-    """
-
+    """Test inherit key normal use."""
     project_path = west_workplace_parametrized["project"]
 
     def west_cmd_fmt(prefix):
@@ -289,8 +272,7 @@ def test_build_type_samples_inherit(west_workplace_parametrized, monkeypatch, mo
 def test_build_type_samples_inherit_build_folder_same_flag(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    In case where sample (with an inherit keword) has a existing build folder from
+    """In case where sample (with an inherit keword) has a existing build folder from
     before, no extra cmake args should be emmited.
     """
     project_path = west_workplace_parametrized["project"]
@@ -312,10 +294,7 @@ def test_build_type_samples_inherit_build_folder_same_flag(
 def test_build_type_samples_no_inherit(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    In case where there is no inherit we default to basic west behavior: no cmake args.
-    """
-
+    """In case where there is no inherit we default to basic west behavior: no cmake args."""
     project_path = west_workplace_parametrized["project"]
     sample_path = os.path.join(project_path, "samples", "dfu")
 
@@ -332,8 +311,7 @@ def test_build_type_samples_no_inherit(
 def test_build_type_samples_does_not_exist(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    In case where sample does not exist in east.yml we default to basic west behaviour:
+    """In case where sample does not exist in east.yml we default to basic west behaviour:
     no cmake args.
 
     """
@@ -375,11 +353,7 @@ samples:
 
 
 def test_non_existing_inherited_app(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    In case where sample is inheriting from a non-existing app we exit.
-
-    """
-
+    """In case where sample is inheriting from a non-existing app we exit."""
     project_path = west_workplace_parametrized["project"]
 
     helpers.create_and_write(
@@ -453,11 +427,9 @@ samples:
 def test_inheriting_from_release_build_type(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    It should be possible for a sample to inherit from a "release" build type. In that
+    """It should be possible for a sample to inherit from a "release" build type. In that
     case only common.conf should be added to the build.
     """
-
     project_path = west_workplace_parametrized["project"]
 
     def west_cmd_fmt(prefix):
@@ -603,10 +575,7 @@ samples:
 def test_duplicated_names_in_east_yml(
     west_workplace_multi_app, monkeypatch, mocker, east_yml
 ):
-    """
-    In case where east.yml has duplicated app names exit and throw error.
-    """
-
+    """In case where east.yml has duplicated app names exit and throw error."""
     helpers.create_and_write(
         west_workplace_multi_app,
         "east.yml",
@@ -681,8 +650,7 @@ def test_searching_for_west_board_specific_confs(
     east_cmd,
     expected_west_cmd,
 ):
-    """
-    In case where we are building for a specific board, build command needs to check in
+    """In case where we are building for a specific board, build command needs to check in
     the conf folder if a file with name west_board.conf exists, if yes then it needs to
     add it.
     In sample folders with inherit key it needs to do the same thing.
@@ -703,8 +671,8 @@ def test_different_build_dir_path_empty_dir(
     west_workplace_parametrized, monkeypatch, mocker
 ):
     """With different build dir path, but no build folder the expected west command
-    should just include the -d option and common.conf"""
-
+    should just include the -d option and common.conf.
+    """
     project_path = west_workplace_parametrized["app"]
 
     build_dir = "../different_build_dir"
@@ -727,7 +695,6 @@ def test_different_build_dir_path_full_dir_same_build_type(
     files as current ones the west command should just include -d option,
     and nothing else.
     """
-
     project_path = west_workplace_parametrized["app"]
 
     build_dir = "../different_build_dir"
@@ -752,7 +719,6 @@ def test_different_build_dir_path_full_dir_different_build_type(
     type files as current ones the west command should include -d option and current
     conf files.
     """
-
     project_path = west_workplace_parametrized["app"]
 
     build_dir = "../different_build_dir"
@@ -837,9 +803,7 @@ def test_using_different_source_dirs(
     east_cmd,
     expected_west_cmd,
 ):
-    """
-    Using a different source dir must not affect the extra args after `--`.
-    """
+    """Using a different source dir must not affect the extra args after `--`."""
     project_path = west_workplace_multi_app
 
     helper_test_against_west_run(
@@ -855,10 +819,7 @@ def test_using_different_source_dirs(
 def test_sample_with_inherit_and_with_source_dir(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    Test if sample with inherit key and source_dir works
-    """
-
+    """Test if sample with inherit key and source_dir works."""
     project_path = west_workplace_parametrized["project"]
 
     def west_cmd_fmt(prefix):
@@ -880,10 +841,7 @@ def test_sample_with_inherit_and_with_source_dir(
 def test_sample_with_inherit_and_with_source_dir_and_board(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    Test if sample with inherit key and source_dir works, when there is board involved.
-    """
-
+    """Test if sample with inherit key and source_dir works, when there is board involved."""
     project_path = west_workplace_parametrized["project"]
 
     def west_cmd_fmt(prefix):
@@ -915,12 +873,10 @@ samples:
 def test_no_apps_key_in_east_yml_build_type(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    Apps key is optional.
+    """Apps key is optional.
     Running east build with no apps key in east.yml should fail if --build-type is
     given.
     """
-
     helpers.create_and_write(
         west_workplace_parametrized["project"],
         "east.yml",
@@ -937,12 +893,10 @@ def test_no_apps_key_in_east_yml_build_type(
 
 
 def test_no_apps_key_in_east_yml_app(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    Apps key is optional.
+    """Apps key is optional.
     Running east build with no apps key in east.yml and building for app should not emit
     any extra cmake args.
     """
-
     helpers.create_and_write(
         west_workplace_parametrized["project"],
         "east.yml",
@@ -961,12 +915,10 @@ def test_no_apps_key_in_east_yml_app(west_workplace_parametrized, monkeypatch, m
 def test_no_apps_key_in_east_yml_sample(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    Apps key is optional.
+    """Apps key is optional.
     Running east build with no apps key in east.yml should not emit any extra cmake
     args.
     """
-
     helpers.create_and_write(
         west_workplace_parametrized["project"],
         "east.yml",
@@ -998,12 +950,10 @@ apps:
 
 
 def test_no_samples_key_in_east_yml(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    Samples key is optional.
+    """Samples key is optional.
     Running east build with no samples key in east.yml in samples should not emit any
     extra args.
     """
-
     helpers.create_and_write(
         west_workplace_parametrized["project"],
         "east.yml",
@@ -1026,10 +976,7 @@ apps:
 
 
 def test_empty_apps_key(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    Empty apps key is not allowed.
-    """
-
+    """Empty apps key is not allowed."""
     helpers.create_and_write(
         west_workplace_parametrized["project"],
         "east.yml",
@@ -1055,10 +1002,7 @@ def test_empty_apps_key(west_workplace_parametrized, monkeypatch, mocker):
 def test_building_outside_of_app_and_samples(
     west_workplace_parametrized, build_path, monkeypatch, mocker
 ):
-    """
-    Empty apps key is not allowed, and samples can not inherit from it.
-    """
-
+    """Empty apps key is not allowed, and samples can not inherit from it."""
     helper_test_against_west_run(
         monkeypatch,
         mocker,
@@ -1072,11 +1016,9 @@ def test_building_outside_of_app_and_samples(
 def test_building_app_that_is_not_in_east_yaml(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """
-    East shouldn't add extra flags to the west build call when building an app that
+    """East shouldn't add extra flags to the west build call when building an app that
     isn't in the east.yaml.
     """
-
     unlisted_app = os.path.join(
         west_workplace_parametrized["project"], "app/test_three"
     )
@@ -1102,10 +1044,7 @@ def test_building_app_that_is_not_in_east_yaml(
 
 
 def test_empty_east_yml_is_valid(west_workplace_parametrized, monkeypatch, mocker):
-    """
-    Apps and sample keys are both optional in east.yaml, so empty east.yml is valid.
-    """
-
+    """Apps and sample keys are both optional in east.yaml, so empty east.yml is valid."""
     # Create empty east.yml
     open(os.path.join(west_workplace_parametrized["project"], "east.yml"), "w").close()
 

@@ -10,7 +10,6 @@ from ..helper_functions import get_git_version
 
 def check_for_codechecker(east):
     """Check if codechecker is installed and available in the path."""
-
     if not east.check_exe(east.consts["codechecker_path"]):
         msg = (
             "\n[bold magenta]Codechecker[/] is [bold red]not installed[/] on this "
@@ -24,7 +23,6 @@ def check_for_codechecker(east):
 
 def check_for_build_folder(east, build_dir):
     """Check that build dir exists."""
-
     if not os.path.isdir(build_dir):
         east.print(
             f"\nBuild folder [magenta bold italic]{build_dir}[/] was [bold red]not found[/].\n\n"
@@ -35,7 +33,6 @@ def check_for_build_folder(east, build_dir):
 
 def check_for_compile_commands_json(east, compile_commands):
     """Check that compile_commands.json exists in the build dir."""
-
     if not os.path.exists(compile_commands):
         east.print(
             f"\nFile [cyan bold]{compile_commands}[/] was [bold red]not found[/].\n"
@@ -50,7 +47,12 @@ def cleanup_compile_commands_json(compile_commands):
 
     Otherwise clangsa fails to analyze the files.
     """
-    args = ["-fno-reorder-functions", "-fno-freestanding", "-mfp16-format=ieee","-fno-printf-return-value"]
+    args = [
+        "-fno-reorder-functions",
+        "-fno-freestanding",
+        "-mfp16-format=ieee",
+        "-fno-printf-return-value",
+    ]
 
     # Create matching regex for all arguments
     args_regex = "|".join([f"({arg})" for arg in args])
@@ -67,7 +69,6 @@ def cleanup_compile_commands_json(compile_commands):
 
 def check_for_codechecker_config_yaml(east, cfg):
     """Check that codechecker_config.yaml exists in the project's root dir."""
-
     if not os.path.exists(cfg):
         east.print(
             "\nFile [cyan bold]codechecker_config.yaml[/] was [bold red]not found[/] in project's git root dir.\n"
@@ -84,7 +85,6 @@ def detect_problematic_zephyr_macros(diag):
     Macros are always connected to a specific description.
     Different problematic macros can have the same description.
     """
-
     bad_diagnostics = [
         {
             "description": "ineffective bitwise and operation",
@@ -125,7 +125,6 @@ def var_never_read_before_disabled_macro_found(files, diag):
     and not being read, but this variable is later passed into some kind of a disabled
     macro, such as __ASSERT* or LOG_* macro.
     """
-
     # Determine first if the description of the diagnostic is as expected for this case
     desc_regexes = [
         "Value stored to '(.*)' during its initialization is never read",
@@ -173,7 +172,6 @@ def sizeof_on_pointer_type_found(files, diag):
     """Returns true if clang-tidy diagnostic is about sizeof() being called on a
     pointer, inside a LOG_*, EVENT_LOG* or APP_EVENT_MANAGER_LOG macro.
     """
-
     # Determine first if the description of the diagnostic is as expected for this case
     desc = "The code calls sizeof() on a pointer type. This can produce an unexpected result"
 
@@ -200,7 +198,6 @@ def sizeof_on_pointer_type_found(files, diag):
 
 def cleanup_plist_files(east, output):
     """Cleanup generated plist files by removing diagnostics that are not useful."""
-
     # Conveniance variable, as the listeral is quite long
     hash = "issue_hash_content_of_line_in_context"
 
@@ -243,7 +240,6 @@ def create_skip_file(east, build_dir, output):
     We are skipping build folder because it contains generated .c files that are not in
     other folders.
     """
-
     skip_file = os.path.join(output, "skip_file.txt")
 
     os.makedirs(output, exist_ok=True)
@@ -270,7 +266,6 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
     The intention is that east codechecker store reads the file and uses it for
     creating the metadata of the run when storing to the server.
     """
-
     # Create a file in the build folder that contains the name of the artefact
     name = os.path.basename(source_dir if source_dir else east.cwd)
     build_dir = os.path.join(east.cwd, build_dir if build_dir else "build")
@@ -293,10 +288,10 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
         json.dump(data, f)
 
 
-def get_metadata_from_codecheckerfile(east, build_dir):
+def get_metadata_from_codecheckerfile(build_dir):
     """Read the codecheckerfile.json file and construct the name and the tag, intended
-    to be used by codechecker store command."""
-
+    to be used by codechecker store command.
+    """
     filename = os.path.join(build_dir, "codecheckerfile.json")
     with open(filename, "r") as f:
         data = json.load(f)
@@ -315,6 +310,7 @@ def get_metadata_from_codecheckerfile(east, build_dir):
 
 
 def get_endpoint(east):
+    """Get the endpoint from the project's git remote origin."""
     cmd = "git config --get remote.origin.url"
     result = east.run(cmd, return_output=True, silent=True)
     return result["output"].split("/")[-1].split(".")[0].strip()
