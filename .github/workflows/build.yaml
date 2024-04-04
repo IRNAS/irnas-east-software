@@ -19,24 +19,24 @@ jobs:
     steps:
       - name: Checkout last PR commit
         if: github.event_name == 'pull_request'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout last tag
         if: github.event_name == 'workflow_dispatch'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.checkout_ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.8"
           cache: "pip"
 
       - name: Install dependencies
-        run: make install-dev
+        run: make install
 
       - name: Run tests
         run: make test
@@ -46,7 +46,7 @@ jobs:
 
       - name: Package artefacts
         if: github.event_name == 'workflow_dispatch'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/*

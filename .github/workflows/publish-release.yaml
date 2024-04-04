@@ -26,7 +26,7 @@ jobs:
           echo "release_version_cut=$version_cut" >> $GITHUB_ENV
 
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ env.release_version }}
 
@@ -37,7 +37,7 @@ jobs:
           version: ${{ env.release_version_cut }}
 
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
