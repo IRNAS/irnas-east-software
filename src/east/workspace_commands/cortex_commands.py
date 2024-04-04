@@ -1,5 +1,6 @@
 import json
 import os
+import copy
 
 import click
 import rich.prompt
@@ -107,7 +108,7 @@ def cortex_debug(east, build_dir, rtt_config, device, gdb_path, elf_file, svd_fi
         attach["svdFile"] = svd_file
 
     # Debug JSON object is mostly the same.
-    debug = attach
+    debug = copy.deepcopy(attach)
     debug["name"] = "Debug"
     debug["request"] = "launch"
 
