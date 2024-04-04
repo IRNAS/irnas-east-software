@@ -35,20 +35,20 @@ clean_print_args = {
     "-h",
     "--html",
     is_flag=True,
-    help="Instead of printing the results in the terminal, generate a html report. "
+    help="Generate a html report, instead of printing the results in the terminal."
     "Default: false.",
 )
 @click.option(
     "-p",
     "--dont-cleanup-plist",
     is_flag=True,
-    help="Skips plist cleanup step. Default: false.",
+    help="Skip plist cleanup step. Default: false.",
 )
 @click.option(
     "-s",
     "--skip-file",
     type=str,
-    help="Instead of generating a skip file, provide your own.",
+    help="Set skip file instead of generating one.",
 )
 @click.option(
     "-file",
@@ -167,7 +167,6 @@ def fixit(east, apply, build_dir):
     \n\nSome analyzers may suggest some automatic bugfixes. Most of the times these are style issues which can be fixed easily. This command handles the listing and application of these automatic fixes.
 
     \n\n[bold]Note:[/] This command should be ran after the [bold cyan]east codechecker check[/] command.
-
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check(check_only_west_workspace=True)
@@ -229,7 +228,6 @@ def store(east, url, build_dir):
 
     \b
     \n\n[bold]Note:[/] This command should be ran after the [bold cyan]east codechecker check[/] command.
-
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check(check_only_west_workspace=True)

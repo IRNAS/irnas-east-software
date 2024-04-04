@@ -5,7 +5,7 @@ from ..helper_functions import get_device_in_runner_yaml
 
 
 def no_jlink_tool_msg(tool):
-    """Returns a message that a required JLink tool was not found."""
+    """Return a message that a required JLink tool was not found."""
     return (
         f"The required program [bold cyan]{tool}[/] was [bold red]not found,[/]"
         " exiting!"
@@ -18,7 +18,7 @@ def no_jlink_tool_msg(tool):
     "--device",
     type=str,
     help=(
-        "Sets the target device, required by JLinkExe, i.e. [bold]NRF52840_xxAA[/]. "
+        "Set the target device, required by JLinkExe, i.e. [bold]NRF52840_xxAA[/]. "
         "If not given, east tries to infer the device by looking into Zephyr's build folder."
     ),
 )
@@ -35,7 +35,7 @@ def no_jlink_tool_msg(tool):
     "--rtt-port",
     type=int,
     default=19021,
-    help=("Sets the RTT Telnet port. Default: 19021."),
+    help=("Set the RTT Telnet port. Default: 19021."),
 )
 @click.option(
     "-s",
@@ -43,13 +43,13 @@ def no_jlink_tool_msg(tool):
     type=str,
     default=4000,
     help=(
-        "Sets the connection speed, can be a number, 'auto' or 'adaptive'. "
+        "Set the connection speed, can be a number, 'auto' or 'adaptive'. "
         "Default: '4000'."
     ),
 )
 @click.pass_obj
 def connect(east, device, dev_id, rtt_port, speed):
-    """Connects to a device and creates a RTT server with [bold cyan]JLinkExe[/].
+    """Connect to a device and create a RTT server with [bold cyan]JLinkExe[/].
 
     \b
     \n\nRTT server will emit any RTT messages produced by the device over its dedicated port. Execute [bold magenta]east util rtt[/] command in the separate window to observe these messages.
@@ -78,14 +78,14 @@ def connect(east, device, dev_id, rtt_port, speed):
     "-e",
     "--local-echo",
     is_flag=True,
-    help="Turns on local echo.",
+    help="Turn on local echo.",
 )
 @click.option(
     "-p",
     "--rtt-port",
     type=int,
     default=19021,
-    help=("Sets the RTT Telnet port. Default: 19021."),
+    help=("Set the RTT Telnet port. Default: 19021."),
 )
 @click.option(
     "-l",
@@ -97,11 +97,11 @@ def connect(east, device, dev_id, rtt_port, speed):
     "-a",
     "--append",
     type=str,
-    help="Appends RTT output to a log file, instead of overwriting it. Requires --logfile option.",
+    help="Append RTT output to a log file, instead of overwriting it. Requires --logfile option.",
 )
 @click.pass_obj
 def rtt(east, local_echo, rtt_port, logfile, append):
-    """Runs a RTT client which connects to a running RTT server.
+    """Run a RTT client and connect a running RTT server.
 
     \b
     \n\nAny messages that RTT server creates are printed. RTT server can be created with an [bold magenta]east util connect[/] command.

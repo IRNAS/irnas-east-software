@@ -266,7 +266,7 @@ def non_existing_sample_msg_fmt(sample_name):
     is_flag=True,
     help=(
         "Create an SPDX 2.2 tag-value bill of materials following the completion "
-        "of a Zephyr build. This will be only done for the apps, not for the samples."
+        "of a Zephyr build. This is done only for the apps, not for the samples."
     ),
 )
 @click.pass_obj
@@ -283,7 +283,6 @@ def release(east, dry_run, verbose, spdx_app_only):
     \n\nDifferent hardware versions of listed boards are picked up automatically from the `board` directory.
 
     \n\n[bold]Note:[/] This command requires [bold yellow]east.yml[/] to function.
-
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     east.pre_workspace_command_check()
