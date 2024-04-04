@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.18.0] - 2024-04-04
+
 ### Added
 
 -   New command `east util cortex-debug`. It generates a configuration file for 
@@ -496,7 +498,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.6...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.0...HEAD
+
+[0.18.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.6...v0.18.0
 
 [0.17.6]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.5...v0.17.6
 
