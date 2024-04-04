@@ -55,7 +55,18 @@ from ..helper_functions import determine_svd_file, get_cortex_debug_params
     type=str,
     help=("Set the SVD file directly, instead of trying to determine it."),
 )
-def cortex_debug(east, build_dir, rtt_config, device, gdb_path, elf_file, svd_file):
+@click.option(
+    "--no-py",
+    is_flag=True,
+    help=(
+        "Use regular arm-zepher-eabi-gdb instead of python version for gdbPath in "
+        "config. Enable this if you are facing an error while trying to use RTT "
+        "in VSCode. Default: False."
+    ),
+)
+def cortex_debug(
+    east, build_dir, rtt_config, device, gdb_path, elf_file, svd_file, no_py
+):
     """Create a configuration file for the [bold green]Cortex Debug[/] VScode extension.
 
     \b
@@ -81,6 +92,9 @@ def cortex_debug(east, build_dir, rtt_config, device, gdb_path, elf_file, svd_fi
         except Exception as e:
             east.print(f"Error: {e}. Can't create the .vscode/launch.json file.")
             east.exit()
+
+    if no_py:
+        gdb_path = gdb_path.replace("-py", "")
 
     attach = {
         "name": "Attach",
