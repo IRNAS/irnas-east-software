@@ -1,6 +1,6 @@
 import click
 
-from ..east_context import east_command_settings, east_group_settings
+from ..east_context import east_command_settings
 from ..helper_functions import get_device_in_runner_yaml
 
 
@@ -126,14 +126,3 @@ def rtt(east, local_echo, rtt_port, logfile, append):
         east.exit()
 
     east.run(rtt_cmd)
-
-
-@click.group(**east_group_settings, subcommand_metavar="Subcommands")
-@click.pass_obj
-def util(_):
-    """Command with several subcommands related to utilities."""
-    pass
-
-
-util.add_command(connect)
-util.add_command(rtt)

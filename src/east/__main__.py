@@ -2,7 +2,7 @@ import click
 import rich_click
 
 from .east_context import EastContext, east_group_settings
-from .system_commands import init, install, update, util
+from .system_commands import connect, init, install, rtt, update
 from .workspace_commands import (
     attach,
     build,
@@ -62,6 +62,17 @@ rich_click.rich_click.COMMAND_GROUPS = {
         }
     ],
 }
+
+
+@click.group(**east_group_settings, subcommand_metavar="Subcommands")
+@click.pass_obj
+def util(_):
+    """Command with several subcommands related to utilities."""
+    pass
+
+
+util.add_command(connect)
+util.add_command(rtt)
 
 
 @click.group(
