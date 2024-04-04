@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   New command `east util cortex-debug`. It generates a configuration file for 
+    the Cortex Debug VSCode extension from the build directory from the current
+    working directory. Run `east util cortex-debug --help` to learn how to use
+    and configure it.
+-   Start using Ruff as the main formatting and linting tool. Entire project was
+    formatted and cleaned with it.
+
+### Changed
+
+-   `--jlink-id` to `--dev-id` in `east util connect` command.
+    `east flash` (actually `west flash`) also uses --dev-id, so for the 
+    consistency sake the same option in `east util connect` was changed.
+
 ## [0.17.6] - 2024-03-07
 
 ### Fixed
