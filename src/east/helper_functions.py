@@ -395,3 +395,76 @@ def get_device_in_runner_yaml():
             return get_device(yaml.safe_load(f.read()))
 
     return None
+
+
+def get_cortex_debug_params(east, build_dir):
+    """Get cortex debug parameters from the build directory.
+
+    Any path returned will be absolute.
+
+    Any failure to read something will result in a raised exception so this should be
+    called inside the try block.
+    """
+    runners_file = os.path.join(east.cwd, build_dir, "zephyr", "runners.yaml")
+    elf_file = os.path.join(east.cwd, build_dir, "zephyr", "zephyr.elf")
+
+    if not os.path.isdir(build_dir):
+        raise Exception(f"Build directory {build_dir} not found")
+
+    if not os.path.isfile(runners_file):
+        raise Exception(f"Runners file {runners_file} not found")
+
+    with open(runners_file) as f:
+        runner_cfg = yaml.safe_load(f)
+
+    device = get_device(runner_cfg)
+
+    if not device:
+        raise Exception("Can't find JLink device in the file")
+
+    if "gdb" not in runner_cfg["config"]:
+        raise Exception("Can't find gdb path in the file")
+
+    if not os.path.isfile(elf_file):
+        raise Exception(f"Elf file {elf_file} not found")
+
+    return device, runner_cfg["config"]["gdb"], elf_file
+
+
+def determine_svd_file(east, device):
+    """Determine the SVD file for the given device.
+
+    Only Nordic devices are supported at the moment, unsupported devices will return
+    None.
+    """
+    mdk_dir = os.path.join(
+        east.west_dir_path,
+        "modules",
+        "hal",
+        "nordic",
+        "nrfx",
+        "mdk",
+    )
+
+    if device.startswith("nRF5340"):
+        if device.endwith("NET"):
+            svd = "nrf5340_network"
+        elif device.endwith("APP"):
+            svd = "nrf5340_application"
+        else:
+            return None
+    elif device.startswith("nRF52832"):
+        svd = "nrf52"
+    elif device.startswith("nRF51"):
+        svd = "nrf51"
+    else:
+        svd = device.split("_")[0].lower()
+
+    return next(
+        (
+            os.path.join(mdk_dir, file)
+            for file in os.listdir(mdk_dir)
+            if svd == os.path.splitext(file)[0] and file.endswith(".svd")
+        ),
+        None,
+    )

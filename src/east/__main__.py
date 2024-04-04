@@ -9,6 +9,7 @@ from .workspace_commands import (
     bypass,
     clean,
     codechecker,
+    cortex_debug,
     debug,
     flash,
     release,
@@ -41,7 +42,9 @@ rich_click.rich_click.COMMAND_GROUPS = {
         },
     ],
     "east update": [{"name": "Subcommands", "commands": ["west", "env", "toolchain"]}],
-    "east util": [{"name": "Subcommands", "commands": ["connect", "rtt"]}],
+    "east util": [
+        {"name": "Subcommands", "commands": ["connect", "rtt", "cortex-debug"]}
+    ],
     "east install": [
         {
             "name": "Packages",
@@ -73,6 +76,7 @@ def util(_):
 
 util.add_command(connect)
 util.add_command(rtt)
+util.add_command(cortex_debug)
 
 
 @click.group(
