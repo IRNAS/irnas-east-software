@@ -371,3 +371,27 @@ def get_git_version(east):
         f"Unsupported git describe output ({result['output']}), contact developer!"
     )
     east.exit()
+
+
+def get_device(runner_yaml_content):
+    """Extract device flag from runner.yaml content."""
+    try:
+        jlink_args = runner_yaml_content["args"]["jlink"]
+        device = next(filter(lambda e: "--device" in e, jlink_args))
+        return device.split("=")[1]
+    except (KeyError, StopIteration):
+        return None
+
+
+def get_device_in_runner_yaml():
+    """Returns device flag for jlink runner from runner.yaml.
+
+    If runner.yaml is not found or the correct flag could not be fetched then None is
+    returned.
+    """
+    runners_yaml = os.path.join("build", "zephyr", "runners.yaml")
+    if os.path.isfile(runners_yaml):
+        with open(runners_yaml) as f:
+            return get_device(yaml.safe_load(f.read()))
+
+    return None

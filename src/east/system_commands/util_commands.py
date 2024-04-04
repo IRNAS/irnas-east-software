@@ -1,9 +1,7 @@
-import os
-
 import click
-import yaml
 
 from ..east_context import east_command_settings, east_group_settings
+from ..helper_functions import get_device_in_runner_yaml
 
 
 def no_jlink_tool_msg(tool):
@@ -14,28 +12,10 @@ def no_jlink_tool_msg(tool):
     )
 
 
-def get_device(runner_yaml):
-    """Returns device flag for jlink runner from runner.yaml.
-
-    If runner.yaml is not found or the correct flag could not be fetched then None is
-    returned.
-    """
-    if os.path.isfile(runner_yaml):
-        with open(runner_yaml, "r") as file:
-            try:
-                jlink_args = yaml.safe_load(file)["args"]["jlink"]
-                device_flag = next(filter(lambda e: "--device" in e, jlink_args))
-                return device_flag.split("=")[1]
-            except (KeyError, StopIteration):
-                pass
-    return None
-
-
 @click.command(**east_command_settings)
 @click.option(
     "-d",
     "--device",
-    default=get_device(os.path.join("build", "zephyr", "runners.yaml")),
     type=str,
     help=(
         "Sets the target device, required by JLinkExe, i.e. [bold]NRF52840_xxAA[/]. "
@@ -83,6 +63,9 @@ def connect(east, device, dev_id, rtt_port, speed):
 
     if dev_id:
         cmd += f"-USB {dev_id} "
+
+    if not device:
+        device = get_device_in_runner_yaml()
 
     if device:
         cmd += f"-Device {device} "
