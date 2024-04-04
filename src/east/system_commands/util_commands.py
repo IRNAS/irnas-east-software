@@ -44,7 +44,7 @@ def get_device(runner_yaml):
 )
 @click.option(
     "-i",
-    "--jlink-id",
+    "--dev-id",
     type=int,
     help=(
         "Identification number of a JLink programmer that should be used for connecting."
@@ -68,7 +68,7 @@ def get_device(runner_yaml):
     ),
 )
 @click.pass_obj
-def connect(east, device, jlink_id, rtt_port, speed):
+def connect(east, device, dev_id, rtt_port, speed):
     """Connects to a device and creates a RTT server with [bold cyan]JLinkExe[/].
 
     \b
@@ -81,8 +81,8 @@ def connect(east, device, jlink_id, rtt_port, speed):
 
     cmd = f"JLinkExe -AutoConnect 1 -Speed {speed} -If SWD -RTTTelnetPort {rtt_port} "
 
-    if jlink_id:
-        cmd += f"-USB {jlink_id} "
+    if dev_id:
+        cmd += f"-USB {dev_id} "
 
     if device:
         cmd += f"-Device {device} "
