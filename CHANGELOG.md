@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.18.1] - 2024-04-04
+
 ### Fixed
 
 -   Shallow copying of Python dicts that didn't create a correct Debug Cortex 
@@ -503,7 +505,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.1...HEAD
+
+[0.18.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.0...v0.18.1
 
 [0.18.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.17.6...v0.18.0
 
