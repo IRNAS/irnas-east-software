@@ -452,22 +452,23 @@ class EastContext:
             self.print(format_east_yml_load_error_msg(msg), highlight=False)
             self.exit()
 
-        # Exit if manager is not installed
-        if not self.check_exe(self.consts["nrf_toolchain_manager_path"]):
-            self.print(no_toolchain_manager_msg, highlight=False)
-            self.exit()
-
         # Check if ncs version was even detected, this can happen in the cases where
         # normal zephyr repo is used
         if self.detected_ncs_version is None:
             self.use_toolchain_manager = False
             return
 
+        # Exit if manager is not installed
+        if not self.check_exe(self.consts["nrf_toolchain_manager_path"]):
+            self.print(no_toolchain_manager_msg, highlight=False)
+            self.exit()
+
+        # If it is installed then we should use it
+        self.use_toolchain_manager = True
+
         # Early exit if toolchain for detected ncs version is installed
         result = self.run_manager("list", silent=True, return_output=True)
         if self.detected_ncs_version in result["output"]:
-            # If it is installed then is also supported
-            self.use_toolchain_manager = True
             return
 
         # Check if toolchain for detected ncs version is supported
