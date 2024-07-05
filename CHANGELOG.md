@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+-   Bump PyYAML to support Python3.12 and up (#106).
+-   Make `tox` to support Python3.12 and up.
+
+### Fixed
+
+-   Resolve invalid escape sequence '\.' warnings (#106).
+
 ## [0.18.3] - 2024-07-03
 
 ### Fixed
