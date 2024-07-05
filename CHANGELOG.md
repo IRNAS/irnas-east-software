@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.19.0] - 2024-07-05
+
 ### Changed
 
 -   Bump PyYAML to support Python3.12 and up (#106).
@@ -13,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
--   Resolve invalid escape sequence '\.' warnings (#106).
+-   Resolve invalid escape sequence '.' warnings (#106).
 
 ## [0.18.3] - 2024-07-03
 
@@ -528,7 +530,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.3...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.19.0...HEAD
+
+[0.19.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.3...v0.19.0
 
 [0.18.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.2...v0.18.3
 
