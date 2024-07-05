@@ -132,6 +132,7 @@ def var_never_read_before_disabled_macro_found(files, diag):
         "unused variable '(.*)'",
     ]
 
+    var = None
     for desc_regex in desc_regexes:
         hit = re.search(desc_regex, diag["description"])
         if hit:
@@ -139,7 +140,7 @@ def var_never_read_before_disabled_macro_found(files, diag):
             var = hit.group(1)
             break
 
-    if not hit:
+    if not var:
         return False
 
     # A hit was found, locate the file where the diagnostic was found
@@ -154,8 +155,8 @@ def var_never_read_before_disabled_macro_found(files, diag):
             # If you hit a line where variable is passed to __ASSERT* or LOG_* macro,
             # then this is a false positive, and should be removed
             patterns = [
-                f".*__ASSERT.*\(.*{var}.*,.*",
-                f".*LOG_.*\(.*,.*{var}.*",
+                rf".*__ASSERT.*\(.*{var}.*,.*",
+                rf".*LOG_.*\(.*,.*{var}.*",
             ]
 
             for pattern in patterns:

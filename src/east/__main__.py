@@ -96,7 +96,7 @@ def cli(ctx, echo):
     \b
     \n\nWant to learn what each command does?
 
-    Run [bold]east \[command] --help[/] to show documentation for that command.
+    Run [bold]east \\[command] --help[/] to show documentation for that command.
 
     \b
     \n\nNote that commands are split into two groups:

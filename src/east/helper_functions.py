@@ -266,7 +266,7 @@ def find_all_boards(east, west_board: str) -> List[str]:
     files = os.listdir(board_dir)
 
     # Find all files with west board name, no matter the version
-    pattern = f"^{west_board}_[0-9]?[0-9]?_[0-9]?[0-9]?_[0-9]?[0-9]?\.conf"
+    pattern = rf"^{west_board}_[0-9]?[0-9]?_[0-9]?[0-9]?_[0-9]?[0-9]?\.conf"
     matches = [file for file in files if re.match(pattern, file)]
 
     # Extract hardware versions and put them into format expected by the west.
