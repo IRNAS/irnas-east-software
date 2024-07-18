@@ -408,9 +408,9 @@ class EastContext:
         * Asserts that workspace command was run from the west workspace
         * Tries to load east.yml
         * Tries to determine the NCS version that is used in the project.
-        * Tries to find the version of the toolcahin in the nordic's toolchain manager.
+        * Tries to find the version of the toolchain in the nordic's toolchain manager.
 
-        This function esentially tries to answer the questions: should the underlying
+        This function esentially tries to answer the question: should the underlying
         west command be passed to the nordic's toolchain manager or directly to the
         west.
 
@@ -419,14 +419,14 @@ class EastContext:
                                             NCS version is not installed by the
                                             Toolchain Manager. Workspace commands such
                                             as build, flash, clean should set this to
-                                            False. Update command should set this to
-                                            True.
+                                            False. install toolchain command should set
+                                            this to True.
 
             ignore_unsupported_ncs (bool):  When true, do not exit if detected
                                             NCS version is not supported by the
                                             Toolchain Manager. Workspace commands such
                                             as build, flash, clean should set this to
-                                            True. Update command should set this to
+                                            True. install toolchain should set this to
                                             false.
 
             check_only_west_workspace (bool): When true, only check if we are in the
@@ -454,20 +454,20 @@ class EastContext:
             self.exit()
 
         # Check if ncs version was even detected, this can happen in the cases where
-        # normal zephyr repo is used
+        # normal zephyr repo is used.
         if self.detected_ncs_version is None:
             self.use_toolchain_manager = False
             return
 
-        # Exit if manager is not installed
+        # Exit if manager is not installed.
         if not self.check_exe(self.consts["nrf_toolchain_manager_path"]):
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 
-        # If it is installed then we should use it
+        # If it is installed then we should use it.
         self.use_toolchain_manager = True
 
-        # Early exit if toolchain for detected ncs version is installed
+        # Early exit if toolchain for the detected ncs version is installed.
         result = self.run_manager("list", silent=True, return_output=True)
         if self.detected_ncs_version in result["output"]:
             self.detected_ncs_version_installed = True
@@ -475,25 +475,25 @@ class EastContext:
 
         # Check if toolchain for detected ncs version is supported
         result = self.run_manager("search", silent=True, return_output=True)
+
         if self.detected_ncs_version in result["output"]:
             # Supported but not installed, should we exit program or silently pass?
             if ignore_uninstalled_ncs:
                 return
-            else:
-                self.print(no_toolchain_msg(self), highlight=False)
-                self.exit()
+
+            self.print(no_toolchain_msg(self), highlight=False)
+            self.exit()
 
         # Not supported, should we silently pass or exit program with message?
         if ignore_unsupported_ncs:
             # Silently pass
             return
-        else:
-            # Exit program
-            # This is usually set, if we intend to install the toolchain later
-            self.print(
-                ncs_version_not_supported_msg(self, result["output"]), highlight=False
-            )
-            self.exit()
+
+        # Exit program, this is usually happens, if we want to install the toolchain.
+        self.print(
+            ncs_version_not_supported_msg(self, result["output"]), highlight=False
+        )
+        self.exit()
 
     def check_for_new_east_version(self):
         """Occasionally check if there is a new version of east available.

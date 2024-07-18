@@ -13,7 +13,7 @@ from .tooling import tool_installer
 )
 @click.pass_obj
 def toolchain(east, force):
-    """Update NCS toolchain for the current West workspace.
+    """Install NCS toolchain for the current West workspace.
 
     \b
     \n\nDetermines the version of the NCS that is being used in the current West
@@ -31,7 +31,7 @@ def toolchain(east, force):
         if not force:
             msg = (
                 f"\nVersion of [bold cyan]{east.detected_ncs_version} NCS[/] toolchain "
-                "is [bold]already[/] installed! \n\n"
+                "is [bold]already[/] installed!\n\n"
                 "You can reinstall it with [bold cyan]--force[/] flag. "
             )
             east.print(msg)
