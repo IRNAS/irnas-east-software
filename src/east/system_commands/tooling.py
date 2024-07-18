@@ -6,56 +6,68 @@ import shutil
 
 from rich.panel import Panel
 
-from ..constants import (
-    CLANG_PATH,
-    CODECHECKER_PATH,
-    CPPCHECK_PATH,
-    NRF_TOOLCHAIN_MANAGER_PATH,
-)
 from ..east_context import EastContext
 from ..helper_functions import download_files
 
 
-def _install_toolchain_manager(east: EastContext, exe_path: str):
-    """Installs toolchain manager to a proper location."""
-    nrfutil_dir = os.path.join(east.consts["tooling_dir"], "nrfutil")
+def _install_nrfutil(east: EastContext, exe_path: str):
+    """Install nrfutil to a proper location."""
+    nrfutil = east.consts["nrfutil_path"]
+    dir = os.path.dirname(nrfutil)
 
-    shutil.rmtree(nrfutil_dir, ignore_errors=True)
-    os.mkdir(nrfutil_dir)
+    shutil.rmtree(dir, ignore_errors=True)
+    os.mkdir(dir)
 
-    # Move toolchain manager to its proper place
-    east.run(f"mv -f {exe_path} {east.consts['nrf_toolchain_manager_path']}")
+    east.run(f"mv -f {exe_path} {nrfutil}")
 
-    # That is octal, make it executable
-    os.chmod(east.consts["nrf_toolchain_manager_path"], 0o777)
+    # That is octal, make it executable.
+    os.chmod(nrfutil, 0o777)
 
-    # Configure the toolchain path
-    east.run(
-        f"{east.consts['nrf_toolchain_manager_path']} config --install-dir "
-        f"{east.consts['east_dir']}"
-    )
+    # Pin the nrfutil to a fixed version to prevent any future breaking changes.
+    # Output of --version flag on linux:
+    # nrfutil 7.11.1 (7c99be8 2024-05-30)
+    # commit-hash: 7c99be87b691a9ea8c7d95a2190356eddad33329
+    # commit-date: 2024-05-30
+    # host: x86_64-unknown-linux-gnu
+    # build-timestamp: 2024-05-30T12:49:04.315203564Z
+    # classification: nrf-external
+    east.run(f"{nrfutil} self-upgrade --to-version 7.11.1")
+
+    # Install toolchain-manager and configure the toolchain path.
+    east.run(f"{nrfutil} install toolchain-manager")
+
+    # Below step shouldn't be done on macOS, the install-dir is hardcoded there.
+    if platform.system() != "Darwin":
+        east.run(
+            f"{nrfutil} toolchain-manager config --set install-dir="
+            f"{east.consts['east_dir']}"
+        )
 
 
-def _get_toolchain_download_link():
-    """Return link for the Nordic's toolchain manager executable.
+def _get_nrfutil_download_link():
+    """Return link for the Nordic's nRF Util executable.
 
-    This link will be updated regularly to follow the progress on the Nordic's repo.
+    The link depends on the platform that the East is running on, however it will always
+    point to a lightweight launcher version of the nrfutil.
 
-    Output of --version flag:
-
-    nrfutil-toolchain-manager 0.13.0-alpha.3 (a7ee07d 2023-05-26)
-    commit-hash: a7ee07d0cbc1539dbf5f89446f558580f0cf000d
-    commit-date: 2023-05-26
-    host: x86_64-unknown-linux-gnu
-    build-timestamp: 2023-05-26T13:54:13.429101305Z
-    classification: nrf-internal
+    Check https://developer.nordicsemi.com/.pc-tools/nrfutil/ for interesting stuff.
     """
-    link = (
-        "https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager/"
-        "blob/7dda8ba815a0c9df52a22c943a25cb43cd622bcb/resources/"
-        "nrfutil-toolchain-manager/linux/nrfutil-toolchain-manager.exe?raw=true"
-    )
-    return link
+    system = platform.system()
+
+    if system == "Linux":
+        system = "x64-linux"
+    elif system == "Windows":
+        system = "x64-windows"
+    elif system == "Darwin":
+        system = "universal-osx"
+    else:
+        print(
+            f"Unsupported system ({system}), East will download x64-linux version "
+            "of nrfutil."
+        )
+        system = "x64-linux"
+
+    return f"https://developer.nordicsemi.com/.pc-tools/nrfutil/{system}/nrfutil"
 
 
 def _get_cppcheck_download_link():
@@ -69,6 +81,7 @@ def _get_cppcheck_download_link():
 
 def _install_cppcheck(east: EastContext, exe_path: str):
     """Install cppcheck to a proper location."""
+    # FIXME: Change how you are getting path
     cppcheck_dir = os.path.join(east.consts["tooling_dir"], "cppcheck")
 
     # Remove old cppcheck dir if it exists
@@ -104,7 +117,7 @@ def _get_clang_download_link():
     elif arch == "aarch64":
         arch = "aarch64-linux-gnu"
     elif arch == "arm64":
-        arch = "arm64-apple-darwin"
+        arch = "arm64-apple-darwin22.0"
     else:
         print(
             f"Unsupported architecture ({arch}), East will download x86_64 version "
@@ -216,9 +229,9 @@ def _install_codechecker(east: EastContext, exe_path: str):
 
 
 toolchain_installed_msg = """
-[bold green]Nordic's Toolchain Manager install done![/]
+[bold magenta]nrfutil toolchain-manager[/] install done!
 
-East will now smartly use Nordic's Toolchain Manager whenever it can.
+East will now smartly use [bold magenta]nrfutil toolchain-manager[/] whenever it can.
 
 [bold]Note:[/] You still need to run [italic bold blue]east install toolchain[/] inside
 of a [yellow bold]West workspace[/] to get the actual toolchain.
@@ -236,40 +249,41 @@ codechecker_installed_msg = """
 [bold green]codechecker install done![/]
 """
 
-supported_tools = [
-    {
-        "name": "nrfutil-toolchain-manager.exe",
-        "exe": NRF_TOOLCHAIN_MANAGER_PATH,
-        "url": _get_toolchain_download_link(),
-        "install_method": _install_toolchain_manager,
-        "installed_msg": toolchain_installed_msg,
-    },
-    {
-        "name": "cppcheck",
-        "exe": CPPCHECK_PATH,
-        "url": _get_cppcheck_download_link(),
-        "install_method": _install_cppcheck,
-        "installed_msg": cppcheck_installed_msg,
-    },
-    {
-        "name": "clang+llvm",
-        "exe": CLANG_PATH,
-        "url": _get_clang_download_link(),
-        "install_method": _install_clang_llvm,
-        "installed_msg": clang_llvm_installed_msg,
-    },
-    {
-        "name": "codechecker",
-        "exe": CODECHECKER_PATH,
-        "url": _get_codechecker_download_link(),
-        "install_method": _install_codechecker,
-        "installed_msg": codechecker_installed_msg,
-    },
-]
-
 
 def tool_installer(east, tool_names):
     """Install tools that are passed in the tool_names list."""
+    # List of supported tools that can be installed by East.
+    supported_tools = [
+        {
+            "name": "toolchain-manager",
+            "exe": east.consts["nrfutil_path"],
+            "url": _get_nrfutil_download_link(),
+            "install_method": _install_nrfutil,
+            "installed_msg": toolchain_installed_msg,
+        },
+        {
+            "name": "cppcheck",
+            "exe": east.consts["cppcheck_path"],
+            "url": _get_cppcheck_download_link(),
+            "install_method": _install_cppcheck,
+            "installed_msg": cppcheck_installed_msg,
+        },
+        {
+            "name": "clang+llvm",
+            "exe": east.consts["clang_path"],
+            "url": _get_clang_download_link(),
+            "install_method": _install_clang_llvm,
+            "installed_msg": clang_llvm_installed_msg,
+        },
+        {
+            "name": "codechecker",
+            "exe": east.consts["codechecker_path"],
+            "url": _get_codechecker_download_link(),
+            "install_method": _install_codechecker,
+            "installed_msg": codechecker_installed_msg,
+        },
+    ]
+
     tools = [tool for tool in supported_tools if tool["name"] in tool_names]
 
     # Construct a list of files that have to be downloaded.

@@ -27,6 +27,7 @@ def clean(east):
 
 class SpecialCommand(RichCommand):
     """Special command that allows to access the raw args."""
+
     def parse_args(self, ctx, args):
         """Parse the args and store a copy of them in the context."""
         # Before parsing the args, make a copy of them so they can be used later.
@@ -260,7 +261,7 @@ def flash(east, extra_help, args):
     is_flag=True,
     help=(
         "Launch a sub-shell within the current terminal inside the isolated "
-        "environment provided by the [magenta bold]Nordic's nRF Toolchain Manager[/]. "
+        "environment provided by the [magenta bold]nrfutil toolchain-manager[/]. "
         "Commands after [bold]--[/] are ignored. To exit the sub-shell type "
         "[bold]exit[/] into it and hit ENTER."
     ),
@@ -268,11 +269,11 @@ def flash(east, extra_help, args):
 @click.argument("args", nargs=-1, type=str, metavar="-- [args]")
 @click.pass_obj
 def bypass(east, shell, args):
-    """Bypass any set of commands directly to the [magenta bold]Nordic's nRF Toolchain Manager[/].
+    """Bypass any set of commands directly to the [magenta bold]nrfutil toolchain-manager[/].
 
     \b
     \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
-    the [bold magenta]Nordic's nRF Toolchain Manager[/] executable.
+    the [bold magenta]nrfutil toolchain-manager[/] executable.
 
     \n\nThose commands will run in the context of the isolated environment, which is provided by the executable.
 
@@ -306,7 +307,7 @@ def bypass(east, shell, args):
         east.run_cmd_in_manager(cmd)
     else:
         east.exit(
-            "Toolchain manager is not available in this [bold yellow]West workspace[/]."
+            "nrfutil toolchain manager is not available in this [bold yellow]West workspace[/]."
         )
 
 

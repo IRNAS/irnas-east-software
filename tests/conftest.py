@@ -67,7 +67,7 @@ def west_workplace_fixture_common(west_top_dir, monkeypatch, mocker):
 
     # # We pretend that
     def mocked_check_exe(self, exe):
-        if exe == self.consts["nrf_toolchain_manager_path"]:
+        if exe == self.consts["nrfutil_path"]:
             return True
 
     def mocked_run_manager(self, command, **kwargs):
