@@ -258,7 +258,7 @@ class EastContext:
         """Run wrapper which should be used when executing commands with west tool.
 
         If toolchain for the detected ncs version is installed then west through
-        Nordic's Toolchain manager is used. If it is not installed then west is used
+        nrfutil toolchain-manager is used. If it is not installed then west is used
         directly.
 
         Args:
@@ -277,16 +277,16 @@ class EastContext:
             return self.run(cmd, **kwargs)
 
     def enter_manager_shell(self):
-        """Enters Nordic's Toolchain Manager shell using detected NCS version."""
+        """Enters nrfutil toolchain-manager shell using detected NCS version."""
         cmd = (
-            f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
+            f"{self.consts['nrfutil_path']} toolchain-manager launch --ncs-version"
             f" {self.detected_ncs_version} --shell"
         )
 
         return self.run(cmd)
 
-    def run_manager(self, command, **kwargs):
-        """Executes a command with Nordic's Toolchain manager executable.
+    def run_manager(self, command: str, **kwargs):
+        """Executes a command with nrfutil toolchain-manager executable.
 
         This is not suitable to be used with a type of a 'launch -- <command>' command.
         For that run_cmd_in_manager should be used.
@@ -298,17 +298,17 @@ class EastContext:
         Returns:
             Check .run
         """
-        cmd = f"{self.consts['nrf_toolchain_manager_path']} {command}"
+        cmd = f"{self.consts['nrfutil_path']} toolchain-manager {command}"
 
         return self.run(cmd, **kwargs)
 
     def run_cmd_in_manager(self, command: str, exit_on_error: bool = True, **kwargs):
-        """Run an arbitrary command through Nordic's Toolchain Manager.
+        """Run an arbitrary command through nrfutil toolchain-manager.
 
         This method should be used when passing any arbitrary command, like west command.
 
         To properly execute an arbitrary command and propagate its return code to the
-        caller we have do a bit of a bash shell dancing, as Nordic's Toolchain Manager
+        caller we have do a bit of a bash shell dancing, as nrfutil toolchain-manager
         does not do this for some commands (if west build fails then return code is not
         propagated, but issuing non-existing command does propagate up).
 
@@ -335,7 +335,7 @@ class EastContext:
         command = command.replace("'", '"')
 
         cmd = (
-            f"{self.consts['nrf_toolchain_manager_path']} launch --ncs-version"
+            f"{self.consts['nrfutil_path']} toolchain-manager launch --ncs-version"
             f" {self.detected_ncs_version} -- bash -c '{command} "
             "&& touch success.txt'"
         )
@@ -408,26 +408,26 @@ class EastContext:
         * Asserts that workspace command was run from the west workspace
         * Tries to load east.yml
         * Tries to determine the NCS version that is used in the project.
-        * Tries to find the version of the toolchain in the nordic's toolchain manager.
+        * Tries to find the version of the toolchain in the nrfutil toolchain-manager.
 
         This function esentially tries to answer the question: should the underlying
-        west command be passed to the nordic's toolchain manager or directly to the
+        west command be passed to the nrfutil toolchain-manager or directly to the
         west.
 
         Args:
             ignore_uninstalled_ncs (bool):  When true, do not exit if detected
                                             NCS version is not installed by the
-                                            Toolchain Manager. Workspace commands such
+                                            toolchain-manager. Workspace commands such
                                             as build, flash, clean should set this to
                                             False. install toolchain command should set
                                             this to True.
 
             ignore_unsupported_ncs (bool):  When true, do not exit if detected
                                             NCS version is not supported by the
-                                            Toolchain Manager. Workspace commands such
+                                            toolchain-manager. Workspace commands such
                                             as build, flash, clean should set this to
-                                            True. install toolchain should set this to
-                                            false.
+                                            True. install toolchain command should set
+                                            this to False.
 
             check_only_west_workspace (bool): When true, only check if we are in the
                                               west Workspace, do not check for the rest
@@ -460,7 +460,7 @@ class EastContext:
             return
 
         # Exit if manager is not installed.
-        if not self.check_exe(self.consts["nrf_toolchain_manager_path"]):
+        if not self.check_exe(self.consts["nrfutil_path"]):
             self.print(no_toolchain_manager_msg, highlight=False)
             self.exit()
 

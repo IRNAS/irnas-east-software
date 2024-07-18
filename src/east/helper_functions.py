@@ -190,7 +190,7 @@ def return_dict_on_match(array_of_dicts, key, value):
 
 
 no_toolchain_manager_msg = """
-[bold cyan]Nordic's Toolchain Manager[/] is [bold red]not installed[/] on this system!
+[bold magenta]nrfutil toolchain-manager[/] is [bold red]not installed[/] on this system!
 
 To install it run:
 
@@ -222,8 +222,8 @@ def ncs_version_not_supported_msg(east, supported_versions):
 
     return (
         f"[bold]East[/] detected [bold]{east.detected_ncs_version}[/] [bold cyan]NCS[/]"
-        " version which is currently [bold red]not supported[/] by the Nordic's"
-        " Toolchain manager.\n\nSupported versions are: \n"
+        " version which is currently [bold red]not supported[/] by the "
+        "[bold magenta]nrfutil toolchain-manager[/].\n\nSupported versions are: \n"
         + vers
         + "\n\nThis means that you need to manually install the [bold cyan]NCS[/]"
         " toolchain by yourself.\n"

@@ -56,8 +56,8 @@ def toolchain(east, force):
 @click.command(**east_command_settings)
 @click.pass_obj
 def nrfutil_toolchain_manager(east):
-    """Install [bold cyan]Nordic's nRF Toolchain Manager[/]."""
-    tool_installer(east, ["nrfutil-toolchain-manager.exe"])
+    """Install [bold magenta]nrfutil toolchain-manager[/]."""
+    tool_installer(east, ["toolchain-manager"])
 
 
 @click.command(**east_command_settings)
@@ -100,9 +100,7 @@ def install(ctx, east, all):
     # WARN: There is a better way to do this: invoke method
 
     if all:
-        tool_installer(
-            east, ["codechecker", "clang+llvm", "nrfutil-toolchain-manager.exe"]
-        )
+        tool_installer(east, ["codechecker", "clang+llvm", "toolchain-manager"])
         ctx.invoke(toolchain)
     return
 
