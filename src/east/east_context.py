@@ -76,6 +76,7 @@ class EastContext:
 
         self.console = Console(width=80, markup=RICH_CONSOLE_ENABLE_MARKUP)
         self.use_toolchain_manager = False
+        self.detected_ncs_version_installed = False
         self.east_yml = None
 
         try:
@@ -469,6 +470,7 @@ class EastContext:
         # Early exit if toolchain for detected ncs version is installed
         result = self.run_manager("list", silent=True, return_output=True)
         if self.detected_ncs_version in result["output"]:
+            self.detected_ncs_version_installed = True
             return
 
         # Check if toolchain for detected ncs version is supported

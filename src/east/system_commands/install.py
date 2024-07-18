@@ -26,11 +26,9 @@ def toolchain(east, force):
         ignore_unsupported_ncs=False,
     )
 
-    # We come to here if the detected ncs version is supported
-    if east.use_toolchain_manager:
-        if force:
-            east.run_manager(f"uninstall --ncs-version {east.detected_ncs_version}")
-        else:
+    # # We come to here if the detected ncs version is installed.
+    if east.detected_ncs_version_installed:
+        if not force:
             msg = (
                 f"\nVersion of [bold cyan]{east.detected_ncs_version} NCS[/] toolchain "
                 "is [bold]already[/] installed! \n\n"
@@ -40,6 +38,10 @@ def toolchain(east, force):
 
             # Exit with 0 error code, we do that so it makes usage of East in CI easier.
             east.exit(0)
+
+        east.run_manager(f"uninstall --ncs-version {east.detected_ncs_version}")
+        # Empty line for nicer output
+        east.print()
 
     east.print(
         "Starting install of [bold cyan]NCS[/] toolchain,"
