@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Fix a case where user would install toolchain with east and
+    then get a message that toolchain is not installed, when trying to
+    build.
+
 ## [0.19.0] - 2024-07-05
 
 ### Changed
