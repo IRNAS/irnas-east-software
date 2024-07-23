@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.19.1] - 2024-07-23
+
 ### Fixed
 
 -   Fix a case where user would install toolchain with east and
@@ -536,7 +538,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.19.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.19.1...HEAD
+
+[0.19.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.19.0...v0.19.1
 
 [0.19.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.18.3...v0.19.0
 
