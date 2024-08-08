@@ -1056,3 +1056,91 @@ def test_empty_east_yml_is_valid(west_workplace_parametrized, monkeypatch, mocke
         "build -b native_posix",
         should_succed=True,
     )
+
+
+east_yaml_no_build_type = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom_nrf52840dk
+"""
+
+
+def test_no_build_type_is_ok(west_workplace_parametrized, monkeypatch, mocker):
+    """East should not add any extra flags to the west build call when no build type is
+    specified in the east.yaml.
+    """
+    project = west_workplace_parametrized["project"]
+    helpers.create_and_write(
+        project,
+        "east.yml",
+        east_yaml_no_build_type,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["app"],
+        "build -b custom_nrf52840dk",
+        expected_west_cmd="build -b custom_nrf52840dk",
+    )
+
+
+def test_build_type_as_arg_is_not_ok_if_not_in_east_yml(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """East should abort if build type is given as an argument but built-types key is
+    not present in the east.yaml.
+    """
+    project = west_workplace_parametrized["project"]
+    helpers.create_and_write(
+        project,
+        "east.yml",
+        east_yaml_no_build_type,
+    )
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace_parametrized["app"],
+        "build -b custom_nrf52840dk --build-type debug",
+        should_succed=False,
+    )
+
+
+east_yaml_no_build_type_inheriting = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom_nrf52840dk
+
+samples:
+  - name: settings
+    west-boards:
+      - custom_nrf52840dk
+    inherit-build-type:
+        app: test_one
+        build-type: debug
+"""
+
+
+def test_inheriting_from_an_app_without_build_type_should_fail(
+    west_workplace_parametrized, monkeypatch, mocker
+):
+    """Test that inheriting from an app without build type fails."""
+    project = west_workplace_parametrized["project"]
+    helpers.create_and_write(
+        project,
+        "east.yml",
+        east_yaml_no_build_type_inheriting,
+    )
+
+    sample_path = os.path.join(project, "samples", "settings")
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        sample_path,
+        "build -b custom_nrf52840dk",
+        should_succed=False,
+    )

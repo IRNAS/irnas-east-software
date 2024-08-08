@@ -72,9 +72,10 @@ def load_east_yml(project_dir: str):
     if apps is not None and apps != -1:
         check_duplicated_entries(east_yml["apps"], "apps", "name")
         for app in east_yml["apps"]:
-            check_duplicated_entries(
-                app["build-types"], f"{app['name']}.build-types", "type"
-            )
+            if "build-types" in app:
+                check_duplicated_entries(
+                    app["build-types"], f"{app['name']}.build-types", "type"
+                )
 
     if apps is None:
         # Exists, but it was not set
@@ -108,7 +109,7 @@ def load_east_yml(project_dir: str):
                 # Release build type is special, apps always have it implicitly, so we
                 # do not have to search for it.
                 if inherited_type != "release":
-                    if not return_dict_on_match(
+                    if "build-types" not in app or not return_dict_on_match(
                         app["build-types"], "type", inherited_type
                     ):
                         raise EastYmlLoadError(

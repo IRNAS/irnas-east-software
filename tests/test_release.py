@@ -8,23 +8,6 @@ from east.helper_functions import find_all_boards
 from . import helpers
 from .helpers import helper_test_against_west_run
 
-east_yaml_single_app = """
-apps:
-  - name: test_one
-    west-boards:
-      - custom_nrf52840dk
-      - nrf52840dk_nrf52840
-
-    build-types:
-      - type: debug
-        conf-files:
-          - debug.conf
-      - type: uart
-        conf-files:
-          - debug.conf
-          - uart.conf
-"""
-
 
 def test_finding_hardware_versions(west_workplace):
     """Test finding hardware versions."""
@@ -256,6 +239,104 @@ def test_basic_release_behaviour(west_workplace, monkeypatch, mocker):
         "release",
         expected_west_cmds=expected_app_release_west_commands
         + expected_samples_release_west_commands,
+    )
+
+
+east_yaml_no_build_types_key = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+"""
+
+expected_app_release_west_commands_no_build_types = [
+    "build -b custom_nrf52840dk@1.0.0 app",
+    "build -b custom_nrf52840dk@1.1.0 app",
+    "build -b custom_nrf52840dk@2.20.1 app",
+    "build -b nrf52840dk_nrf52840 app",
+]
+
+
+def test_basic_app_release_behaviour_no_build_type(west_workplace, monkeypatch, mocker):
+    """Running east release on applications without any build types should just build
+    apps.
+    """
+    project_path = west_workplace
+
+    helpers.create_and_write(
+        project_path,
+        "east.yml",
+        east_yaml_no_build_types_key,
+    )
+
+    monkeypatch.setattr(east.workspace_commands.release_commands, "RUNNING_TESTS", True)
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        "release",
+        expected_west_cmds=expected_app_release_west_commands_no_build_types,
+    )
+
+
+east_yaml_samples_no_build_types_key = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+
+samples:
+  - name: settings
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+  - name: dfu
+    west-boards:
+      - custom_nrf52840dk
+      - nrf52840dk_nrf52840
+"""
+
+expected_app_samples_release_west_commands = [
+    "build -b custom_nrf52840dk@1.0.0 app",
+    "build -b custom_nrf52840dk@1.1.0 app",
+    "build -b custom_nrf52840dk@2.20.1 app",
+    "build -b nrf52840dk_nrf52840 app",
+    "build -b custom_nrf52840dk@1.0.0 samples/settings",
+    "build -b custom_nrf52840dk@1.1.0 samples/settings",
+    "build -b custom_nrf52840dk@2.20.1 samples/settings",
+    "build -b nrf52840dk_nrf52840 samples/settings",
+    "build -b custom_nrf52840dk@1.0.0 samples/dfu",
+    "build -b custom_nrf52840dk@1.1.0 samples/dfu",
+    "build -b custom_nrf52840dk@2.20.1 samples/dfu",
+    "build -b nrf52840dk_nrf52840 samples/dfu",
+]
+
+
+def test_basic_app_release_behaviour_no_build_type_with_samples(
+    west_workplace, monkeypatch, mocker
+):
+    """Running east release on applications and samples without any build types should
+    just build apps and samples.
+    """
+    project_path = west_workplace
+
+    helpers.create_and_write(
+        project_path,
+        "east.yml",
+        east_yaml_samples_no_build_types_key,
+    )
+
+    monkeypatch.setattr(east.workspace_commands.release_commands, "RUNNING_TESTS", True)
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project_path,
+        "release",
+        expected_west_cmds=expected_app_samples_release_west_commands,
     )
 
 

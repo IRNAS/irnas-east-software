@@ -249,6 +249,15 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
         path_prefix = ""
         cmake_build_type = f' -DEAST_BUILD_TYPE="{build_types_str}"'
 
+    if "build-types" not in app:
+        if build_type:
+            east.print(no_build_type_msg(build_type))
+            east.exit()
+        else:
+            # If no --build-type is given and there is not build-types key in the app,
+            # we default to plain west behaviour: no cmake args.
+            return ("", "")
+
     # "release" is a special, implicit, default, build type. Samples can request to
     # inherit from it, in that case only the common.conf is added to the build.
     if build_type == "release":

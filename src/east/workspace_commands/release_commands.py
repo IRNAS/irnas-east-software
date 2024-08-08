@@ -1,3 +1,4 @@
+import copy
 import os
 import re
 import shutil as sh
@@ -314,6 +315,11 @@ def release(east, dry_run, verbose, spdx_app_only):
     apps = east.east_yml.get("apps", [])
     samples = east.east_yml.get("samples", [])
 
+    # Since above two return a reference to the array, we need to make a deep copy
+    # to prevent any changes to the original dict.
+    apps = copy.deepcopy(apps)
+    samples = copy.deepcopy(samples)
+
     # We inject app and samples with additional key/value pairs in below two for loops
     # so the logic afterwards for detection of jobs can be common/simpler.
     # We also do some existence checks.
@@ -337,7 +343,10 @@ def release(east, dry_run, verbose, spdx_app_only):
         # Add parent to mark from where this key comes from
         app.update({"parent": "apps"})
         # Add "release" type (but only in apps context).
-        app["build-types"].append({"type": "release"})
+        if "build-types" in app:
+            app["build-types"].append({"type": "release"})
+        else:
+            app["build-types"] = [{"type": None}]
 
     samples_in_dir = os.listdir("samples") if os.path.isdir("samples") else []
     for sample in samples:
@@ -369,13 +378,16 @@ def release(east, dry_run, verbose, spdx_app_only):
 
                     if target["parent"] == "apps":
                         # Create destination path where artefact should be placed into
-                        destination = os.path.join(common_dest, build_type, board)
+                        if build_type:
+                            destination = os.path.join(common_dest, build_type, board)
+                        else:
+                            destination = os.path.join(common_dest, board)
                         if is_single_app:
                             src_dir = "app"
                         else:
                             src_dir = os.path.join("app", target["name"])
-
-                    if target["parent"] == "samples":
+                    else:
+                        # target["parent"] is "samples"
                         # Create destination path where artefact should be placed into
                         destination = os.path.join(common_dest, board)
                         src_dir = os.path.join("samples", target["name"])
@@ -452,9 +464,12 @@ def release(east, dry_run, verbose, spdx_app_only):
 
         for build_type in build_types:
             # A bit of naming manipulation for release build
-            app_folder = os.path.join(release_dir, "apps", app["name"], build_type)
-
-            build_type_suf = "" if build_type == "release" else f"-{build_type}"
+            if build_type:
+                app_folder = os.path.join(release_dir, "apps", app["name"], build_type)
+                build_type_suf = "" if build_type == "release" else f"-{build_type}"
+            else:
+                app_folder = os.path.join(release_dir, "apps", app["name"])
+                build_type_suf = ""
 
             # Build zip name and make a zip archive
             zip_targets.append(
