@@ -41,12 +41,46 @@ def create_artefact_name(project, board, version, build_type):
     """
     board = board.replace("@", "-hv")
 
+    # "Normalize" hw v2 board names
+    board = board.replace("/", "_")
+
     # "release" or None build_type should not generate any build type qualifier.
     build_type = "" if build_type == "release" or not build_type else f"-{build_type}"
 
     git_hash = f"-{version['hash']}" if version["hash"] else ""
 
     return f"{project}-{board}-{version['tag']}{build_type}{git_hash}"
+
+
+def create_art_dest_and_src_dir(
+    name: str,
+    parent: str,
+    release_dir: str,
+    board: str,
+    build_type: str,
+    is_single_app: bool,
+):
+    """Create destination and source directories for the artefact."""
+    common_dest = os.path.join(release_dir, parent, name)
+
+    # "Normalize" hw v2 board names
+    board = board.replace("/", "_")
+
+    if parent == "apps":
+        if build_type:
+            dst = os.path.join(common_dest, build_type, board)
+        else:
+            dst = os.path.join(common_dest, board)
+        if is_single_app:
+            src_dir = "app"
+        else:
+            src_dir = os.path.join("app", name)
+    else:
+        # parent is "samples"
+        dst = os.path.join(common_dest, board)
+        src_dir = os.path.join("samples", name)
+
+    return dst, src_dir
 
 
 def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
@@ -372,25 +406,14 @@ def release(east, dry_run, verbose, spdx_app_only):
                     # Rename created binaries and move them to a specific destination.
                     # Some dance around built type name is needed for "release" type
 
-                    common_dest = os.path.join(
-                        release_dir, target["parent"], target["name"]
+                    dst, src_dir = create_art_dest_and_src_dir(
+                        target["name"],
+                        target["parent"],
+                        release_dir,
+                        board,
+                        build_type,
+                        is_single_app,
                     )
-
-                    if target["parent"] == "apps":
-                        # Create destination path where artefact should be placed into
-                        if build_type:
-                            destination = os.path.join(common_dest, build_type, board)
-                        else:
-                            destination = os.path.join(common_dest, board)
-                        if is_single_app:
-                            src_dir = "app"
-                        else:
-                            src_dir = os.path.join("app", target["name"])
-                    else:
-                        # target["parent"] is "samples"
-                        # Create destination path where artefact should be placed into
-                        destination = os.path.join(common_dest, board)
-                        src_dir = os.path.join("samples", target["name"])
 
                     # Create name for job artefact
                     name = create_artefact_name(
@@ -406,7 +429,7 @@ def release(east, dry_run, verbose, spdx_app_only):
                         "board": board,
                         "build_type": build_type,
                         "artefact_name": name,
-                        "artefact_destination": destination,
+                        "artefact_destination": dst,
                     }
                     jobs.append(job)
 

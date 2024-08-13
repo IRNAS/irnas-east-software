@@ -230,8 +230,11 @@ def ncs_version_not_supported_msg(east, supported_versions):
     )
 
 
-def find_all_boards(east, west_board: str) -> List[str]:
-    """Find all west board names by searching the boards directory.
+BOARD_YML = "board.yml"
+
+
+def find_board_dir(east, board: str):
+    """Find the directory of the given board.
 
     Search for directory that contains *_defconfig file with given west_board name,
     (this is the same process that west uses to determine the boards).
@@ -239,9 +242,28 @@ def find_all_boards(east, west_board: str) -> List[str]:
     After such directory is found, scan it and try to find what board revisions are
     present and generate a list of board names and board revisions in format expected by
     west build command.
+    """
+    root = os.path.join(east.project_dir, "boards")
 
-    If no folder is found or there are no revision specific files in the folder then
-    just return west_board.
+    for path, _, files in os.walk(root):
+        # Presence of board.yml file is used to detect hw v2 boards
+        if BOARD_YML in files:
+            with open(os.path.join(path, BOARD_YML)) as f:
+                if yaml.safe_load(f).get("board").get("name") in board:
+                    return path
+
+        # Fallback to the old method of searching
+        for file in files:
+            if file.endswith("_defconfig") and file[: -len("_defconfig")] in board:
+                return path
+
+    return None
+
+
+def find_all_boards(east, west_board: str) -> List[str]:
+    """Find all possible revisions of west board.
+
+    If there are no revision specific files in the folder then just return west_board.
 
         east ():            East context.
         west_board (str):   Board to search for.
@@ -249,19 +271,16 @@ def find_all_boards(east, west_board: str) -> List[str]:
     Returns:
         List of west boards to be used by west build -b <board>
     """
+    west_board_unmodified = west_board
 
-    def dir_find(root, west_board):
-        for path, _, files in os.walk(root):
-            for file in files:
-                if file.endswith("_defconfig"):
-                    if west_board == file[: -len("_defconfig")]:
-                        return path
-        return None
+    # "Normalize" hw v2 board names
+    if "/" in west_board:
+        west_board = west_board.replace("/", "_")
 
-    board_dir = dir_find(os.path.join(east.project_dir, "boards"), west_board)
+    board_dir = find_board_dir(east, west_board)
 
     if not board_dir:
-        return [west_board]
+        east.exit(f"Board {west_board} not found in the boards directory.")
 
     files = os.listdir(board_dir)
 
@@ -274,9 +293,9 @@ def find_all_boards(east, west_board: str) -> List[str]:
         ".".join(m.split(".")[0].replace(west_board, "").split("_")[1:])
         for m in matches
     ]
-    boards = ["@".join([west_board, hw]) for hw in sorted(hw_versions)]
+    boards = ["@".join([west_board_unmodified, hw]) for hw in sorted(hw_versions)]
 
-    return boards if boards else [west_board]
+    return boards if boards else [west_board_unmodified]
 
 
 def clean_up_extra_args(args):

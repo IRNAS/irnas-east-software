@@ -6,7 +6,7 @@ from east.east_context import EastContext
 from east.helper_functions import find_all_boards
 
 from . import helpers
-from .helpers import helper_test_against_west_run
+from .helpers import helper_test_against_west_run, helper_test_against_west_dbg
 
 
 def test_finding_hardware_versions(west_workplace):
@@ -26,11 +26,6 @@ def test_finding_hardware_versions(west_workplace):
     # Some board that has a board folder but not revisions
     boards = find_all_boards(east, "nrf52840dk_nrf52840")
     expected_boards = ["nrf52840dk_nrf52840"]
-    assert expected_boards == boards
-
-    # Non-existing in sense that it does not have its own boards folder.
-    boards = find_all_boards(east, "non_existing_board")
-    expected_boards = ["non_existing_board"]
     assert expected_boards == boards
 
 
@@ -482,4 +477,41 @@ def test_building_app_that_is_not_on_the_first_level(
         project,
         "release",
         expected_west_cmds=expected_single_app_release_west_commands,
+    )
+
+
+east_yaml_hw_model_v2_only_apps = """
+apps:
+  - name: test_one
+    west-boards:
+      - custom/nrf52840dk
+      - nrf52840dk/nrf52840
+"""
+
+expected_hw_v2_only_apps_release_west_commands = [
+    "build -b custom/nrf52840dk@1.0.0 app",
+    "build -b custom/nrf52840dk@1.1.0 app",
+    "build -b custom/nrf52840dk@2.20.1 app",
+    "build -b nrf52840dk/nrf52840 app",
+]
+
+
+def test_hw_model_v2_only_apps(west_workplace, monkeypatch, mocker):
+    """Running east release with only apps key, where the board names are in the new
+    hardware model v2 format.
+    """
+    helpers.create_and_write(
+        west_workplace,
+        "east.yml",
+        east_yaml_hw_model_v2_only_apps,
+    )
+
+    monkeypatch.setattr(east.workspace_commands.release_commands, "RUNNING_TESTS", True)
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace,
+        "release",
+        expected_west_cmds=expected_hw_v2_only_apps_release_west_commands,
     )
