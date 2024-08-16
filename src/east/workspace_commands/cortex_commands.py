@@ -1,6 +1,6 @@
+import copy
 import json
 import os
-import copy
 
 import click
 import rich.prompt
@@ -84,8 +84,7 @@ def cortex_debug(
     # If not all params are provided, try to infer them from the runners.yaml file.
     if not all([device, gdb_path, elf_file]):
         try:
-            print("reading from runners.yaml")
-            _device, _gdb_path, _elf_file = get_cortex_debug_params(east, build_dir)
+            _device, _gdb_path, _elf_file = get_cortex_debug_params(build_dir)
             device = device if device else _device
             gdb_path = gdb_path if gdb_path else _gdb_path
             elf_file = elf_file if elf_file else _elf_file

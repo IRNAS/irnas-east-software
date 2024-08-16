@@ -438,7 +438,7 @@ def get_device_in_runner_yaml(build_dir):
     return device
 
 
-def get_cortex_debug_params(east, build_dir):
+def get_cortex_debug_params(build_dir):
     """Get cortex debug parameters from the build directory.
 
     Any path returned will be absolute.
@@ -446,14 +446,12 @@ def get_cortex_debug_params(east, build_dir):
     Any failure to read something will result in a raised exception so this should be
     called inside the try block.
     """
-    runners_file = os.path.join(east.cwd, build_dir, "zephyr", "runners.yaml")
-    elf_file = os.path.join(east.cwd, build_dir, "zephyr", "zephyr.elf")
-
     if not os.path.isdir(build_dir):
         raise Exception(f"Build directory {build_dir} not found")
 
-    if not os.path.isfile(runners_file):
-        raise Exception(f"Runners file {runners_file} not found")
+    runners_file = os.path.join(find_app_build_dir(build_dir), "runners.yaml")
+    elf_file = os.path.join(find_app_build_dir(build_dir), "zephyr.elf")
+    elf_file = os.path.realpath(elf_file)
 
     with open(runners_file) as f:
         runner_cfg = yaml.safe_load(f)
@@ -461,10 +459,10 @@ def get_cortex_debug_params(east, build_dir):
     device = get_device(runner_cfg)
 
     if not device:
-        raise Exception("Can't find JLink device in the file")
+        raise Exception(f"Can't find JLink device in the {runners_file} file")
 
     if "gdb" not in runner_cfg["config"]:
-        raise Exception("Can't find gdb path in the file")
+        raise Exception(f"Can't find gdb path in the {runners_file} file")
 
     if not os.path.isfile(elf_file):
         raise Exception(f"Elf file {elf_file} not found")
