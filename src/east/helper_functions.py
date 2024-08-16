@@ -53,6 +53,10 @@ class WestYmlNotFound(RuntimeError):
     """west.yml file does not exist."""
 
 
+class EastJlinkDeviceLoadError(RuntimeError):
+    """Some error happened when trying to collect --device flag for JLink."""
+
+
 def download_file(task_id: TaskID, url: str, path: str):
     """Download a file from the internet to the given path."""
     file_size = requests.head(url, allow_redirects=True).headers.get(
@@ -402,18 +406,36 @@ def get_device(runner_yaml_content):
         return None
 
 
-def get_device_in_runner_yaml():
-    """Returns device flag for jlink runner from runner.yaml.
+def find_app_build_dir(build_dir):
+    """Find the build directory of the app."""
+    try:
+        # Presence of domain.yaml indicates that the project is using sysbuild.
+        with open(os.path.join(build_dir, "domains.yaml")) as f:
+            d = yaml.safe_load(f)
+            return os.path.join(build_dir, d["default"], "zephyr")
+    except FileNotFoundError:
+        return os.path.join(build_dir, "zephyr")
 
-    If runner.yaml is not found or the correct flag could not be fetched then None is
-    returned.
+
+def get_device_in_runner_yaml(build_dir):
+    """Returns device flag for JLink runner from runners.yaml.
+
+    If it is not possible to do that it will raise an exception.
     """
-    runners_yaml = os.path.join("build", "zephyr", "runners.yaml")
-    if os.path.isfile(runners_yaml):
-        with open(runners_yaml) as f:
-            return get_device(yaml.safe_load(f.read()))
+    app_build_dir = find_app_build_dir(build_dir)
 
-    return None
+    with open(os.path.join(app_build_dir, "runners.yaml")) as f:
+        runners_yaml = yaml.safe_load(f)
+
+    device = get_device(runners_yaml)
+
+    if not device:
+        raise Exception(
+            "No JLink device was found in the runners.yaml file! Used board might "
+            "not be supported. Try specifying the specific device with --device flag."
+        )
+
+    return device
 
 
 def get_cortex_debug_params(east, build_dir):

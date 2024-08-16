@@ -12,14 +12,30 @@ def no_jlink_tool_msg(tool):
     )
 
 
+def fmt_runner_error_msg(exception_msg):
+    """Format error message for EastJlinkDeviceLoadError."""
+    return (
+        "An [bold red]error[/] occurred when trying to extract [bold cyan]--device[/] "
+        "flag from [bold yellow]runners.yaml[/] file!\n\n"
+        f"[italic yellow]{exception_msg}[/]\n"
+    )
+
+
 @click.command(**east_command_settings)
+@click.option(
+    "-d",
+    "--build-dir",
+    type=str,
+    default="build",
+    help=("Build directory of the project. Default: build."),
+)
 @click.option(
     "-d",
     "--device",
     type=str,
     help=(
         "Set the target device, required by JLinkExe, i.e. [bold]NRF52840_xxAA[/]. "
-        "If not given, east tries to infer the device by looking into Zephyr's build folder."
+        "If not given, east tries to infer the device by looking into --build-dir."
     ),
 )
 @click.option(
@@ -48,7 +64,7 @@ def no_jlink_tool_msg(tool):
     ),
 )
 @click.pass_obj
-def connect(east, device, dev_id, rtt_port, speed):
+def connect(east, device, dev_id, rtt_port, speed, build_dir):
     """Connect to a device and create a RTT server with [bold cyan]JLinkExe[/].
 
     \b
@@ -65,7 +81,11 @@ def connect(east, device, dev_id, rtt_port, speed):
         cmd += f"-USB {dev_id} "
 
     if not device:
-        device = get_device_in_runner_yaml()
+        try:
+            device = get_device_in_runner_yaml(build_dir)
+        except Exception as msg:
+            east.print(fmt_runner_error_msg(msg), highlight=False)
+            east.exit()
 
     if device:
         cmd += f"-Device {device} "
