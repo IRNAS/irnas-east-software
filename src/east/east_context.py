@@ -307,22 +307,6 @@ class EastContext:
 
         This method should be used when passing any arbitrary command, like west command.
 
-        To properly execute an arbitrary command and propagate its return code to the
-        caller we have do a bit of a bash shell dancing, as nrfutil toolchain-manager
-        does not do this for some commands (if west build fails then return code is not
-        propagated, but issuing non-existing command does propagate up).
-
-        What we do is that we run the arbitrary command the following way:
-
-            bash -c '{arbitrary_command} && touch success.txt'
-
-        if arbitrary_command inside it fails, then `touch success.txt` is not executed.
-
-        So we are checking for success.txt file after every call and exit if it does not
-        exist.
-
-        We also need to be careful what quotes we are using.
-
         Args:
             command (str):          Command to execute.
             exit_on_error (bool):   If true the program is exited if the return code of
@@ -332,38 +316,12 @@ class EastContext:
         Returns:
             Check .run
         """
-        command = command.replace("'", '"')
-
         cmd = (
             f"{self.consts['nrfutil_path']} toolchain-manager launch --ncs-version"
-            f" {self.detected_ncs_version} -- bash -c '{command} "
-            "&& touch success.txt'"
+            f" {self.detected_ncs_version} -- {command}"
         )
 
-        # Clean any success.txt file from before
-        def cleanup():
-            try:
-                os.remove("success.txt")
-            except FileNotFoundError:
-                pass
-
-        cleanup()
-        result = self.run(cmd, **kwargs)
-
-        # Correctly pass the information if the previous command run successfully
-        if os.path.isfile("success.txt"):
-            returncode = 0
-        else:
-            returncode = 1
-            if exit_on_error:
-                self.exit()
-
-        cleanup()
-
-        # Patch over the correct returncode
-        result["returncode"] = returncode
-
-        return result
+        return self.run(cmd, **kwargs)
 
     def check_exe(self, exe: str, on_fail_exit: bool = False) -> bool:
         """Checks if the given executable can be found by the which command.
