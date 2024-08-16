@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   Make east compatible with Docker. When inside the docker environment East will 
+    not try to pass any commands to the nRFUtil's toolchain-manager, 
+    but it will pass them directly to the west.
+    The rationale for that is that the docker environment should provide
+    all commands that are needed for working on a Zephyr/NCS project and
+    east should just use them directly.
+
 ## [0.20.0] - 2024-08-16
 
 ### Added

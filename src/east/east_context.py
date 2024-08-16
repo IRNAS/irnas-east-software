@@ -78,6 +78,7 @@ class EastContext:
         self.use_toolchain_manager = False
         self.detected_ncs_version_installed = False
         self.east_yml = None
+        self.in_docker = os.path.exists("/.dockerenv")
 
         try:
             self.west_dir_path = west_topdir()
@@ -394,6 +395,11 @@ class EastContext:
                                               inside the west workspace, but does not
                                               need nrf toolchain manager.
         """
+        if self.in_docker:
+            # Running in docker, we shouldn't use the toolchain manager.
+            self.use_toolchain_manager = False
+            return
+
         # Workspace commands can only be run inside west workspace, so exit if that is
         # not the case.
         if not self.west_dir_path:
