@@ -6,7 +6,7 @@ from east.east_context import EastContext
 from east.helper_functions import find_all_boards
 
 from . import helpers
-from .helpers import helper_test_against_west_run, helper_test_against_west_dbg
+from .helpers import helper_test_against_west_run
 
 
 def test_finding_hardware_versions(west_workplace):

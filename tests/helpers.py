@@ -2,6 +2,7 @@ import os
 import shutil
 
 from click.testing import CliRunner
+
 from east.__main__ import cli
 from east.east_context import EastContext
 

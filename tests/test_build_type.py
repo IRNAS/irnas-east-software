@@ -2,6 +2,7 @@ import os
 
 import pytest
 from click.testing import CliRunner
+
 from east.__main__ import cli
 
 from . import helpers

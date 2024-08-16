@@ -13,5 +13,5 @@ __all__ = [
     "twister",
     "codechecker",
     "release",
-    "cortex_debug"
+    "cortex_debug",
 ]

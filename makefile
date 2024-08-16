@@ -7,7 +7,7 @@ test:
 	pytest -s
 
 format:
-	ruff . --fix
+	ruff check . --fix
 	ruff format .
 
 build:

@@ -1,7 +1,8 @@
 import os
 
-import east.east_context
 import pytest
+
+import east.east_context
 
 from . import helpers
 

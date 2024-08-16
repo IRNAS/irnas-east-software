@@ -1,6 +1,7 @@
 import os
 
 from click.testing import CliRunner
+
 from east.__main__ import cli
 
 
