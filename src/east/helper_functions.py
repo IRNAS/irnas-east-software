@@ -284,7 +284,8 @@ def find_all_boards(east, west_board: str) -> List[str]:
     board_dir = find_board_dir(east, west_board)
 
     if not board_dir:
-        east.exit(f"Board {west_board} not found in the boards directory.")
+        # Just return the original name, since the board might come from Zephyr or NCS.
+        return [west_board]
 
     files = os.listdir(board_dir)
 
