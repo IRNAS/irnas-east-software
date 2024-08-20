@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.21.1] - 2024-08-20
+
 ## Fixed
 
 -   `east release` command wrongly aborted, if a board from `east.yml` wasn't found 
@@ -581,7 +583,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.1...HEAD
+
+[0.21.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.0...v0.21.1
 
 [0.21.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.20.0...v0.21.0
 
