@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   `east build` command silently dropped the board-related .conf files when build types 
+    were used. This bug was introduced in the v0.20.0. with the adoption of the new hardware 
+    model naming.
+
 ## [0.21.1] - 2024-08-20
 
 ### Fixed

@@ -515,3 +515,50 @@ def test_hw_model_v2_only_apps(west_workplace, monkeypatch, mocker):
         "release",
         expected_west_cmds=expected_hw_v2_only_apps_release_west_commands,
     )
+
+
+east_yaml_hw_model_v2_with_build_types = """
+apps:
+  - name: test_one
+    west-boards:
+      - nrf52840dk/nrf52840
+
+    build-types:
+      - type: debug
+        conf-files:
+          - debug.conf
+"""
+
+expected_hw_v2_with_build_types_release_west_commands = [
+    (
+        "build -b nrf52840dk/nrf52840 app -- -DCONF_FILE=conf/common.conf"
+        ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;conf/debug.conf"'
+        ' -DEAST_BUILD_TYPE="debug"'
+    ),
+    (
+        "build -b nrf52840dk/nrf52840 app -- -DCONF_FILE=conf/common.conf"
+        ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+        ' -DEAST_BUILD_TYPE="release"'
+    ),
+]
+
+
+def test_hw_model_v2_with_build_types(west_workplace, monkeypatch, mocker):
+    """Running east release with build types, where the board names are in the new
+    hardware model v2 format, should work.
+    """
+    helpers.create_and_write(
+        west_workplace,
+        "east.yml",
+        east_yaml_hw_model_v2_with_build_types,
+    )
+
+    monkeypatch.setattr(east.workspace_commands.release_commands, "RUNNING_TESTS", True)
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        west_workplace,
+        "release",
+        expected_west_cmds=expected_hw_v2_with_build_types_release_west_commands,
+    )

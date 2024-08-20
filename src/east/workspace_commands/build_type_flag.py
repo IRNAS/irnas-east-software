@@ -48,6 +48,8 @@ def _construct_required_cmake_args(
     if board:
         # Sanitize the board input, user might gave hv version
         board = board.split("@")[0]
+        # Cleanup also hw v2 board names
+        board = board.replace("/", "_")
 
         # Location of the board file depends on the source_dir and prefix
         board_prefix = f"{source_dir}/{prefix}" if source_dir else f"{prefix}"
