@@ -8,9 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [0.21.1] - 2024-08-20
 
-## Fixed
+### Fixed
 
--   `east release` command wrongly aborted, if a board from `east.yml` wasn't found 
+-   `east release` command wrongly aborted, if a board from `east.yml` wasn't found
     in project's board directory. That was wrong, since the board might be located
     either in Zephyr, NCS or some other Zephyr module.
 
