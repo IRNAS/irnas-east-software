@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Relax the PyYAML requirement from exact version (PyYAML==6.0.2) to a range 
+    (PyYAML>=6.0.0). This prevents pip conflicts with the CodeChecker package
+    (which wants ==6.0.0) in the CI.
+
 ## [0.21.2] - 2024-08-20
 
 ### Fixed
