@@ -256,7 +256,7 @@ def tool_installer(east, tool_names):
     supported_tools = [
         {
             "name": "toolchain-manager",
-            "exe": east.consts["nrfutil_path"],
+            "cmd": east.consts["nrfutil_path"] + " toolchain-manager",
             "url": _get_nrfutil_download_link(),
             "install_method": _install_nrfutil,
             "installed_msg": toolchain_installed_msg,
@@ -301,17 +301,24 @@ def tool_installer(east, tool_names):
     }
 
     for tool in tools:
-        tool["installed"] = east.check_exe(tool["exe"])
+        if "exe" in tool:
+            tool["installed"] = east.check_exe(tool["exe"])
+            tool_path = tool["exe"]
+        else:
+            ret = east.run(tool["cmd"], exit_on_error=False, silent=True)
+            tool["installed"] = ret["returncode"] == 0
+            tool_path = tool["cmd"]
+
         if tool["installed"]:
-            east.print(f"{tool['exe']} [green]found", **print_args)
+            east.print(f"{tool_path} [green]found", **print_args)
         elif tool["name"] in downloaded_files:
             east.print(
-                f"{tool['exe']} [red]not installed[/], but downloaded file is "
+                f"{tool_path} [red]not installed[/], but downloaded file is "
                 f"present in the {east.consts['cache_dir']}",
                 **print_args,
             )
         else:
-            east.print(f"{tool['exe']} [red]not found", **print_args)
+            east.print(f"{tool_path} [red]not found", **print_args)
             files_to_download.append(
                 {
                     "url": tool["url"],

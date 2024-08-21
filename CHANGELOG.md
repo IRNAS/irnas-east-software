@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   `east install nrfutil-toolchain-manager` until now only checked if the `nrfutil`
+    binary is present, but not also if the `toolchain-manager` package is installed 
+    inside it. That resulted in situations where the install command would report
+    success, however any other east command after it would fail. Now the install
+    command checks if the `nrfutil` binary is present and if the `toolchain-manager`
+    package is installed inside it.
+
 ## [0.21.3] - 2024-08-21
 
 ### Fixed
