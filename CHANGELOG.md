@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.21.3] - 2024-08-21
+
 ### Fixed
 
 -   Relax the PyYAML requirement from exact version (PyYAML==6.0.2) to a range 
@@ -597,7 +599,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.2...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.3...HEAD
+
+[0.21.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.2...v0.21.3
 
 [0.21.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.1...v0.21.2
 
