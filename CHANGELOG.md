@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+-   Remove self-detection of Docker environment (introduced in v0.21.0) and add support for
+    `EAST_DONT_USE_TOOLCHAIN_MANAGER` environment variable. If this variable is set to `1`,
+    East will not try to use the toolchain manager, but will pass the commands directly to the
+    system provided West.
+    The rationale for this change is that some Docker environments don't provide all tools/commands
+    and East should use toolchain-manager in that cases. That case is our current CI environment, 
+    where we just install East and want it to manage the tooling. But some Docker environments
+    will provide all tools, including East, so East should just use them directly.
+    But there is no way to detect this automatically, so we need to provide a way for the user to
+    tell East what to do. This is done with the `EAST_DONT_USE_TOOLCHAIN_MANAGER` environment
+    variable.
+
 ## [0.21.4] - 2024-08-21
 
 ### Fixed
