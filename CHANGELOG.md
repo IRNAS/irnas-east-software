@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.22.0] - 2024-08-22
+
 ### Changed
 
 -   Remove self-detection of Docker environment (introduced in v0.21.0) and add support for
@@ -624,7 +626,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.4...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.22.0...HEAD
+
+[0.22.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.4...v0.22.0
 
 [0.21.4]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.3...v0.21.4
 
