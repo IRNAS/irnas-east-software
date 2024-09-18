@@ -11,7 +11,12 @@ from rich.rule import Rule
 from rich.table import Table
 
 from ..east_context import east_command_settings
-from ..helper_functions import find_all_boards, get_git_version
+from ..helper_functions import (
+    does_project_use_sysbuild,
+    find_all_boards,
+    find_app_build_dir,
+    get_git_version,
+)
 from .basic_commands import create_build_command
 
 # This could be considered as a hack, but it is actually the cleanest way to test
@@ -83,41 +88,88 @@ def create_art_dest_and_src_dir(
     return dst, src_dir
 
 
-def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
-    """Moves build artefacts to art_dest and renames them to art_name."""
-    # Create artefact destination
-    os.makedirs(art_dest, exist_ok=True)
+def collect_binaries_using_sysbuild(build_dir, dry_run):
+    """Collect binaries from build folder that used sysbuild."""
+    app_build_dir = find_app_build_dir(build_dir)
 
-    build_dir = os.path.join("build", "zephyr")
+    # This two always exist.
+    merged_hex = os.path.join(build_dir, "merged.hex")
+    zephyr_elf = os.path.join(app_build_dir, "zephyr.elf")
+    binaries = [merged_hex, zephyr_elf]
 
-    # Determine, if we have basic build with MCUBoot, some other build with child images, or default build
+    # This one might exist.
+    dfu_zip = os.path.join(build_dir, "dfu_application.zip")
+    if os.path.isfile(dfu_zip):
+        binaries.append(dfu_zip)
+
+    # This one also might exist, if not use zephyr.bin instead.
+    app_update_bin = os.path.join(app_build_dir, "zephyr.signed.bin")
+    if not os.path.isfile(app_update_bin):
+        app_update_bin = os.path.join(app_build_dir, "zephyr.bin")
+    binaries.append(app_update_bin)
+
+    if dry_run or RUNNING_TESTS:
+        binaries = [merged_hex, zephyr_elf, dfu_zip, app_update_bin]
+
+    return binaries
+
+
+def collect_binaries_without_using_sysbuild(build_dir, dry_run):
+    """Collect binaries from build folder that did not use sysbuild."""
+    app_build_dir = os.path.join(build_dir, "zephyr")
+
+    # Determine, if we have basic build with MCUBoot, some other build with child
+    # images, or default build
     if (
-        os.path.isfile(os.path.join(build_dir, "app_update.bin"))
+        os.path.isfile(os.path.join(app_build_dir, "app_update.bin"))
         or dry_run
         or RUNNING_TESTS
     ):
         # MCUBoot
-        binaries = ["dfu_application.zip", "app_update.bin", "merged.hex", "zephyr.elf"]
-    elif os.path.isfile(os.path.join(build_dir, "merged.hex")):
+        binaries = [
+            "dfu_application.zip",
+            "app_update.bin",
+            "merged.hex",
+            "zephyr.elf",
+        ]
+    elif os.path.isfile(os.path.join(app_build_dir, "merged.hex")):
         # Other (TFM, SPM, ...)
         binaries = ["merged.hex", "zephyr.elf"]
     else:
         # Basic build (No merged.hex is generated)
         binaries = ["zephyr.bin", "zephyr.hex", "zephyr.elf"]
 
+    return [os.path.join(app_build_dir, binary) for binary in binaries]
+
+
+def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
+    """Moves build artefacts to art_dest and renames them to art_name."""
+    os.makedirs(art_dest, exist_ok=True)
+
+    build_dir = "build"
+    # Figure out out if sysbuild is used or not, presence of domains.yaml can be used
+    # for that. Determine the default build directory.
+    # Collect dfu_application.zip, zephyr.signed.bin, merged.hex, zephyr.elf, first two
+    # might be missing.
+
+    if does_project_use_sysbuild(build_dir):
+        binaries = collect_binaries_using_sysbuild(build_dir, dry_run)
+    else:
+        binaries = collect_binaries_without_using_sysbuild(build_dir, dry_run)
+
     for binary in binaries:
-        bin_path = os.path.join(build_dir, binary)
-
         # If doing dry run or running tests we just create empty files so that we have
-        # something to copy
+        # something to copy.
         if dry_run or RUNNING_TESTS:
-            os.makedirs(build_dir, exist_ok=True)
-            open(bin_path, "w").close()
+            path = os.path.dirname(binary)
+            if not os.path.exists(path):
+                os.makedirs(path, exist_ok=True)
+            open(binary, "w").close()
 
-        if os.path.isfile(bin_path):
-            exten = binary.split(".")[1]
+        if os.path.isfile(binary):
+            exten = binary.split(".")[-1]
             sh.copyfile(
-                bin_path,
+                binary,
                 os.path.join(art_dest, ".".join([art_name, exten])),
             )
 

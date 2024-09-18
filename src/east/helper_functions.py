@@ -418,6 +418,11 @@ def find_app_build_dir(build_dir):
         return os.path.join(build_dir, "zephyr")
 
 
+def does_project_use_sysbuild(build_dir):
+    """Based on the presence of domain.yaml file determine if the project uses sysbuild."""
+    return os.path.isfile(os.path.join(build_dir, "domains.yaml"))
+
+
 def get_device_in_runner_yaml(build_dir):
     """Returns device flag for JLink runner from runners.yaml.
 
