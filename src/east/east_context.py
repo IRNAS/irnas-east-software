@@ -302,7 +302,7 @@ class EastContext:
 
         return self.run(cmd, **kwargs)
 
-    def run_cmd_in_manager(self, command: str, exit_on_error: bool = True, **kwargs):
+    def run_cmd_in_manager(self, command: str, **kwargs):
         """Run an arbitrary command through nrfutil toolchain-manager.
 
         This method should be used when passing any arbitrary command, like west command.
