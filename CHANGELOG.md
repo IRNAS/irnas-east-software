@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.22.1] - 2024-09-18
+
 ### Fixed
 
 -   The issue where build failure in `east release` command would just fail without warning.
@@ -633,7 +635,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.22.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.22.1...HEAD
+
+[0.22.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.22.0...v0.22.1
 
 [0.22.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.21.4...v0.22.0
 
