@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   The issue where build failure in `east release` command would just fail without warning.
+    (#110).
+-   The issue where `east release` command wasn't creating artefacts for builds using sysbuild
+    (#108).
+
 ## [0.22.0] - 2024-08-22
 
 ### Changed
