@@ -5,7 +5,7 @@ import click
 from rich.syntax import Syntax
 
 from ..east_context import east_command_settings, east_group_settings
-from ..helper_functions import clean_up_extra_args
+from ..helper_functions import clean_up_extra_args, find_app_build_dir
 from .codechecker_helpers import (
     check_for_build_folder,
     check_for_codechecker,
@@ -105,7 +105,9 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze, build_d
     cc = east.consts["codechecker_path"]
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
     cc_output_dir = os.path.join(build_dir, "codechecker")
-    compile_commands = os.path.join(build_dir, "compile_commands.json")
+    compile_commands = os.path.join(
+        find_app_build_dir(build_dir), "compile_commands.json"
+    )
 
     check_for_codechecker(east)
     check_for_build_folder(east, build_dir)
