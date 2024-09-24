@@ -107,14 +107,12 @@ def build(ctx, east, build_type, spdx, extra_help, args):
     if spdx:
         east.run_west(f"spdx --build-dir {build_dir} --analyze-includes --include-sdk")
 
-    compile_file = os.path.join("build", "compile_commands.json")
+    compile_file = os.path.join(build_dir, "compile_commands.json")
     if os.path.isfile(compile_file):
         for dest in [east.project_dir, east.west_dir_path]:
             sh.copyfile(compile_file, os.path.join(dest, "compile_commands.json"))
 
-    create_codecheckerfile(
-        east, opts.board, build_type, opts.build_dir, opts.source_dir
-    )
+    create_codecheckerfile(east, opts.board, build_type, build_dir, opts.source_dir)
 
 
 def create_build_command_from_commandline(east, raw_args, build_type):
