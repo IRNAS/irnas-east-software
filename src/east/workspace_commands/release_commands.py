@@ -44,6 +44,10 @@ def create_artefact_name(project, board, version, build_type):
     We also add git hash at the end if the build was not done on the clean tagged
     commit.
     """
+    # As we allow project names to be paths for samples, we need to extract just the
+    # name of the project.
+    project = os.path.basename(project)
+
     board = board.replace("@", "-hv")
 
     # "Normalize" hw v2 board names
@@ -434,10 +438,9 @@ def release(east, dry_run, verbose, spdx_app_only):
         else:
             app["build-types"] = [{"type": None}]
 
-    samples_in_dir = os.listdir("samples") if os.path.isdir("samples") else []
     for sample in samples:
         # Check, if the sample even exists before building for it
-        if sample["name"] not in samples_in_dir:
+        if not os.path.isdir(os.path.join("samples", sample["name"])):
             east.print(non_existing_sample_msg_fmt(sample["name"]))
             east.exit()
         # Add parent to mark from where this key comes from

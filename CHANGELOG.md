@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   `east.yml` now supports specifying samples in nested subdirectories. For example, if there is a
+    sample located under `samples/basic/blinky`, it can be specified in `east.yml` simply as
+    `- name: basic/blinky`. Samples build artefacts will be stored in the `build` directory under
+    the same subdirectory structure. This feature allows users to organize their samples in a more 
+    structured way, instead of having all samples in the root `samples` directory.
+    This feature is documented in the `docs/configuration.md` file under `Samples` section.
+    Suggested by @Finwood in #111.
+
 ### Fixed
 
 -   `east release` command, which failed to find project dir, when run with 

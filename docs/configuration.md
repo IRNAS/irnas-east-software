@@ -234,6 +234,31 @@ samples:
     # Don't inherit, use default west behaviour in the `dfu` sample folder
 ```
 
+### Nested samples
+
+`samples` folder can contain nested sub-folders with samples.
+
+For example, if we have a `blinky` sample located like this:
+
+```text
+example_project
+├── samples
+│   ├── basic
+│   │   ├── blinky   # Blinky sample
+```
+
+then you would specify such sample in `east.yml` like this:
+
+```yaml
+samples:
+  - name: basic/blinky
+    west-boards:
+      - custom_nrf52840dk
+    inherit-build-type:
+      app: nrf52_app
+      build-type: debug
+```
+
 ## Release command
 
 `east release` command runs a release process consisting of a series of
@@ -253,9 +278,10 @@ for a specific key will be skipped, if it is not present.
 Different hardware versions of listed boards are picked up automatically from
 the `board` directory.
 
-Created binaries are named according to the [IRNAS's release artefact naming
-guidelines]. Samples are placed into a separate folder to avoid confusion. A
-collection of zip files is created to simplify upload to GitHub Release page.
+Created binaries are named according to the [IRNAS's release artefact
+naming guidelines]. Samples are placed into a separate folder to avoid
+confusion. A collection of zip files is created to simplify upload to GitHub
+Release page.
 
 High-level release process looks like this:
 
@@ -299,8 +325,8 @@ In both cases the file extensions are preserved.
 This document assumes knowledge of several different concepts:
 
 - [Kconfig documentation page] - the main page about KConfig
-- [One time CMake Arguments] - How to specify additional conf files to `Cmake`,
-  `east` uses that under the hood
+- [One time CMake Arguments] - How to specify additional conf files to `Cmake`, `east`
+  uses that under the hood
 - [Nice blog about Zephyr configuration]
 
 [irnas's release artefact naming guidelines]:
