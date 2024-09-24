@@ -22,6 +22,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 -   `east release` command, which failed to find project dir, when run with 
     `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` option.
+-  `east codechecker check`, which previous failed to find `compile_command.json` file on 
+    builds that were using sysbuild.
 
 ## [0.22.1] - 2024-09-18
 
