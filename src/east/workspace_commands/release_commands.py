@@ -90,7 +90,7 @@ def create_art_dest_and_src_dir(
 
 def collect_binaries_using_sysbuild(build_dir, dry_run):
     """Collect binaries from build folder that used sysbuild."""
-    app_build_dir = find_app_build_dir(build_dir)
+    app_build_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
 
     # This two always exist.
     merged_hex = os.path.join(build_dir, "merged.hex")

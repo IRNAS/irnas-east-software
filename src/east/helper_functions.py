@@ -413,9 +413,9 @@ def find_app_build_dir(build_dir):
         # Presence of domain.yaml indicates that the project is using sysbuild.
         with open(os.path.join(build_dir, "domains.yaml")) as f:
             d = yaml.safe_load(f)
-            return os.path.join(build_dir, d["default"], "zephyr")
+            return os.path.join(build_dir, d["default"])
     except FileNotFoundError:
-        return os.path.join(build_dir, "zephyr")
+        return os.path.join(build_dir)
 
 
 def does_project_use_sysbuild(build_dir):
@@ -428,9 +428,9 @@ def get_device_in_runner_yaml(build_dir):
 
     If it is not possible to do that it will raise an exception.
     """
-    app_build_dir = find_app_build_dir(build_dir)
+    zephyr_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
 
-    with open(os.path.join(app_build_dir, "runners.yaml")) as f:
+    with open(os.path.join(zephyr_dir, "runners.yaml")) as f:
         runners_yaml = yaml.safe_load(f)
 
     device = get_device(runners_yaml)
@@ -455,8 +455,10 @@ def get_cortex_debug_params(build_dir):
     if not os.path.isdir(build_dir):
         raise Exception(f"Build directory {build_dir} not found")
 
-    runners_file = os.path.join(find_app_build_dir(build_dir), "runners.yaml")
-    elf_file = os.path.join(find_app_build_dir(build_dir), "zephyr.elf")
+    zephyr_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
+
+    runners_file = os.path.join(zephyr_dir, "runners.yaml")
+    elf_file = os.path.join(zephyr_dir, "zephyr.elf")
     elf_file = os.path.realpath(elf_file)
 
     with open(runners_file) as f:
