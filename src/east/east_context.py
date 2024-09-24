@@ -394,11 +394,6 @@ class EastContext:
                                               inside the west workspace, but does not
                                               need nrf toolchain manager.
         """
-        if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "1":
-            # Running in docker, we shouldn't use the toolchain manager.
-            self.use_toolchain_manager = False
-            return
-
         # Workspace commands can only be run inside west workspace, so exit if that is
         # not the case.
         if not self.west_dir_path:
@@ -415,6 +410,11 @@ class EastContext:
         except EastYmlLoadError as msg:
             self.print(format_east_yml_load_error_msg(msg), highlight=False)
             self.exit()
+
+        if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "1":
+            # Running in docker, we shouldn't use the toolchain manager.
+            self.use_toolchain_manager = False
+            return
 
         # Check if ncs version was even detected, this can happen in the cases where
         # normal zephyr repo is used.

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   `east release` command, which failed to find project dir, when run with 
+    `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` option.
+
+
 ## [0.22.1] - 2024-09-18
 
 ### Fixed
