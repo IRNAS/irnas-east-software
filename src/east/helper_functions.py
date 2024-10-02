@@ -171,18 +171,23 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     with open(west_yaml, "r") as file:
         manifest = yaml.safe_load(file)["manifest"]
 
-    try:
         ncs = list(
             filter(
-                lambda project: project["repo-path"] == "sdk-nrf", manifest["projects"]
+                lambda project: project.get("repo-path", "") == "sdk-nrf",
+                manifest["projects"],
             )
         )
-    except KeyError:
-        # This can happen in the case where there is no sdk-nrf repo in the west yaml
-        # file, project is probably using ordinary Zephyr.
+
+    # This can happen in the case where there is no sdk-nrf repo in the west yaml
+    # file, project is probably using ordinary Zephyr.
+    if len(ncs) == 0:
         return None, project_path
 
-    return (ncs[0]["revision"], project_path)
+    # Attempt to extract the NCS revision, which is optional.
+    # (We can safely access the first element, since we checked the length above)
+    revision = ncs[0].get("revision", None)
+
+    return (revision, project_path)
 
 
 def return_dict_on_match(array_of_dicts, key, value):

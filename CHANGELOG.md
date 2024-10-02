@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   Parsing of `west.yml` when a project within the yaml does not contain the `repo-path` key.
+
 ## [0.23.0] - 2024-09-24
 
 ### Added
