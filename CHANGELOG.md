@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.23.1] - 2024-10-03
+
 ### Fixed
 
 -   Parsing of `west.yml` when a project within the yaml does not contain the `repo-path` key.
@@ -29,8 +31,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 -   `east release` command, which failed to find project dir, when run with
     `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` option.
--  `east codechecker check`, which previous failed to find `compile_command.json` file on
-    builds that were using sysbuild.
+-   `east codechecker check`, which previous failed to find `compile_command.json` file on
+     builds that were using sysbuild.
 
 ## [0.22.1] - 2024-09-18
 
@@ -661,7 +663,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Docker scripts for building and running docker containers, for development
     purposes.
 
-[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.0...HEAD
+[Unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.1...HEAD
+
+[0.23.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.0...v0.23.1
 
 [0.23.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.22.1...v0.23.0
 
