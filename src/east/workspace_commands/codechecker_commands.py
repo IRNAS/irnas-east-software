@@ -19,7 +19,7 @@ from .codechecker_helpers import (
     get_metadata_from_codecheckerfile,
 )
 
-# Print output of the parse and diff command,s with default rich highlighting, but
+# Print output of the parse and diff commands, with default rich highlighting, but
 # without any other wrapping, cropping.
 clean_print_args = {
     "highlight": True,
