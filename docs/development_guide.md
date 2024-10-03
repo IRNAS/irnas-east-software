@@ -39,7 +39,7 @@ source venv/bin/activate
    on the command line afterwards.
 
 ```bash
-make install-dev
+make install
 ```
 
 ## Running unit tests
