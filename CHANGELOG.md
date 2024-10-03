@@ -19,16 +19,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   `east.yml` now supports specifying samples in nested subdirectories. For example, if there is a
     sample located under `samples/basic/blinky`, it can be specified in `east.yml` simply as
     `- name: basic/blinky`. Samples build artefacts will be stored in the `build` directory under
-    the same subdirectory structure. This feature allows users to organize their samples in a more 
+    the same subdirectory structure. This feature allows users to organize their samples in a more
     structured way, instead of having all samples in the root `samples` directory.
     This feature is documented in the `docs/configuration.md` file under `Samples` section.
     Suggested by @Finwood in #111.
 
 ### Fixed
 
--   `east release` command, which failed to find project dir, when run with 
+-   `east release` command, which failed to find project dir, when run with
     `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` option.
--  `east codechecker check`, which previous failed to find `compile_command.json` file on 
+-  `east codechecker check`, which previous failed to find `compile_command.json` file on
     builds that were using sysbuild.
 
 ## [0.22.1] - 2024-09-18
@@ -49,7 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     East will not try to use the toolchain manager, but will pass the commands directly to the
     system provided West.
     The rationale for this change is that some Docker environments don't provide all tools/commands
-    and East should use toolchain-manager in that cases. That case is our current CI environment, 
+    and East should use toolchain-manager in that cases. That case is our current CI environment,
     where we just install East and want it to manage the tooling. But some Docker environments
     will provide all tools, including East, so East should just use them directly.
     But there is no way to detect this automatically, so we need to provide a way for the user to
@@ -61,7 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 -   `east install nrfutil-toolchain-manager` until now only checked if the `nrfutil`
-    binary is present, but not also if the `toolchain-manager` package is installed 
+    binary is present, but not also if the `toolchain-manager` package is installed
     inside it. That resulted in situations where the install command would report
     success, however any other east command after it would fail. Now the install
     command checks if the `nrfutil` binary is present and if the `toolchain-manager`
@@ -71,7 +71,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
--   Relax the PyYAML requirement from exact version (PyYAML==6.0.2) to a range 
+-   Relax the PyYAML requirement from exact version (PyYAML==6.0.2) to a range
     (PyYAML>=6.0.0). This prevents pip conflicts with the CodeChecker package
     (which wants ==6.0.0) in the CI.
 
@@ -79,8 +79,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
--   `east build` command silently dropped the board-related .conf files when build types 
-    were used. This bug was introduced in the v0.20.0. with the adoption of the new hardware 
+-   `east build` command silently dropped the board-related .conf files when build types
+    were used. This bug was introduced in the v0.20.0. with the adoption of the new hardware
     model naming.
 
 ## [0.21.1] - 2024-08-20
@@ -95,8 +95,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
--   Make east compatible with Docker. When inside the docker environment East will 
-    not try to pass any commands to the nRFUtil's toolchain-manager, 
+-   Make east compatible with Docker. When inside the docker environment East will
+    not try to pass any commands to the nRFUtil's toolchain-manager,
     but it will pass them directly to the west.
     The rationale for that is that the docker environment should provide
     all commands that are needed for working on a Zephyr/NCS project and
