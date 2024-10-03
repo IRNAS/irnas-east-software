@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 -   Parsing of `west.yml` when a project within the yaml does not contain the `repo-path` key.
 -   `compile_commands.json` file is now correctly copied from the build directory to the project
     directory and west top directory for Zephyr projects using sysbuild.
+-   Correctly propagate return code in case `east codechecker diff` fails.
 
 ## [0.23.0] - 2024-09-24
 

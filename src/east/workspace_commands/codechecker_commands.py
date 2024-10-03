@@ -416,6 +416,10 @@ def servdiff(east, new, resolved, unresolved, html, url, build_dir):
 
     east.print(result["output"], **clean_print_args)
 
+    # Propagate return code, so that if diff_cmd fails external scripts can react to
+    # that.
+    east.exit(result["returncode"])
+
 
 @click.group(**east_group_settings, subcommand_metavar="Subcommands")
 @click.pass_obj
