@@ -42,6 +42,16 @@ def check_for_compile_commands_json(east, compile_commands):
         east.exit()
 
 
+def check_for_url(east, url):
+    """Checks if URL is provided."""
+    if not url:
+        east.print(
+            "\nURL of the Codechecker server is required. "
+            "Please provide it using [cyan bold]--url[/] flag or set the [bold]EAST_CODECHECKER_SERVER_URL[/] env var."
+        )
+        east.exit()
+
+
 def cleanup_compile_commands_json(compile_commands):
     """Remove GCC specific arguments from compile_commands.json.
 

@@ -11,6 +11,7 @@ from .codechecker_helpers import (
     check_for_codechecker,
     check_for_codechecker_config_yaml,
     check_for_compile_commands_json,
+    check_for_url,
     cleanup_compile_commands_json,
     cleanup_plist_files,
     create_skip_file,
@@ -234,6 +235,7 @@ def store(east, url, build_dir):
     """
     east.pre_workspace_command_check(check_only_west_workspace=True)
     check_for_codechecker(east)
+    check_for_url(east, url)
 
     cc = east.consts["codechecker_path"]
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
@@ -377,6 +379,7 @@ def servdiff(east, new, resolved, unresolved, html, url, build_dir):
     """
     east.pre_workspace_command_check(check_only_west_workspace=True)
     check_for_codechecker(east)
+    check_for_url(east, url)
 
     cc = east.consts["codechecker_path"]
     cc_diff_output_dir = os.path.join(build_dir, "codechecker_diff")
