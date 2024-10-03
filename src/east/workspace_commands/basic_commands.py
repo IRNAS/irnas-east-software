@@ -7,7 +7,7 @@ import click
 from rich_click.rich_command import RichCommand
 
 from ..east_context import east_command_settings
-from ..helper_functions import clean_up_extra_args
+from ..helper_functions import clean_up_extra_args, find_app_build_dir
 from .build_type_flag import construct_extra_cmake_arguments
 from .codechecker_helpers import create_codecheckerfile
 
@@ -107,7 +107,7 @@ def build(ctx, east, build_type, spdx, extra_help, args):
     if spdx:
         east.run_west(f"spdx --build-dir {build_dir} --analyze-includes --include-sdk")
 
-    compile_file = os.path.join(build_dir, "compile_commands.json")
+    compile_file = os.path.join(find_app_build_dir(build_dir), "compile_commands.json")
     if os.path.isfile(compile_file):
         for dest in [east.project_dir, east.west_dir_path]:
             sh.copyfile(compile_file, os.path.join(dest, "compile_commands.json"))
