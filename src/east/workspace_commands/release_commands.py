@@ -12,12 +12,13 @@ from rich.table import Table
 
 from ..east_context import east_command_settings
 from ..helper_functions import (
+    clean_up_extra_args,
     does_project_use_sysbuild,
     find_all_boards,
     find_app_build_dir,
     get_git_version,
 )
-from .basic_commands import create_build_command
+from .build_type_flag import construct_extra_cmake_arguments
 
 # This could be considered as a hack, but it is actually the cleanest way to test
 # release command.
@@ -207,6 +208,56 @@ def show_job_summary(east, jobs):
     east.print()
     east.print(table)
     east.print()
+
+
+def create_build_command(
+    east,
+    board=None,
+    build_type=None,
+    build_dir=None,
+    target=None,
+    source_dir=None,
+    cmake_args=None,
+    silence_diagnostic=False,
+):
+    """Helper for creating a build command.
+
+    Returns:
+        build_cmd: a string with the build command, intended to be given to run_west()
+    """
+    build_type_args, diagnostic = construct_extra_cmake_arguments(
+        east,
+        build_type,
+        board,
+        build_dir,
+        source_dir,
+    )
+
+    if diagnostic and not silence_diagnostic:
+        east.print(diagnostic)
+
+    build_cmd = "build"
+
+    if board:
+        build_cmd += f" -b {board}"
+    if build_dir:
+        build_cmd += f" -d {build_dir}"
+    if target:
+        build_cmd += f" -t {target}"
+    if source_dir:
+        build_cmd += f" {source_dir}"
+
+    # Some flags need to be passed as extra parameters to the west tool
+    if build_type_args or cmake_args:
+        build_cmd += " --"
+
+    if build_type_args:
+        build_cmd += f" {build_type_args}"
+
+    if cmake_args:
+        build_cmd += f" {clean_up_extra_args(cmake_args)}"
+
+    return build_cmd
 
 
 def run_job(east, progress, job, dry_run, verbose, spdx_app_only):

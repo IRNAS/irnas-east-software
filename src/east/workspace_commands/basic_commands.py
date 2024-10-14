@@ -196,57 +196,6 @@ def find_source_dir(raw_args):
     return source_dir
 
 
-def create_build_command(
-    east,
-    board=None,
-    build_type=None,
-    build_dir=None,
-    target=None,
-    source_dir=None,
-    cmake_args=None,
-    silence_diagnostic=False,
-):
-    """Helper for creating a build command. This extra helper is needed so it can also
-    be reused by release command.
-
-    Returns:
-        build_cmd: a string with the build command, intended to be given to run_west()
-    """
-    build_type_args, diagnostic = construct_extra_cmake_arguments(
-        east,
-        build_type,
-        board,
-        build_dir,
-        source_dir,
-    )
-
-    if diagnostic and not silence_diagnostic:
-        east.print(diagnostic)
-
-    build_cmd = "build"
-
-    if board:
-        build_cmd += f" -b {board}"
-    if build_dir:
-        build_cmd += f" -d {build_dir}"
-    if target:
-        build_cmd += f" -t {target}"
-    if source_dir:
-        build_cmd += f" {source_dir}"
-
-    # Some flags need to be passed as extra parameters to the west tool
-    if build_type_args or cmake_args:
-        build_cmd += " --"
-
-    if build_type_args:
-        build_cmd += f" {build_type_args}"
-
-    if cmake_args:
-        build_cmd += f" {clean_up_extra_args(cmake_args)}"
-
-    return build_cmd
-
-
 @click.command(
     **east_command_settings,
     context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
