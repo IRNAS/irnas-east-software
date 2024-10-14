@@ -1,6 +1,7 @@
 import argparse
 import copy
 import os
+import re
 import shutil as sh
 
 import click
@@ -94,9 +95,7 @@ def build(ctx, east, build_type, spdx, extra_help, args):
         east.run_west("build --help")
         east.exit(return_code=0)
 
-    build_cmd, opts = create_build_command_from_commandline(
-        east, ctx.raw_args, build_type
-    )
+    build_cmd, opts = create_build_command_from_commandline(east, ctx.raw_args)
     build_dir = opts.build_dir if opts.build_dir else "build"
 
     if spdx:
@@ -115,53 +114,86 @@ def build(ctx, east, build_type, spdx, extra_help, args):
     create_codecheckerfile(east, opts.board, build_type, build_dir, opts.source_dir)
 
 
-def create_build_command_from_commandline(east, raw_args, build_type):
+def create_build_command_from_commandline(east, raw_args):
     """Helper for creating a build command.
 
-    It parses raw_args and creates two objects:
-    - build_cmd: a string with the build command, intended to be given to run_west()
-    - opts: an object with parsed arguments
+    It parses raw_args (which is a list) and creates two objects:
+
+        - build_cmd: a string with the build command, intended to be given to run_west()
+        - opts: an object with parsed arguments
     """
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("-b", "--board")
     parser.add_argument("-d", "--build-dir")
     parser.add_argument("-t", "--target")
+    parser.add_argument("-u", "--build-type")
+    opts, _ = parser.parse_known_args(raw_args)
 
-    # find source_dir in the args
+    # We need to find source_dir ourselves, ArgumentParser can't find, unless we specify
+    # all possible west build arguments.
+    source_dir = find_source_dir(raw_args)
+    opts.source_dir = source_dir
+
+    # If cmake arguments are present, extract them and remove them from the raw_args.
+    cmake_args = None
+    if "--" in raw_args:
+        raw_args = raw_args[: raw_args.index("--")]
+        cmake_args = raw_args[raw_args.index("--") + 1 :]
+        cmake_args = clean_up_extra_args(cmake_args)
+
+    build_type_args, diagnostic = construct_extra_cmake_arguments(
+        east,
+        opts.build_type,
+        opts.board,
+        opts.build_dir,
+        opts.source_dir,
+    )
+    if diagnostic:
+        east.print(diagnostic)
+
+    # Construct the build command
+    build_cmd = ["build"]
+    if raw_args:
+        build_cmd += raw_args
+
+    if build_type_args or cmake_args:
+        build_cmd.append("--")
+
+        if build_type_args:
+            build_cmd.append(build_type_args)
+
+        if cmake_args:
+            build_cmd.append(cmake_args)
+
+    # Change list to a string
+    build_cmd = " ".join(build_cmd)
+
+    # If --build-type is in raw_args remove it and the following argument. The extra \s*
+    # is needed to remove the space after the argument.
+    build_cmd = re.sub(r"(-u|--build-type) (\S+)\s*", "", build_cmd).strip()
+
+    return build_cmd, opts
+
+
+def find_source_dir(raw_args):
+    """Helper for finding the source directory in the raw_args."""
     source_dir = None
-    option_flag = False
+    is_option_flag = False
 
     for arg in raw_args:
         if arg == "--":
             break
         if arg.startswith("-"):
-            option_flag = True
+            is_option_flag = True
             continue
-        elif option_flag:
-            option_flag = False
+        elif is_option_flag:
+            is_option_flag = False
             continue
         else:
             source_dir = arg
             break
 
-    # find cmake_args in the args
-    cmake_args = raw_args[raw_args.index("--") + 1 :] if "--" in raw_args else None
-
-    # Parse the rest of the args
-    opts, _ = parser.parse_known_args(raw_args)
-    opts.source_dir = source_dir
-
-    build_cmd = create_build_command(
-        east,
-        opts.board,
-        build_type,
-        opts.build_dir,
-        opts.target,
-        source_dir,
-        cmake_args,
-    )
-
-    return build_cmd, opts
+    return source_dir
 
 
 def create_build_command(

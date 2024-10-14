@@ -777,7 +777,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
             ),
         ),
         (
-            "build app/test_one -b nrf52840dk_nrf52840",
+            "build -b nrf52840dk_nrf52840 app/test_one",
             (
                 "build -b nrf52840dk_nrf52840 app/test_one --"
                 " -DCONF_FILE=conf/common.conf"
@@ -786,7 +786,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
             ),
         ),
         (
-            "build app/test_one -b nrf52840dk_nrf52840 --build-type uart",
+            "build -b nrf52840dk_nrf52840 --build-type uart app/test_one",
             (
                 "build -b nrf52840dk_nrf52840 app/test_one --"
                 " -DCONF_FILE=conf/common.conf"
@@ -857,7 +857,7 @@ def test_sample_with_inherit_and_with_source_dir_and_board(
         monkeypatch,
         mocker,
         project_path,
-        "build samples/settings -b nrf52840dk_nrf52840",
+        "build -b nrf52840dk_nrf52840 samples/settings",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
         should_succed=True,
     )
@@ -1144,4 +1144,73 @@ def test_inheriting_from_an_app_without_build_type_should_fail(
         sample_path,
         "build -b custom_nrf52840dk",
         should_succed=False,
+    )
+
+
+@pytest.mark.parametrize(
+    "east_cmd, expected_west_cmd",
+    [
+        (
+            "build --snippet rtt app/test_one",
+            (
+                "build --snippet rtt app/test_one -- -DCONF_FILE=conf/common.conf "
+                '-DEAST_BUILD_TYPE="release"'
+            ),
+        ),
+        (
+            "build --snippet rtt app/test_two",
+            (
+                "build --snippet rtt app/test_two -- -DCONF_FILE=conf/common.conf "
+                '-DEAST_BUILD_TYPE="release"'
+            ),
+        ),
+        (
+            "build --snippet rtt app/test_one --build-type debug",
+            (
+                "build --snippet rtt app/test_one -- -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/debug.conf"'
+                ' -DEAST_BUILD_TYPE="debug"'
+            ),
+        ),
+        (
+            "build --snippet rtt app/test_two --build-type debug",
+            (
+                "build --snippet rtt app/test_two -- -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/debug.conf"'
+                ' -DEAST_BUILD_TYPE="debug"'
+            ),
+        ),
+        (
+            "build -b nrf52840dk_nrf52840 --snippet rtt app/test_one",
+            (
+                "build -b nrf52840dk_nrf52840 --snippet rtt app/test_one --"
+                " -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf"'
+                ' -DEAST_BUILD_TYPE="release"'
+            ),
+        ),
+        (
+            "build --snippet rtt -b nrf52840dk_nrf52840 --build-type uart app/test_one",
+            (
+                "build --snippet rtt -b nrf52840dk_nrf52840 app/test_one --"
+                " -DCONF_FILE=conf/common.conf"
+                ' -DOVERLAY_CONFIG="conf/nrf52840dk_nrf52840.conf;'
+                'conf/debug.conf;conf/uart.conf"'
+                ' -DEAST_BUILD_TYPE="uart"'
+            ),
+        ),
+    ],
+)
+def test_additional_flags_should_passthrough(
+    west_workplace_multi_app, monkeypatch, mocker, east_cmd, expected_west_cmd
+):
+    """Test that additional flags, such as --snippet, pass through east logic unchanged."""
+    project = west_workplace_multi_app
+
+    helper_test_against_west_run(
+        monkeypatch,
+        mocker,
+        project,
+        east_cmd,
+        expected_west_cmd,
     )

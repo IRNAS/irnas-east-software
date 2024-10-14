@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   `east build` is now a true pass-through command. Previously, the less used commands would
+    silently get dropped. This now enables the use of the `--snippet`, `--shield` and other `west
+    build` flags. Run `east build --extra-help` to see all the available options.
+
 ## [0.23.1] - 2024-10-03
 
 ### Fixed
