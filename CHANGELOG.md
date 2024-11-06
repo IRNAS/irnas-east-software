@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+-   Support for installing non-release NCS versions of toolchain, such as `v2.7.0-rc1`. East will
+    now correctly install such versions of the toolchain, if found in the west manifest file.
+
 ### Fixed
 
 -   A bug in `east build` parsing introduced in v0.23.2.
