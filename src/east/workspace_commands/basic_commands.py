@@ -135,9 +135,10 @@ def create_build_command_from_commandline(east, raw_args):
     opts.source_dir = source_dir
 
     # If cmake arguments are present, extract them and remove them from the raw_args.
+    args = None
     cmake_args = None
     if "--" in raw_args:
-        raw_args = raw_args[: raw_args.index("--")]
+        args = raw_args[: raw_args.index("--")]
         cmake_args = raw_args[raw_args.index("--") + 1 :]
         cmake_args = clean_up_extra_args(cmake_args)
 
@@ -153,8 +154,8 @@ def create_build_command_from_commandline(east, raw_args):
 
     # Construct the build command
     build_cmd = ["build"]
-    if raw_args:
-        build_cmd += raw_args
+    if args:
+        build_cmd += args
 
     if build_type_args or cmake_args:
         build_cmd.append("--")
