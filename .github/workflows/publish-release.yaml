@@ -32,7 +32,7 @@ jobs:
 
       - name: Get latest Changelog entry
         id: changelog-reader
-        uses: mindsers/changelog-reader-action@v2.2.2
+        uses: mindsers/changelog-reader-action@v2.2.3
         with:
           version: ${{ env.release_version_cut }}
 
@@ -49,7 +49,7 @@ jobs:
 
       - name: Publish Release
         if: ${{ !env.ACT }}
-        uses: softprops/action-gh-release@v0.1.15
+        uses: softprops/action-gh-release@v2.0.9
         with:
           files: dist/*
           tag_name: ${{ env.release_version }}
