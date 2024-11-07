@@ -59,15 +59,59 @@ jobs:
     with:
       checkout_ref: ${{ inputs.version }}
 
-  call-publish-release:
+  publish-release:
     needs: call-build
-    uses: ./.github/workflows/publish-release.yaml
-    with:
-      release_version: ${{ inputs.version }}
+    runs-on: ubuntu-22.04
+    environment:
+      name: pypi
+      url: https://pypi.org/p/east-tool
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+      contents: write
+
+    steps:
+      - name: Start
+        run: |
+          version_cut=$(echo "${{ inputs.version }}" | cut -c 2-)
+          echo "release_version=${{ inputs.version }}" >> $GITHUB_ENV
+          echo "release_version_cut=$version_cut" >> $GITHUB_ENV
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.release_version }}
+
+      - name: Get latest Changelog entry
+        id: changelog-reader
+        uses: mindsers/changelog-reader-action@v2.2.3
+        with:
+          version: ${{ env.release_version_cut }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # You wonder how there isn't any token? east is configured to use OIDC,
+      # check on pypi under Publishing section what is that.
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Publish Release
+        if: ${{ !env.ACT }}
+        uses: softprops/action-gh-release@v2.0.9
+        with:
+          files: dist/*
+          tag_name: ${{ env.release_version }}
+          body: |
+            # Release notes
+
+            ${{ steps.changelog-reader.outputs.changes }}
 
   cleanup-on-failure:
-    # Only run cleanup if either call-build or call-publish-release fail.
-    needs: [call-build, call-publish-release]
+    # Only run cleanup if either call-build or publish-release fail.
+    needs: [call-build, publish-release]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
     runs-on: ubuntu-22.04
 
