@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.24.1] - 2024-11-19
+
 ### Fixed
 
--   A bug where installed `v2.8.0-rc1` toolchain would be confused for `v2.8.0`.
+- A bug where installed `v2.8.0-rc1` toolchain would be confused for `v2.8.0`.
 
 ## [0.24.0] - 2024-11-07
 
@@ -686,7 +688,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.0...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.1...HEAD
+[0.24.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.2...v0.24.0
 [0.23.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.1...v0.23.2
 [0.23.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.0...v0.23.1
