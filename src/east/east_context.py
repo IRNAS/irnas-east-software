@@ -439,7 +439,7 @@ class EastContext:
         # Check if toolchain for detected ncs version is supported
         result = self.run_manager("search --show-all", silent=True, return_output=True)
 
-        if self.detected_ncs_version in result["output"]:
+        if self.detected_ncs_version == result["output"]:
             # Supported but not installed, should we exit program or silently pass?
             if ignore_uninstalled_ncs:
                 return

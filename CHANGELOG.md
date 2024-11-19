@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+-   A bug where installed `v2.8.0-rc1` toolchain would be confused for `v2.8.0`.
+
 ## [0.24.0] - 2024-11-07
 
 ### Added
