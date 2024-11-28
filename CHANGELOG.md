@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.25.0] - 2024-11-28
+
 ### Changed
 
 - `east util connect` command now tries to determine the JLink's `--speed` option from the
@@ -695,7 +697,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.1...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.0...HEAD
+[0.25.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.2...v0.24.0
 [0.23.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.1...v0.23.2
