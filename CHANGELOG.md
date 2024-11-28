@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+- `east util connect` command now tries to determine the JLink's `--speed` option from the
+  build directory's `runners.yaml` file. If that value is not present, it defaults to `4000`.
+  `east util connect` still accepts the `--speed` option, which will override the value from 
+  the build directory's `runners.yaml` file.
+
 ## [0.24.1] - 2024-11-19
 
 ### Fixed

@@ -402,15 +402,14 @@ def get_git_version(east):
     east.exit()
 
 
-def get_device(runner_yaml_content):
-    """Extract device flag from runner.yaml content."""
+def get_jlink_param(runner_yaml_content, jlink_param):
+    """Extract value for a given jlink param from runner.yaml content."""
     try:
         jlink_args = runner_yaml_content["args"]["jlink"]
-        device = next(filter(lambda e: "--device" in e, jlink_args))
-        return device.split("=")[1]
+        value = next(filter(lambda e: jlink_param in e, jlink_args))
+        return value.split("=")[1]
     except (KeyError, StopIteration):
         return None
-
 
 def find_app_build_dir(build_dir):
     """Find the build directory of the app."""
@@ -438,7 +437,7 @@ def get_device_in_runner_yaml(build_dir):
     with open(os.path.join(zephyr_dir, "runners.yaml")) as f:
         runners_yaml = yaml.safe_load(f)
 
-    device = get_device(runners_yaml)
+    device = get_jlink_param(runners_yaml, "--device")
 
     if not device:
         raise Exception(
@@ -447,6 +446,18 @@ def get_device_in_runner_yaml(build_dir):
         )
 
     return device
+
+def get_jlink_speed_in_runner_yaml(build_dir):
+    """Returns speed flag for JLink runner from runners.yaml.
+
+    If it is not found, None is returned, so caller should handle that case.
+    """
+    zephyr_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
+
+    with open(os.path.join(zephyr_dir, "runners.yaml")) as f:
+        runners_yaml = yaml.safe_load(f)
+
+    return get_jlink_param(runners_yaml, "--speed")
 
 
 def get_cortex_debug_params(build_dir):

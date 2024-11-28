@@ -1,7 +1,7 @@
 import click
 
 from ..east_context import east_command_settings
-from ..helper_functions import get_device_in_runner_yaml
+from ..helper_functions import get_device_in_runner_yaml, get_jlink_speed_in_runner_yaml
 
 
 def no_jlink_tool_msg(tool):
@@ -57,10 +57,9 @@ def fmt_runner_error_msg(exception_msg):
     "-s",
     "--speed",
     type=str,
-    default=4000,
     help=(
         "Set the connection speed, can be a number, 'auto' or 'adaptive'. "
-        "Default: '4000'."
+        "If not given, east tries to infer the speed by looking into --build-dir."
     ),
 )
 @click.pass_obj
@@ -75,7 +74,7 @@ def connect(east, device, dev_id, rtt_port, speed, build_dir):
         east.print(no_jlink_tool_msg("JLinkExe"), highlight=False)
         east.exit()
 
-    cmd = f"JLinkExe -AutoConnect 1 -Speed {speed} -If SWD -RTTTelnetPort {rtt_port} "
+    cmd = f"JLinkExe -AutoConnect 1 -If SWD -RTTTelnetPort {rtt_port} "
 
     if dev_id:
         cmd += f"-USB {dev_id} "
@@ -83,12 +82,21 @@ def connect(east, device, dev_id, rtt_port, speed, build_dir):
     if not device:
         try:
             device = get_device_in_runner_yaml(build_dir)
+            cmd += f"-Device {device} "
         except Exception as msg:
             east.print(fmt_runner_error_msg(msg), highlight=False)
             east.exit()
 
-    if device:
-        cmd += f"-Device {device} "
+    if not speed:
+        speed = get_jlink_speed_in_runner_yaml(build_dir)
+        if not speed:
+            speed = 4000
+            east.print(
+                f"No --speed param found in runner.yml, falling back to {speed}",
+                highlight=False,
+            )
+
+        cmd += f"-Speed {speed} "
 
     east.run(cmd)
 
