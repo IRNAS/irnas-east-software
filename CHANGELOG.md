@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.25.1] - 2024-12-18
+
 ### Fixed
 
 - A bug where `east install toolchain` command wouldn't correctly detect supported versions
@@ -702,7 +704,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.0...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.1...HEAD
+[0.25.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.23.2...v0.24.0
