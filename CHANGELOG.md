@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- A bug where `east install toolchain` command wouldn't correctly detect supported versions
+  from `nrfutil-toolchain-manager`.
+
 ## [0.25.0] - 2024-11-28
 
 ### Changed

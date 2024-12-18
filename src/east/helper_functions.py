@@ -225,9 +225,7 @@ def no_toolchain_msg(east):
 
 def ncs_version_not_supported_msg(east, supported_versions):
     """Return message that informs user that detected NCS version is not supported."""
-    vers = "\n".join(
-        [f"[bold yellow]•[/] {ver}" for ver in supported_versions.strip().split("\n")]
-    )
+    vers = "\n".join([f"[bold yellow]•[/] {ver}" for ver in supported_versions])
 
     return (
         f"[bold]East[/] detected [bold]{east.detected_ncs_version}[/] [bold cyan]NCS[/]"
@@ -411,6 +409,7 @@ def get_jlink_param(runner_yaml_content, jlink_param):
     except (KeyError, StopIteration):
         return None
 
+
 def find_app_build_dir(build_dir):
     """Find the build directory of the app."""
     try:
@@ -446,6 +445,7 @@ def get_device_in_runner_yaml(build_dir):
         )
 
     return device
+
 
 def get_jlink_speed_in_runner_yaml(build_dir):
     """Returns speed flag for JLink runner from runners.yaml.

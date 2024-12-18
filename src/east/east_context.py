@@ -1,5 +1,6 @@
 import importlib.metadata
 import inspect
+import json
 import os
 import signal
 import subprocess
@@ -437,9 +438,13 @@ class EastContext:
             return
 
         # Check if toolchain for detected ncs version is supported
-        result = self.run_manager("search --show-all", silent=True, return_output=True)
+        result = self.run_manager(
+            "search --show-all --json", silent=True, return_output=True
+        )
 
-        if self.detected_ncs_version == result["output"]:
+        supported_ncs_versions = json.loads(result["output"])["data"]["ncs_versions"]
+
+        if self.detected_ncs_version in supported_ncs_versions:
             # Supported but not installed, should we exit program or silently pass?
             if ignore_uninstalled_ncs:
                 return
@@ -454,7 +459,7 @@ class EastContext:
 
         # Exit program, this is usually happens, if we want to install the toolchain.
         self.print(
-            ncs_version_not_supported_msg(self, result["output"]), highlight=False
+            ncs_version_not_supported_msg(self, supported_ncs_versions), highlight=False
         )
         self.exit()
 
