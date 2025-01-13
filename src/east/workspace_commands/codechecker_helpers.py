@@ -101,6 +101,10 @@ def detect_problematic_zephyr_macros(diag):
             "patterns": ["expanded from macro '.*LOG_.*'"],
         },
         {
+            "description": "integer to pointer cast pessimizes optimization opportunities",
+            "patterns": ["expanded from macro '.*LOG_.*'"],
+        },
+        {
             "description": "conditional operator with identical true and false expressions",
             "patterns": [
                 "expanded from macro 'SHELL_CMD_.*'",

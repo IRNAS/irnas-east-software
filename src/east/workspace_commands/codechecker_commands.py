@@ -78,9 +78,7 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze, build_d
 
     \b
     \n\nExpects that a CodeChecker config file (codechecker_config.yaml) exists in the
-    project's root dir. That file is used to configure the analysis.
-    See https://github.com/Ericsson/codechecker/tree/master/docs/config_file.md for more
-    information. Run east codechecker example-config to see a suggested config file.
+    project's root dir. That file is used to configure the analysis. See https://github.com/Ericsson/codechecker/tree/master/docs/config_file.md for more information. Run [bold magenta]east codechecker example-config[/] to see a suggested config file.
 
     \n\nResults of analysis are printed in the terminal by default. If --html flag is given, a html report is generated instead.
 
@@ -89,10 +87,12 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze, build_d
     \n\nCurrently removed diagnostics are:
 
     \n\n- [bold magenta]Ineffective bitwise and operation[/], caused by [bold cyan]LOG_*[/] macros.
-    \n\n- [bold magenta]Conditional operator with identical true and false expressions[/], caused by [bold cyan]LOG_*[/], [bold cyan]SHELL_CMD_*[/], [bold cyan]APP_EVENT_MANAGER_*[/] macros.
+    \n\n- [bold magenta]Conditional operator with identical true and false expressions[/], caused by [bold cyan]SHELL_CMD_*[/], [bold cyan]APP_EVENT_MANAGER_*[/] macros.
     \n\n- [bold magenta]Value stored to 'variable' is never read or used[/], but is actually later used in disabled [bold cyan]__ASSERT*[/] or [bold cyan]LOG_*[/] macros.
     \n\n- [bold magenta]Comparison of integers of different signs: 'int' and 'unsigned int'[/], caused by [bold cyan]INIT_OBJ_RES*[/] macros.
     \n\n- [bold magenta]Missing field 'help' initializer[/], caused by [bold cyan]SHELL_SUBCMD*[/] macros.
+    \n\n- [bold magenta]integer to pointer cast pessimizes optimization opportunities[/], caused by [bold cyan]LOG_*[/] macros.
+    \n\n- [bold magenta]The code calls sizeof() on a pointer type. This can produce an unexpected result[/], caused by [bold cyan]LOG_*[/], [bold cyan]EVENT_LOG*[/], [bold cyan]APP_EVENT_MANAGER_LOG*[/] macros.
 
     \n\nBy default, a generated skip file is used to skip needless analysis of the Zephyr, NCS and external repositories. If that is not desired, you can provide your own skip file with the --skip-file flag, check the link for more info: https://codechecker.readthedocs.io/en/latest/analyzer/user_guide/#skip
 
