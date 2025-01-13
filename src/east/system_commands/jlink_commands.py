@@ -12,10 +12,10 @@ def no_jlink_tool_msg(tool):
     )
 
 
-def fmt_runner_error_msg(exception_msg):
+def fmt_runner_error_msg(flag, exception_msg):
     """Format error message for EastJlinkDeviceLoadError."""
     return (
-        "An [bold red]error[/] occurred when trying to extract [bold cyan]--device[/] "
+        f"An [bold red]error[/] occurred when trying to extract [bold cyan]{flag}[/] "
         "flag from [bold yellow]runners.yaml[/] file!\n\n"
         f"[italic yellow]{exception_msg}[/]\n"
     )
@@ -82,21 +82,26 @@ def connect(east, device, dev_id, rtt_port, speed, build_dir):
     if not device:
         try:
             device = get_device_in_runner_yaml(build_dir)
-            cmd += f"-Device {device} "
         except Exception as msg:
-            east.print(fmt_runner_error_msg(msg), highlight=False)
+            east.print(fmt_runner_error_msg("--device", msg), highlight=False)
             east.exit()
 
-    if not speed:
-        speed = get_jlink_speed_in_runner_yaml(build_dir)
-        if not speed:
-            speed = 4000
-            east.print(
-                f"No --speed param found in runner.yml, falling back to {speed}",
-                highlight=False,
-            )
+    cmd += f"-Device {device} "
 
-        cmd += f"-Speed {speed} "
+    if not speed:
+        try:
+            speed = get_jlink_speed_in_runner_yaml(build_dir)
+            if not speed:
+                speed = 4000
+                east.print(
+                    f"No --speed param found in runner.yml, falling back to {speed}",
+                    highlight=False,
+                )
+        except Exception as msg:
+            east.print(fmt_runner_error_msg("--speed", msg), highlight=False)
+            east.exit()
+
+    cmd += f"-Speed {speed} "
 
     east.run(cmd)
 
