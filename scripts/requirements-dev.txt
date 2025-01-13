@@ -5,6 +5,3 @@ build == 1.2.1
 twine == 5.1.1
 setuptools_scm == 8.1.0
 tox == 4.18.0
-# Below two are needed for the codechecker to work inside the virtualvenv
-portalocker
-psutil
