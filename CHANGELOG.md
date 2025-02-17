@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.25.3] - 2025-02-17
+
 ### Fixed
 
 - Fixed the bug in `east release` command where hardware model v2 board names would be reverted
@@ -718,7 +720,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.2...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.3...HEAD
+[0.25.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.2...v0.25.3
 [0.25.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.1...v0.25.2
 [0.25.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.24.1...v0.25.0
