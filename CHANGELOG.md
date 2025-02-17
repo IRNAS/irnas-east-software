@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the bug in `east release` command where hardware model v2 board names would be reverted
+  to the v1 naming scheme, if the board did not have a board dir in the project. This bug was
+  harmless, however the build system reported deprecation warnings.
+
 ## [0.25.2] - 2025-01-13
 
 ### Fixed

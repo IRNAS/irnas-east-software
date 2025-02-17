@@ -288,7 +288,7 @@ def find_all_boards(east, west_board: str) -> List[str]:
 
     if not board_dir:
         # Just return the original name, since the board might come from Zephyr or NCS.
-        return [west_board]
+        return [west_board_unmodified]
 
     files = os.listdir(board_dir)
 

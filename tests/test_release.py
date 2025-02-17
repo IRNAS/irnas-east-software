@@ -24,8 +24,8 @@ def test_finding_hardware_versions(west_workplace):
     assert expected_boards == boards
 
     # Some board that has a board folder but not revisions
-    boards = find_all_boards(east, "nrf52840dk_nrf52840")
-    expected_boards = ["nrf52840dk_nrf52840"]
+    boards = find_all_boards(east, "nrf52840dk/nrf52840")
+    expected_boards = ["nrf52840dk/nrf52840"]
     assert expected_boards == boards
 
 
