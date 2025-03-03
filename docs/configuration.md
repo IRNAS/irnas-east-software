@@ -330,10 +330,10 @@ This document assumes knowledge of several different concepts:
 - [Nice blog about Zephyr configuration]
 
 [irnas's release artefact naming guidelines]:
-  https://github.com/IRNAS/irnas-guidelines-docs/blob/dev/docs/github_projects_guidelines.md#release-artefacts-naming-scheme-
+  https://github.com/IRNAS/irnas-guidelines-docs/blob/main/docs/github_projects_guidelines.md#release-artifacts-naming-scheme-
 [kconfig documentation page]:
-  https://docs.zephyrproject.org/2.6.0/guides/kconfig/index.html
+  https://docs.zephyrproject.org/latest/guides/kconfig/index.html
 [one time cmake arguments]:
-  https://docs.zephyrproject.org/3.1.0/develop/west/build-flash-debug.html#one-time-cmake-arguments
+  https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#one-time-cmake-arguments
 [nice blog about zephyr configuration]:
   https://www.jaredwolff.com/optimize-zephyr-config-and-overlays/
