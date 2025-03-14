@@ -531,3 +531,15 @@ def determine_svd_file(east, device):
         ),
         None,
     )
+
+
+def configure_toolchain_manager(east):
+    """Configure the nrfutil toolchain-manager.
+
+    We need to tell it where to install the toolchain.
+    """
+    nrfutil = east.consts["nrfutil_path"]
+    east.run(
+        f"{nrfutil} toolchain-manager config --set install-dir="
+        f"{east.consts['east_dir']}"
+    )

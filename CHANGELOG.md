@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- `east install nrfutil-toolchain-manager` now skips downloading and installing the toolchain
+  manager if `EAST_DONT_USE_TOOLCHAIN_MANAGER` is set to `1`. That way some time is saved in the CI.
+  Regardless of the value of `EAST_DONT_USE_TOOLCHAIN_MANAGER`, the command still configures the
+  toolchain manager.
+
 ## [0.25.3] - 2025-02-17
 
 ### Fixed

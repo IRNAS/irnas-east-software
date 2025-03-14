@@ -2,6 +2,7 @@ import click
 
 from ..east_context import east_command_settings, east_group_settings
 from .tooling import tool_installer
+from ..helper_functions import configure_toolchain_manager
 
 
 @click.command(**east_command_settings)
@@ -57,7 +58,18 @@ def toolchain(east, force):
 @click.pass_obj
 def nrfutil_toolchain_manager(east):
     """Install [bold magenta]nrfutil toolchain-manager[/]."""
-    tool_installer(east, ["toolchain-manager"])
+    # Environmnet doesn't provide toolchain-manager, so we need to download and install
+    # in. In cases where it does, we skip this step.
+    if east.use_toolchain_manager:
+        tool_installer(east, ["toolchain-manager"])
+
+    # Always configure the toolchain manager, regardless of how the toolchain manager is
+    # installed.
+    # Below function is intended for the cases in the CI where toolchain manager was
+    # cached by action/cache and needs to be configured.
+    # For every other case we are now doing configuration twice, but it is not a big
+    # deal.
+    configure_toolchain_manager(east)
 
 
 @click.command(**east_command_settings)

@@ -7,7 +7,7 @@ import shutil
 from rich.panel import Panel
 
 from ..east_context import EastContext
-from ..helper_functions import download_files
+from ..helper_functions import configure_toolchain_manager, download_files
 
 
 def _install_nrfutil(east: EastContext, exe_path: str):
@@ -36,12 +36,10 @@ def _install_nrfutil(east: EastContext, exe_path: str):
     # Install toolchain-manager and configure the toolchain path.
     east.run(f"{nrfutil} install toolchain-manager")
 
-    # Below step shouldn't be done on macOS, the install-dir is hardcoded there.
+    # Configure toolchain path. Below step shouldn't be done on macOS, the install-dir
+    # is hardcoded there.
     if platform.system() != "Darwin":
-        east.run(
-            f"{nrfutil} toolchain-manager config --set install-dir="
-            f"{east.consts['east_dir']}"
-        )
+        configure_toolchain_manager(east)
 
 
 def _get_nrfutil_download_link():
