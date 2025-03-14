@@ -25,16 +25,19 @@ def _install_nrfutil(east: EastContext, exe_path: str):
 
     # Pin the nrfutil to a fixed version to prevent any future breaking changes.
     # Output of --version flag on linux:
-    # nrfutil 7.11.1 (7c99be8 2024-05-30)
-    # commit-hash: 7c99be87b691a9ea8c7d95a2190356eddad33329
-    # commit-date: 2024-05-30
+    # nrfutil 7.13.0 (8289424 2024-07-01)
+    # commit-hash: 82894242d19ff24a1541712312b3ea3af0ca8f85
+    # commit-date: 2024-07-01
     # host: x86_64-unknown-linux-gnu
-    # build-timestamp: 2024-05-30T12:49:04.315203564Z
+    # build-timestamp: 2024-07-01T07:32:31.582129656Z
     # classification: nrf-external
-    east.run(f"{nrfutil} self-upgrade --to-version 7.11.1")
+    east.run(f"{nrfutil} self-upgrade --to-version 7.13.0")
 
-    # Install toolchain-manager and configure the toolchain path.
+    # Install toolchain-manager
     east.run(f"{nrfutil} install toolchain-manager")
+
+    # Install device commands, used for flashing devices.
+    east.run(f"{nrfutil} install device")
 
     # Configure toolchain path. Below step shouldn't be done on macOS, the install-dir
     # is hardcoded there.
