@@ -88,8 +88,8 @@ class EastContext:
 
         except (WestDirNotFound, WestConfigNotFound, WestYmlNotFound):
             self.west_dir_path = None
-            self.detected_ncs_version = None
             self.project_dir = None
+            self.detected_ncs_version = None
 
         self.check_for_new_east_version()
 
@@ -211,6 +211,9 @@ class EastContext:
                     stderr=subprocess.STDOUT,
                     universal_newlines=True,
                 )
+                if popen.stdout is None:
+                    raise Exception("Could not open stdout")
+
                 for stdout_line in iter(popen.stdout.readline, ""):
                     yield stdout_line
                 popen.stdout.close()
@@ -255,7 +258,7 @@ class EastContext:
 
             return {"output": "", "returncode": p.returncode}
 
-    def run_west(self, west_command: str, **kwargs) -> str:
+    def run_west(self, west_command: str, **kwargs):
         """Run wrapper which should be used when executing commands with west tool.
 
         If toolchain for the detected ncs version is installed then west through
