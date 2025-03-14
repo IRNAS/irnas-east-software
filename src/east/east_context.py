@@ -320,8 +320,17 @@ class EastContext:
         Returns:
             Check .run
         """
+        # We need to add the nrfutil that we use to run toolchain-manager to the PATH.
+        # The toolchain-manager does not provide it, so must avoid cases where system
+        # could have some nrfutil install on the PATH but it would be different from the
+        # one used by the east.
+        # Concretly, this is needed for the west flash command that recently started to
+        # use nrfutil device command to flash devices.
+        nrfutil = self.consts["nrfutil_path"]
+        nrfutil_dir = os.path.dirname(nrfutil)
+
         cmd = (
-            f"{self.consts['nrfutil_path']} toolchain-manager launch --ncs-version"
+            f"PATH={nrfutil_dir}:$PATH {nrfutil} toolchain-manager launch --ncs-version"
             f" {self.detected_ncs_version} -- {command}"
         )
 
