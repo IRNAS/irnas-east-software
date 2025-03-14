@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+- The toolchain environment will from now on use the `nrfutil` binary provided by the East and not 
+  the one found on the system path. That way the East controls what commands the `nrfutil` supports.
+  `east install toolchain-manager` now also installs the `device` commands inside the `nrfutil`
+  binary. `nrfutil device` is replacing the deprecated `nrfjprog` tool and now more often used by 
+  the Zephyr/NCS to communicate with the Nordic chips.
+
 ### Fixed
 
 - `east install nrfutil-toolchain-manager` now skips downloading and installing the toolchain
