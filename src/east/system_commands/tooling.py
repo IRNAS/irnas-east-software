@@ -39,10 +39,8 @@ def _install_nrfutil(east: EastContext, exe_path: str):
     # Install device commands, used for flashing devices.
     east.run(f"{nrfutil} install device")
 
-    # Configure toolchain path. Below step shouldn't be done on macOS, the install-dir
-    # is hardcoded there.
-    if platform.system() != "Darwin":
-        configure_toolchain_manager(east)
+    # Configure toolchain path.
+    configure_toolchain_manager(east)
 
 
 def _get_nrfutil_download_link():

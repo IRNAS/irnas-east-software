@@ -1,4 +1,5 @@
 import click
+import os
 
 from ..east_context import east_command_settings, east_group_settings
 from .tooling import tool_installer
@@ -58,9 +59,10 @@ def toolchain(east, force):
 @click.pass_obj
 def nrfutil_toolchain_manager(east):
     """Install [bold magenta]nrfutil toolchain-manager[/]."""
-    # Environmnet doesn't provide toolchain-manager, so we need to download and install
+    # Environment doesn't provide toolchain-manager, so we need to download and install
     # in. In cases where it does, we skip this step.
-    if east.use_toolchain_manager:
+    if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "0":
+        # In other words, we are using east provided toolchain manager.
         tool_installer(east, ["toolchain-manager"])
 
     # Always configure the toolchain manager, regardless of how the toolchain manager is

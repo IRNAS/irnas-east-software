@@ -1,5 +1,6 @@
 import os
 import pathlib
+import platform
 import re
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
@@ -537,7 +538,12 @@ def configure_toolchain_manager(east):
     """Configure the nrfutil toolchain-manager.
 
     We need to tell it where to install the toolchain.
+
     """
+    # Below step shouldn't be done on macOS, the install-dir is hardcoded there.
+    if platform.system() == "Darwin":
+        return
+
     nrfutil = east.consts["nrfutil_path"]
     east.run(
         f"{nrfutil} toolchain-manager config --set install-dir="
