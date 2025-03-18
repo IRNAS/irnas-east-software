@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.26.2] - 2025-03-18
+
 ### Fixed
 
 - `east util cortex-debug` got broken when cbaad865 (introduced in v0.25.0) was implemented.
@@ -747,7 +749,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.1...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.2...HEAD
+[0.26.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.0...v0.26.1
 [0.26.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.3...v0.26.0
 [0.25.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.25.2...v0.25.3
