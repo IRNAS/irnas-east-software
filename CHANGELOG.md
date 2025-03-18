@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- `east util cortex-debug` got broken when cbaad865 (introduced in v0.25.0) was implemented.
+
 ## [0.26.1] - 2025-03-17
 
 ### Fixed

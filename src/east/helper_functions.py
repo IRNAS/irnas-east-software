@@ -427,15 +427,25 @@ def does_project_use_sysbuild(build_dir):
     return os.path.isfile(os.path.join(build_dir, "domains.yaml"))
 
 
+def get_runner_yaml(build_dir):
+    """Returns runner.yaml content as dict."""
+    if not os.path.isdir(build_dir):
+        raise Exception(f"Build directory {build_dir} not found")
+
+    zephyr_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
+
+    with open(os.path.join(zephyr_dir, "runners.yaml")) as f:
+        runners_yaml = yaml.safe_load(f)
+
+    return runners_yaml
+
+
 def get_device_in_runner_yaml(build_dir):
     """Returns device flag for JLink runner from runners.yaml.
 
     If it is not possible to do that it will raise an exception.
     """
-    zephyr_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
-
-    with open(os.path.join(zephyr_dir, "runners.yaml")) as f:
-        runners_yaml = yaml.safe_load(f)
+    runners_yaml = get_runner_yaml(build_dir)
 
     device = get_jlink_param(runners_yaml, "--device")
 
@@ -453,12 +463,7 @@ def get_jlink_speed_in_runner_yaml(build_dir):
 
     If it is not found, None is returned, so caller should handle that case.
     """
-    zephyr_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
-
-    with open(os.path.join(zephyr_dir, "runners.yaml")) as f:
-        runners_yaml = yaml.safe_load(f)
-
-    return get_jlink_param(runners_yaml, "--speed")
+    return get_jlink_param(get_runner_yaml(build_dir), "--speed")
 
 
 def get_cortex_debug_params(build_dir):
@@ -469,30 +474,21 @@ def get_cortex_debug_params(build_dir):
     Any failure to read something will result in a raised exception so this should be
     called inside the try block.
     """
-    if not os.path.isdir(build_dir):
-        raise Exception(f"Build directory {build_dir} not found")
-
     zephyr_dir = os.path.join(find_app_build_dir(build_dir), "zephyr")
-
-    runners_file = os.path.join(zephyr_dir, "runners.yaml")
+    runners_file_path = os.path.join(zephyr_dir, "runners.yaml")
     elf_file = os.path.join(zephyr_dir, "zephyr.elf")
     elf_file = os.path.realpath(elf_file)
 
-    with open(runners_file) as f:
-        runner_cfg = yaml.safe_load(f)
+    runners_yaml = get_runner_yaml(build_dir)
+    device = get_device_in_runner_yaml(build_dir)
 
-    device = get_device(runner_cfg)
-
-    if not device:
-        raise Exception(f"Can't find JLink device in the {runners_file} file")
-
-    if "gdb" not in runner_cfg["config"]:
-        raise Exception(f"Can't find gdb path in the {runners_file} file")
+    if "gdb" not in runners_yaml["config"]:
+        raise Exception(f"Can't find gdb path in the {runners_file_path} file")
 
     if not os.path.isfile(elf_file):
         raise Exception(f"Elf file {elf_file} not found")
 
-    return device, runner_cfg["config"]["gdb"], elf_file
+    return device, runners_yaml["config"]["gdb"], elf_file
 
 
 def determine_svd_file(east, device):
