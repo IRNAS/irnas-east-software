@@ -57,3 +57,32 @@ mapping:
                 type: str
               build-type:
                 type: str
+
+  pack:
+    type: map
+    required: false
+    mapping:
+      artifacts:
+        type: seq
+        required: false
+        sequence:
+          - type: str
+      projects:
+        type: seq
+        required: false
+        sequence:
+          - type: map
+            mapping:
+              name:
+                type: str
+                required: true
+              artifacts:
+                type: seq
+                required: false
+                sequence:
+                  - type: str
+              overwrite_artifacts:
+                type: seq
+                required: false
+                sequence:
+                  - type: str
