@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+- Add new `east util version` command. This command can be used to generate VERSION files, that are
+  required by some Zephyr applications. The command is configurable, run `east util version --help`
+  to learn how to use it.
+
 ## [0.26.2] - 2025-03-18
 
 ### Fixed
