@@ -8,31 +8,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Documentation about East's [environment variables](./docs/environment_variables.md).
+- Documentation about East's
+  [environment variables](./docs/environment_variables.md).
+- Add new `east util version` command. This command can be used to generate
+  VERSION files, that are required by some Zephyr applications. The command is
+  configurable, run `east util version --help` to learn how to use it.
 
 ### Changed
 
-- Replace `EAST_DONT_USE_TOOLCHAIN_MANAGER` with `EAST_NRFUTIL_CI_MODE`. Behaviour is now better
-  defined in the above linked environment variables document. 
-- When `EAST_NRFUTIL_CI_MODE` is not set `east install toolchain-manager` command now always
-  makes sure that `nrfutil` and it's commands (`device`, `toolchain-manager`) are installed, pinned 
-  to a specific version and configured . Before that was only done as a part of the `nrfutil` 
-  installation procedure, when `nrfutil` was not installed.
+- Replace `EAST_DONT_USE_TOOLCHAIN_MANAGER` with `EAST_NRFUTIL_CI_MODE`.
+  Behaviour is now better defined in the above linked environment variables
+  document.
+- When `EAST_NRFUTIL_CI_MODE` is not set `east install toolchain-manager`
+  command now always makes sure that `nrfutil` and it's commands (`device`,
+  `toolchain-manager`) are installed, pinned to a specific version and
+  configured . Before that was only done as a part of the `nrfutil` installation
+  procedure, when `nrfutil` was not installed.
 
 ## [0.26.3] - 2025-04-11
 
 ### Fixed
 
-- Path to the `nrfutil` wasn't correctly set when using `EAST_DONT_USE_TOOLCHAIN_MANAGER=1`.
-- When `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` is set `east install nrfutil-toolchain-manager` will 
-  print a info message that `nrfutil` was only configured and not installed.
+- Path to the `nrfutil` wasn't correctly set when using
+  `EAST_DONT_USE_TOOLCHAIN_MANAGER=1`.
+- When `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` is set
+  `east install nrfutil-toolchain-manager` will print a info message that
+  `nrfutil` was only configured and not installed.
 - `east install` and it's subcommands now have better help text.
 
 ## [0.26.2] - 2025-03-18
 
 ### Fixed
 
-- `east util cortex-debug` got broken when cbaad865 (introduced in v0.25.0) was implemented.
+- `east util cortex-debug` got broken when cbaad865 (introduced in v0.25.0) was
+  implemented.
 
 ## [0.26.1] - 2025-03-17
 
@@ -44,50 +53,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- The toolchain environment will from now on use the `nrfutil` binary provided by the East and not 
-  the one found on the system path. That way the East controls what commands the `nrfutil` supports.
-  `east install toolchain-manager` now also installs the `device` commands inside the `nrfutil`
-  binary. `nrfutil device` is replacing the deprecated `nrfjprog` tool and now more often used by 
-  the Zephyr/NCS to communicate with the Nordic chips.
+- The toolchain environment will from now on use the `nrfutil` binary provided
+  by the East and not the one found on the system path. That way the East
+  controls what commands the `nrfutil` supports.
+  `east install toolchain-manager` now also installs the `device` commands
+  inside the `nrfutil` binary. `nrfutil device` is replacing the deprecated
+  `nrfjprog` tool and now more often used by the Zephyr/NCS to communicate with
+  the Nordic chips.
 
 ### Fixed
 
-- `east install nrfutil-toolchain-manager` now skips downloading and installing the toolchain
-  manager if `EAST_DONT_USE_TOOLCHAIN_MANAGER` is set to `1`. That way some time is saved in the CI.
-  Regardless of the value of `EAST_DONT_USE_TOOLCHAIN_MANAGER`, the command still configures the
-  toolchain manager.
+- `east install nrfutil-toolchain-manager` now skips downloading and installing
+  the toolchain manager if `EAST_DONT_USE_TOOLCHAIN_MANAGER` is set to `1`. That
+  way some time is saved in the CI. Regardless of the value of
+  `EAST_DONT_USE_TOOLCHAIN_MANAGER`, the command still configures the toolchain
+  manager.
 
 ## [0.25.3] - 2025-02-17
 
 ### Fixed
 
-- Fixed the bug in `east release` command where hardware model v2 board names would be reverted
-  to the v1 naming scheme, if the board did not have a board dir in the project. This bug was
-  harmless, however the build system reported deprecation warnings.
+- Fixed the bug in `east release` command where hardware model v2 board names
+  would be reverted to the v1 naming scheme, if the board did not have a board
+  dir in the project. This bug was harmless, however the build system reported
+  deprecation warnings.
 
 ## [0.25.2] - 2025-01-13
 
 ### Fixed
 
 - Wrong handling of command-line arguments in `east util connect`.
-- Suppress `integer to pointer cast pessimizes optimization opportunities`, caused by LOG\_\* macros, 
-  when `east codechecker check` is run.
+- Suppress `integer to pointer cast pessimizes optimization opportunities`,
+  caused by LOG\_\* macros, when `east codechecker check` is run.
 
 ## [0.25.1] - 2024-12-18
 
 ### Fixed
 
-- A bug where `east install toolchain` command wouldn't correctly detect supported versions
-  from `nrfutil-toolchain-manager`.
+- A bug where `east install toolchain` command wouldn't correctly detect
+  supported versions from `nrfutil-toolchain-manager`.
 
 ## [0.25.0] - 2024-11-28
 
 ### Changed
 
-- `east util connect` command now tries to determine the JLink's `--speed` option from the
-  build directory's `runners.yaml` file. If that value is not present, it defaults to `4000`.
-  `east util connect` still accepts the `--speed` option, which will override the value from 
-  the build directory's `runners.yaml` file.
+- `east util connect` command now tries to determine the JLink's `--speed`
+  option from the build directory's `runners.yaml` file. If that value is not
+  present, it defaults to `4000`. `east util connect` still accepts the
+  `--speed` option, which will override the value from the build directory's
+  `runners.yaml` file.
 
 ## [0.24.1] - 2024-11-19
 
@@ -99,8 +113,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Support for installing non-release NCS versions of toolchain, such as `v2.7.0-rc1`. East will
-  now correctly install such versions of the toolchain, if found in the west manifest file.
+- Support for installing non-release NCS versions of toolchain, such as
+  `v2.7.0-rc1`. East will now correctly install such versions of the toolchain,
+  if found in the west manifest file.
 
 ### Fixed
 
@@ -110,73 +125,78 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
-- `east build` is now a true pass-through command. Previously, the less used commands would
-  silently get dropped. This now enables the use of the `--snippet`, `--shield` and other `west
-  build` flags. Run `east build --extra-help` to see all the available options.
+- `east build` is now a true pass-through command. Previously, the less used
+  commands would silently get dropped. This now enables the use of the
+  `--snippet`, `--shield` and other `west build` flags. Run
+  `east build --extra-help` to see all the available options.
 
 ## [0.23.1] - 2024-10-03
 
 ### Fixed
 
-- Parsing of `west.yml` when a project within the yaml does not contain the `repo-path` key.
-- `compile_commands.json` file is now correctly copied from the build directory to the project
-  directory and west top directory for Zephyr projects using sysbuild.
+- Parsing of `west.yml` when a project within the yaml does not contain the
+  `repo-path` key.
+- `compile_commands.json` file is now correctly copied from the build directory
+  to the project directory and west top directory for Zephyr projects using
+  sysbuild.
 - Correctly propagate return code in case `east codechecker servdiff` fails.
 
 ## [0.23.0] - 2024-09-24
 
 ### Added
 
-- `east.yml` now supports specifying samples in nested subdirectories. For example, if there is a
-  sample located under `samples/basic/blinky`, it can be specified in `east.yml` simply as
-  `- name: basic/blinky`. Samples build artefacts will be stored in the `build` directory under
-  the same subdirectory structure. This feature allows users to organize their samples in a more
+- `east.yml` now supports specifying samples in nested subdirectories. For
+  example, if there is a sample located under `samples/basic/blinky`, it can be
+  specified in `east.yml` simply as `- name: basic/blinky`. Samples build
+  artefacts will be stored in the `build` directory under the same subdirectory
+  structure. This feature allows users to organize their samples in a more
   structured way, instead of having all samples in the root `samples` directory.
-  This feature is documented in the `docs/configuration.md` file under `Samples` section.
-  Suggested by @Finwood in #111.
+  This feature is documented in the `docs/configuration.md` file under `Samples`
+  section. Suggested by @Finwood in #111.
 
 ### Fixed
 
 - `east release` command, which failed to find project dir, when run with
   `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` option.
-- `east codechecker check`, which previous failed to find `compile_command.json` file on
-   builds that were using sysbuild.
+- `east codechecker check`, which previous failed to find `compile_command.json`
+  file on builds that were using sysbuild.
 
 ## [0.22.1] - 2024-09-18
 
 ### Fixed
 
-- The issue where build failure in `east release` command would just fail without warning.
-  (#110).
-- The issue where `east release` command wasn't creating artefacts for builds using sysbuild
-  (#108).
+- The issue where build failure in `east release` command would just fail
+  without warning. (#110).
+- The issue where `east release` command wasn't creating artefacts for builds
+  using sysbuild (#108).
 
 ## [0.22.0] - 2024-08-22
 
 ### Changed
 
-- Remove self-detection of Docker environment (introduced in v0.21.0) and add support for
-  `EAST_DONT_USE_TOOLCHAIN_MANAGER` environment variable. If this variable is set to `1`,
-  East will not try to use the toolchain manager, but will pass the commands directly to the
-  system provided West.
-  The rationale for this change is that some Docker environments don't provide all tools/commands
-  and East should use toolchain-manager in that cases. That case is our current CI environment,
-  where we just install East and want it to manage the tooling. But some Docker environments
-  will provide all tools, including East, so East should just use them directly.
-  But there is no way to detect this automatically, so we need to provide a way for the user to
-  tell East what to do. This is done with the `EAST_DONT_USE_TOOLCHAIN_MANAGER` environment
+- Remove self-detection of Docker environment (introduced in v0.21.0) and add
+  support for `EAST_DONT_USE_TOOLCHAIN_MANAGER` environment variable. If this
+  variable is set to `1`, East will not try to use the toolchain manager, but
+  will pass the commands directly to the system provided West. The rationale for
+  this change is that some Docker environments don't provide all tools/commands
+  and East should use toolchain-manager in that cases. That case is our current
+  CI environment, where we just install East and want it to manage the tooling.
+  But some Docker environments will provide all tools, including East, so East
+  should just use them directly. But there is no way to detect this
+  automatically, so we need to provide a way for the user to tell East what to
+  do. This is done with the `EAST_DONT_USE_TOOLCHAIN_MANAGER` environment
   variable.
 
 ## [0.21.4] - 2024-08-21
 
 ### Fixed
 
-- `east install nrfutil-toolchain-manager` until now only checked if the `nrfutil`
-  binary is present, but not also if the `toolchain-manager` package is installed
-  inside it. That resulted in situations where the install command would report
-  success, however any other east command after it would fail. Now the install
-  command checks if the `nrfutil` binary is present and if the `toolchain-manager`
-  package is installed inside it.
+- `east install nrfutil-toolchain-manager` until now only checked if the
+  `nrfutil` binary is present, but not also if the `toolchain-manager` package
+  is installed inside it. That resulted in situations where the install command
+  would report success, however any other east command after it would fail. Now
+  the install command checks if the `nrfutil` binary is present and if the
+  `toolchain-manager` package is installed inside it.
 
 ## [0.21.3] - 2024-08-21
 
@@ -190,28 +210,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
-- `east build` command silently dropped the board-related .conf files when build types
-  were used. This bug was introduced in the v0.20.0. with the adoption of the new hardware
-  model naming.
+- `east build` command silently dropped the board-related .conf files when build
+  types were used. This bug was introduced in the v0.20.0. with the adoption of
+  the new hardware model naming.
 
 ## [0.21.1] - 2024-08-20
 
 ### Fixed
 
-- `east release` command wrongly aborted, if a board from `east.yml` wasn't found
-  in project's board directory. That was wrong, since the board might be located
-  either in Zephyr, NCS or some other Zephyr module.
+- `east release` command wrongly aborted, if a board from `east.yml` wasn't
+  found in project's board directory. That was wrong, since the board might be
+  located either in Zephyr, NCS or some other Zephyr module.
 
 ## [0.21.0] - 2024-08-16
 
 ### Added
 
 - Make east compatible with Docker. When inside the docker environment East will
-  not try to pass any commands to the nRFUtil's toolchain-manager,
-  but it will pass them directly to the west.
-  The rationale for that is that the docker environment should provide
-  all commands that are needed for working on a Zephyr/NCS project and
-  east should just use them directly.
+  not try to pass any commands to the nRFUtil's toolchain-manager, but it will
+  pass them directly to the west. The rationale for that is that the docker
+  environment should provide all commands that are needed for working on a
+  Zephyr/NCS project and east should just use them directly.
 
 ## [0.20.0] - 2024-08-16
 
@@ -771,7 +790,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.3...HEAD
+[unreleased]:
+  https://github.com/IRNAS/irnas-east-software/compare/v0.26.3...HEAD
 [0.26.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.2...v0.26.3
 [0.26.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.0...v0.26.1
@@ -833,4 +853,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]:
+  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42

@@ -57,3 +57,12 @@ mapping:
                 type: str
               build-type:
                 type: str
+  version:
+    type: map
+    required: false
+    mapping:
+      paths:
+        type: seq
+        required: true
+        sequence:
+          - type: str

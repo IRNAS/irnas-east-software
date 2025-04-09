@@ -363,6 +363,16 @@ def create_artefact_name(project, board, version, build_type):
     return f"{project}-{board}-{version['tag']}{build_type}{git_hash}"
 
 
+def get_raw_git_describe_output(east):
+    """Return raw output from the git describe command."""
+    result = east.run(
+        "git describe --tags --always --long --dirty=+", silent=True, return_output=True
+    )
+
+    # Use strip to remove trailing newline
+    return result["output"].strip()
+
+
 def get_git_version(east):
     """Return structured output from git describe command.
 
@@ -372,11 +382,9 @@ def get_git_version(east):
     patch it in the test files, otherwise pytest thinks that is the mocked call that it
     should test against.
     """
-    result = east.run(
-        "git describe --tags --always --long --dirty=+", silent=True, return_output=True
-    )
+    raw_output = get_raw_git_describe_output(east)
 
-    output = result["output"].strip().split("-")
+    output = raw_output.split("-")
 
     if len(output) == 1:
         # No git tag, only hash was produced
@@ -396,7 +404,7 @@ def get_git_version(east):
         return version
 
     east.print(
-        f"Unsupported git describe output ({result['output']}), contact developer!"
+        f"Unsupported git describe output ({raw_output['output']}), contact developer!"
     )
     east.exit()
 

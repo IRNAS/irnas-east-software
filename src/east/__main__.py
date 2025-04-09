@@ -14,6 +14,7 @@ from .workspace_commands import (
     flash,
     release,
     twister,
+    version,
 )
 
 rich_click.rich_click.MAX_WIDTH = 80
@@ -43,7 +44,10 @@ rich_click.rich_click.COMMAND_GROUPS = {
     ],
     "east update": [{"name": "Subcommands", "commands": ["west", "env", "toolchain"]}],
     "east util": [
-        {"name": "Subcommands", "commands": ["connect", "rtt", "cortex-debug"]}
+        {
+            "name": "Subcommands",
+            "commands": ["connect", "rtt", "cortex-debug", "version"],
+        }
     ],
     "east install": [
         {
@@ -77,6 +81,7 @@ def util(_):
 util.add_command(connect)
 util.add_command(rtt)
 util.add_command(cortex_debug)
+util.add_command(version)
 
 
 @click.group(

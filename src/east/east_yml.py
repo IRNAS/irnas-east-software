@@ -118,4 +118,18 @@ def load_east_yml(project_dir: str):
                             f" [bold]{inherited_type}[/]."
                         )
 
+    # version is optional
+    if east_yml.get("version"):
+        check_for_duplicated_items_in_list(
+            east_yml["version"]["paths"], "version.paths"
+        )
+
     return east_yml
+
+
+def check_for_duplicated_items_in_list(x: list, field_name: str):
+    """Raise exception if x contains duplicate entries."""
+    if len(x) != len(set(x)):
+        raise EastYmlLoadError(
+            f"Found duplicated artifacts under [bold]{field_name}[/]."
+        )
