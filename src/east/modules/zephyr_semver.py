@@ -63,7 +63,7 @@ def _parse_int_version(part: str, tag: str, annotation: str) -> int:
         return int(part)
     except Exception:
         raise ValueError(
-            f"Invalid tag format: {tag}. {annotation} version must be an integer."
+            f"Invalid tag format: {tag}\n{annotation} version must be an integer."
         )
 
 
