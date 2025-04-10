@@ -4,6 +4,7 @@ import os
 # in __main__.
 # There are however exceptions: NRFUTIL_PATH, CPPCHECK_PATH,
 # CLANG_PATH, CODECHECKER_PATH are needed for downloading in install.py.
+# Also, EAST_GITHUB_URL can be accessed from other modules for documentation purposes.
 
 HOME_DIR = os.environ["HOME"]
 
@@ -47,6 +48,8 @@ MINICONDA_DIR = os.path.join(HOME_DIR, "miniconda3")
 
 # Path to the Conda executable, this can be used when the Conda is not yet on PATH.
 CONDA_PATH = os.path.join(MINICONDA_DIR, "bin", "conda")
+
+EAST_GITHUB_URL = "https://github.com/irnas/irnas-east-software"
 
 const_paths = {
     "cache_dir": CACHE_DIR,
