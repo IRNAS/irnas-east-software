@@ -12,6 +12,7 @@ from .workspace_commands import (
     cortex_debug,
     debug,
     flash,
+    pack,
     release,
     twister,
     version,
@@ -33,6 +34,7 @@ rich_click.rich_click.COMMAND_GROUPS = {
                 "attach",
                 "bypass",
                 "release",
+                "pack",
                 "twister",
                 "codechecker",
             ],
@@ -130,6 +132,7 @@ cli.add_command(debug)
 cli.add_command(attach)
 cli.add_command(twister)
 cli.add_command(codechecker)
+cli.add_command(pack)
 
 
 def main():

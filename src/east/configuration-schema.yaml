@@ -57,6 +57,7 @@ mapping:
                 type: str
               build-type:
                 type: str
+
   version:
     type: map
     required: false
@@ -64,5 +65,39 @@ mapping:
       paths:
         type: seq
         required: true
+        sequence:
+          - type: str
+
+  pack:
+    type: map
+    required: false
+    mapping:
+      artifacts:
+        type: seq
+        required: false
+        sequence:
+          - type: str
+      projects:
+        type: seq
+        required: false
+        sequence:
+          - type: map
+            mapping:
+              name:
+                type: str
+                required: true
+              artifacts:
+                type: seq
+                required: false
+                sequence:
+                  - type: str
+              overwrite_artifacts:
+                type: seq
+                required: false
+                sequence:
+                  - type: str
+      extra:
+        type: seq
+        required: false
         sequence:
           - type: str
