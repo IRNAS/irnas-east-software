@@ -7,7 +7,7 @@ import shutil
 from rich.panel import Panel
 
 from ..east_context import EastContext
-from ..helper_functions import configure_nrfutil, download_files
+from ..helper_functions import download_files
 
 
 def _install_nrfutil(east: EastContext, exe_path: str):
