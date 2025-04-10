@@ -178,7 +178,7 @@ def helper_run_cmd(infra, east_cmd):
 
     # Mock output of git commmand, so tests do not have to depend on it
     infra["mocker"].patch(
-        "east.workspace_commands.version_commands.get_raw_git_describe_output",
+        "east.helper_functions.get_raw_git_describe_output",
         return_value=infra["git"],
     )
 
