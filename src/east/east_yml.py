@@ -117,6 +117,46 @@ def load_east_yml(project_dir: str):
                             "from a [bold red]non-existing[/] build-type"
                             f" [bold]{inherited_type}[/]."
                         )
+    # pack is optional
+    if east_yml.get("pack"):
+        common_artifacts = east_yml["pack"].get("artifacts", [])
+        check_for_duplicated_items_in_list(common_artifacts, "pack.artifacts")
+
+        if "projects" in east_yml["pack"]:
+            check_duplicated_entries(
+                east_yml["pack"]["projects"], "pack.projects", "name"
+            )
+
+            # Validation loop
+            for p in east_yml["pack"]["projects"]:
+                if "artifacts" in p and "overwrite_artifacts" in p:
+                    raise EastYmlLoadError(
+                        "Both [bold]artifacts[/] and [bold]overwrite_artifacts[/] fields "
+                        f"are set for the [bold]pack.project.{p['name']}[/] in the "
+                        "[bold]east.yml[/], this is not allowed!"
+                    )
+                if "artifacts" not in p and "overwrite_artifacts" not in p:
+                    raise EastYmlLoadError(
+                        f"[bold]pack.project.{p['name']}[/] field should have atleast one "
+                        "of [bold]artifacts[/] and [bold]overwrite_artifacts[/] fields but "
+                        "it has none!"
+                    )
+
+                if "artifacts" in p:
+                    check_for_duplicated_items_in_list(
+                        p["artifacts"],
+                        f"combined pack.artifact and pack.project.{p['name']}.artifacts",
+                    )
+                    check_for_duplicated_items_in_list(
+                        common_artifacts + p["artifacts"],
+                        f"pack.project.{p['name']}.artifacts",
+                    )
+
+                if "overwrite_artifacts" in p:
+                    check_for_duplicated_items_in_list(
+                        p["overwrite_artifacts"],
+                        f"pack.project.{p['name']}.overwrite_artifacts",
+                    )
 
     # version is optional
     if east_yml.get("version"):
