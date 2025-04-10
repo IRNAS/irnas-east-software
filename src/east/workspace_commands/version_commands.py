@@ -3,9 +3,7 @@ import os
 import click
 
 from ..east_context import east_command_settings
-from ..helper_functions import get_raw_git_describe_output
-from ..modules.parsedtag import ParsedTag
-from ..modules.zephyr_semver import ZephyrSemver
+from ..helper_functions import determine_version_file
 
 
 @click.command(**east_command_settings)
@@ -73,18 +71,7 @@ def version(east, tag, paths):
             east.print(msg)
             east.exit(1)
 
-    try:
-        if tag:
-            pt = ParsedTag.from_cmd(tag)
-        else:
-            git_out = get_raw_git_describe_output(east)
-            pt = ParsedTag.from_git_describe(git_out)
-
-        version_file = ZephyrSemver(pt).to_version_file()
-    except Exception as e:
-        msg = f"Error occured while trying to parse the version: \n\n{e}"
-        east.print(msg)
-        east.exit(1)
+    version_file = determine_version_file(east, tag)
 
     msgs = []
     for p in paths:

@@ -4,7 +4,7 @@ import platform
 import re
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, NoReturn, Optional, Tuple, Union
 
 import requests
 import yaml
@@ -16,6 +16,9 @@ from rich.progress import (
     TextColumn,
     TransferSpeedColumn,
 )
+
+from .modules.parsedtag import ParsedTag
+from .modules.zephyr_semver import ZephyrSemver
 
 # What west's APIs accept for paths.
 #
@@ -553,3 +556,47 @@ def configure_toolchain_manager(east):
         f"{nrfutil} toolchain-manager config --set install-dir="
         f"{east.consts['east_dir']}"
     )
+
+
+def _get_zephyr_semver(east, tag: str | None):
+    """Get the ZephyrSemver object from the tag or git describe output.
+
+    This function can raise an exception.
+    """
+    if tag:
+        pt = ParsedTag.from_cmd(tag)
+    else:
+        git_out = get_raw_git_describe_output(east)
+        pt = ParsedTag.from_git_describe(git_out)
+
+    return ZephyrSemver(pt)
+
+
+def determine_version_file(east, tag: str | None) -> str:
+    """Determine the VERSION file of the project.
+
+    If tag is given use it, otherwise use the output of git describe command.
+    """
+    try:
+        zs = _get_zephyr_semver(east, tag)
+        return zs.to_version_file()
+
+    except Exception as e:
+        msg = f"Error occured while trying to parse the version: \n\n{e}"
+        east.print(msg)
+        east.exit(1)
+
+
+def determine_version_string(east, tag: str | None) -> str:
+    """Determine the version string of the project.
+
+    If tag is given use it, otherwise use the output of git describe command.
+    """
+    try:
+        zs = _get_zephyr_semver(east, tag)
+        return zs.to_string()
+
+    except Exception as e:
+        msg = f"Error occured while trying to parse the version: \n\n{e}"
+        east.print(msg)
+        east.exit(1)
