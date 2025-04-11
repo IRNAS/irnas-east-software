@@ -1,9 +1,10 @@
-import click
 import os
 
+import click
+
 from ..east_context import east_command_settings, east_group_settings
-from .tooling import tool_installer
 from ..helper_functions import configure_toolchain_manager
+from .tooling import tool_installer
 
 
 @click.command(**east_command_settings)
@@ -58,7 +59,11 @@ def toolchain(east, force):
 @click.command(**east_command_settings)
 @click.pass_obj
 def nrfutil_toolchain_manager(east):
-    """Install [bold magenta]nrfutil toolchain-manager[/]."""
+    """Install and configure [bold magenta]nrfutil toolchain-manager[/].
+
+    \b
+    \n\nIf [bold]EAST_DONT_USE_TOOLCHAIN_MANAGER[/] is set to [bold]1[/], it will skip the installation and only configure the existing [bold magenta]nrfutil[/].
+    """
     # Environment doesn't provide toolchain-manager, so we need to download and install
     # in. In cases where it does, we skip this step.
     if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "0":
@@ -72,6 +77,12 @@ def nrfutil_toolchain_manager(east):
     # For every other case we are now doing configuration twice, but it is not a big
     # deal.
     configure_toolchain_manager(east)
+
+    if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "1":
+        east.print(
+            "[bold magenta]toolchain-manager[/] is already installed, it was "
+            "just configured."
+        )
 
 
 @click.command(**east_command_settings)
@@ -113,10 +124,13 @@ def install(ctx, east, all):
     # infrastructure.
     # WARN: There is a better way to do this: invoke method
 
+    if not all and ctx.invoked_subcommand is None:
+        east.print(ctx.get_help())
+        east.exit(0)
+
     if all:
         tool_installer(east, ["codechecker", "clang+llvm", "toolchain-manager"])
         ctx.invoke(toolchain)
-    return
 
 
 install.add_command(toolchain)

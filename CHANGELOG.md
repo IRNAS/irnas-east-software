@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Path to the `nrfutil` wasn't correctly set when using `EAST_DONT_USE_TOOLCHAIN_MANAGER=1`.
+- When `EAST_DONT_USE_TOOLCHAIN_MANAGER=1` is set `east install nrfutil-toolchain-manager` will 
+  print a info message that `nrfutil` was only configured and not installed.
+- `east install` and it's subcommands now have better help text.
+
 ## [0.26.2] - 2025-03-18
 
 ### Fixed
