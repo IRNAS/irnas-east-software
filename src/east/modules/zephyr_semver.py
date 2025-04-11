@@ -1,7 +1,9 @@
+from typing import Tuple
+
 from .parsedtag import ParsedTag
 
 
-def _parse_tag(tag: str) -> tuple[int, int, int, str, int]:
+def _parse_tag(tag: str) -> Tuple[int, int, int, str, int]:
     """Parse a tag.
 
     This function contains logic to parse the semver-like tag into structured data.
