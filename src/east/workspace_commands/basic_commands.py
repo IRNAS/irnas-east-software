@@ -274,17 +274,18 @@ def bypass(east, shell, args):
         )
         east.exit()
 
+    if not east.use_toolchain_manager:
+        east.exit(
+            "nrfutil toolchain manager is not available in this [bold yellow]West "
+            "workspace[/]."
+        )
+
     if shell:
         east.enter_manager_shell()
         east.exit(return_code=0)
 
     if not args:
         east.exit()
-
-    if not east.use_toolchain_manager:
-        east.exit(
-            "nrfutil toolchain manager is not available in this [bold yellow]West workspace[/]."
-        )
 
     cmd = clean_up_extra_args(args)
     east.run_cmd_in_manager(cmd)
