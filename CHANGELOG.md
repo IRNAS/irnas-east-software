@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+- Documentation about East's [environment variables](./docs/environment_variables.md).
+
+### Changed
+
+- Replace `EAST_DONT_USE_TOOLCHAIN_MANAGER` with `EAST_NRFUTIL_CI_MODE`. Behaviour is now better
+  defined in the above linked environment variables document. 
+- When `EAST_NRFUTIL_CI_MODE` is not set `east install toolchain-manager` command now always
+  makes sure that `nrfutil` and it's commands (`device`, `toolchain-manager`) are installed, pinned 
+  to a specific version and configured . Before that was only done as a part of the `nrfutil` 
+  installation procedure, when `nrfutil` was not installed.
+
 ## [0.26.3] - 2025-04-11
 
 ### Fixed
