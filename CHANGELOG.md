@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.27.0] - 2025-04-17
+
 ### Added
 
 - Documentation about East's
@@ -790,8 +792,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]:
-  https://github.com/IRNAS/irnas-east-software/compare/v0.26.3...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.0...HEAD
+[0.27.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.3...v0.27.0
 [0.26.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.2...v0.26.3
 [0.26.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.0...v0.26.1
@@ -853,5 +855,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]:
-  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
