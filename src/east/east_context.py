@@ -424,8 +424,10 @@ class EastContext:
             self.print(format_east_yml_load_error_msg(msg), highlight=False)
             self.exit()
 
-        if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "1":
-            # Running in docker, we shouldn't use the toolchain manager.
+        if os.environ.get("EAST_NRFUTIL_CI_MODE", "0") == "1":
+            # Running in docker, we assume that toolchain is available directly on the
+            # PATH, so there is no need to run commands through nrfutil
+            # toolchain-manager.
             self.use_toolchain_manager = False
             return
 

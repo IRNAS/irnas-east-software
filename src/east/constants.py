@@ -19,7 +19,7 @@ TOOLING_DIR = os.path.join(EAST_DIR, "tooling")
 # Path to the nrfutil executable.
 NRFUTIL_PATH = os.path.join(TOOLING_DIR, "nrfutil", "nrfutil")
 
-if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "1":
+if os.environ.get("EAST_NRFUTIL_CI_MODE", "0") == "1":
     # If this is set, we assume that nrfutil is on path.
     NRFUTIL_PATH = "nrfutil"
 

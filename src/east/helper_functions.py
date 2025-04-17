@@ -530,18 +530,50 @@ def determine_svd_file(east, device):
     )
 
 
-def configure_toolchain_manager(east):
-    """Configure the nrfutil toolchain-manager.
+def configure_nrfutil(east):
+    """Configure the nrfutil.
 
-    We need to tell it where to install the toolchain.
+    Pin nrfutil and it's commands to fixed versions to prevent any future breaking
+    changes.
 
+    All below install/self-update commands are idempotent and they don't require any
+    error or version checking.
     """
+
+    def nrfutil_cmd(cmd: str):
+        nrfutil = east.consts["nrfutil_path"]
+        east.run(f"{nrfutil} {cmd}")
+
+    # Output of --version flag on linux:
+    # nrfutil 7.13.0 (8289424 2024-07-01)
+    # commit-hash: 82894242d19ff24a1541712312b3ea3af0ca8f85
+    # commit-date: 2024-07-01
+    # host: x86_64-unknown-linux-gnu
+    # build-timestamp: 2024-07-01T07:32:31.582129656Z
+    # classification: nrf-external
+    nrfutil_cmd("self-upgrade --to-version 7.13.0")
+
+    # Output of --version flag on linux:
+    # Install toolchain-manager
+    # nrfutil-toolchain-manager 0.15.0 (30dc218 2024-06-12)
+    # commit-hash: 30dc218a99ce1abd296f9ff5de836eacda2cc474
+    # commit-date: 2024-06-12
+    # host: x86_64-unknown-linux-gnu
+    # build-timestamp: 2024-06-12T14:39:56.492204338Z
+    # classification: nrf-external
+    nrfutil_cmd("install toolchain-manager=0.15.0")
+
+    # Output of --version flag on linux:
+    # nrfutil-device 2.9.0 (eb7607c 2025-04-11)
+    # commit-hash: eb7607cafe8cc9d87ff4b05f3e9a543cd6b907ad
+    # commit-date: 2025-04-11
+    # host: x86_64-unknown-linux-gnu
+    # build-timestamp: 2025-04-11T11:06:32.449672386Z
+    # classification: nrf-external
+    nrfutil_cmd("install device=2.9.0")
+
     # Below step shouldn't be done on macOS, the install-dir is hardcoded there.
     if platform.system() == "Darwin":
         return
 
-    nrfutil = east.consts["nrfutil_path"]
-    east.run(
-        f"{nrfutil} toolchain-manager config --set install-dir="
-        f"{east.consts['east_dir']}"
-    )
+    nrfutil_cmd(f"toolchain-manager config --set install-dir={east.consts['east_dir']}")

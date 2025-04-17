@@ -3,7 +3,7 @@ import os
 import click
 
 from ..east_context import east_command_settings, east_group_settings
-from ..helper_functions import configure_toolchain_manager
+from ..helper_functions import configure_nrfutil
 from .tooling import tool_installer
 
 
@@ -62,27 +62,22 @@ def nrfutil_toolchain_manager(east):
     """Install and configure [bold magenta]nrfutil toolchain-manager[/].
 
     \b
-    \n\nIf [bold]EAST_DONT_USE_TOOLCHAIN_MANAGER[/] is set to [bold]1[/], it will skip the installation and only configure the existing [bold magenta]nrfutil[/].
+    \n\nIf [bold]EAST_NRFUTIL_CI_MODE[/] is set to [bold]1[/], this command
+    doesn't do anything.
     """
-    # Environment doesn't provide toolchain-manager, so we need to download and install
-    # in. In cases where it does, we skip this step.
-    if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "0":
-        # In other words, we are using east provided toolchain manager.
-        tool_installer(east, ["toolchain-manager"])
-
-    # Always configure the toolchain manager, regardless of how the toolchain manager is
-    # installed.
-    # Below function is intended for the cases in the CI where toolchain manager was
-    # cached by action/cache and needs to be configured.
-    # For every other case we are now doing configuration twice, but it is not a big
-    # deal.
-    configure_toolchain_manager(east)
-
-    if os.environ.get("EAST_DONT_USE_TOOLCHAIN_MANAGER", "0") == "1":
+    if os.environ.get("EAST_NRFUTIL_CI_MODE", "0") == "1":
         east.print(
-            "[bold magenta]toolchain-manager[/] is already installed, it was "
-            "just configured."
+            "[bold cyan]EAST_NRFUTIL_CI_MODE[/] is set, skipping `nrfutil "
+            "installation and configuration."
         )
+        return
+
+    # Environment doesn't provide nrfutil, so we need to download and install
+    # in. Below function will just install the nrfutil binary if it is missing.
+    tool_installer(east, ["nrfutil"])
+
+    # Configure nrfutil, check for versions and install commands.
+    configure_nrfutil(east)
 
 
 @click.command(**east_command_settings)
@@ -129,7 +124,8 @@ def install(ctx, east, all):
         east.exit(0)
 
     if all:
-        tool_installer(east, ["codechecker", "clang+llvm", "toolchain-manager"])
+        tool_installer(east, ["codechecker", "clang+llvm", "nrfutil"])
+        configure_nrfutil(east)
         ctx.invoke(toolchain)
 
 

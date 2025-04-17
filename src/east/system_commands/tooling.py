@@ -7,7 +7,7 @@ import shutil
 from rich.panel import Panel
 
 from ..east_context import EastContext
-from ..helper_functions import configure_toolchain_manager, download_files
+from ..helper_functions import configure_nrfutil, download_files
 
 
 def _install_nrfutil(east: EastContext, exe_path: str):
@@ -22,25 +22,6 @@ def _install_nrfutil(east: EastContext, exe_path: str):
 
     # That is octal, make it executable.
     os.chmod(nrfutil, 0o777)
-
-    # Pin the nrfutil to a fixed version to prevent any future breaking changes.
-    # Output of --version flag on linux:
-    # nrfutil 7.13.0 (8289424 2024-07-01)
-    # commit-hash: 82894242d19ff24a1541712312b3ea3af0ca8f85
-    # commit-date: 2024-07-01
-    # host: x86_64-unknown-linux-gnu
-    # build-timestamp: 2024-07-01T07:32:31.582129656Z
-    # classification: nrf-external
-    east.run(f"{nrfutil} self-upgrade --to-version 7.13.0")
-
-    # Install toolchain-manager
-    east.run(f"{nrfutil} install toolchain-manager")
-
-    # Install device commands, used for flashing devices.
-    east.run(f"{nrfutil} install device")
-
-    # Configure toolchain path.
-    configure_toolchain_manager(east)
 
 
 def _get_nrfutil_download_link():
@@ -254,8 +235,8 @@ def tool_installer(east, tool_names):
     # List of supported tools that can be installed by East.
     supported_tools = [
         {
-            "name": "toolchain-manager",
-            "cmd": east.consts["nrfutil_path"] + " toolchain-manager",
+            "name": "nrfutil",
+            "exe": east.consts["nrfutil_path"],
             "url": _get_nrfutil_download_link(),
             "install_method": _install_nrfutil,
             "installed_msg": toolchain_installed_msg,
