@@ -53,10 +53,13 @@ East automates the above tasks and tries to make the developer more productive.
 - [How East works] - How East works under the hood and what to expect from it.
 - [Configuration] - How to configure build types and release procedure via
   `east.yml` file.
+- [Environmental variables] - How to configure East using environmental
+  variables.
 - [Development guide] - How to setup development environment for working on
   East.
 
 [getting stared]: docs/getting_started.md
 [how east works]: docs/how_east_works.md
 [configuration]: docs/configuration.md
+[environmental variables]: docs/environmental_variables.md
 [development guide]: docs/development_guide.md
