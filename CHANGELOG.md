@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Broken parsing of the `--spdx` flag.
+
 ## [0.27.0] - 2025-04-17
 
 ### Added

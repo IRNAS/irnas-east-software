@@ -122,11 +122,14 @@ def create_build_command_from_commandline(east, raw_args):
         - build_cmd: a string with the build command, intended to be given to run_west()
         - opts: an object with parsed arguments
     """
+    print("here1")
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("-b", "--board")
     parser.add_argument("-d", "--build-dir")
     parser.add_argument("-t", "--target")
     parser.add_argument("-u", "--build-type")
+    parser.add_argument("--spdx", action="store_true")
+    print("here2")
     opts, _ = parser.parse_known_args(raw_args)
 
     # We need to find source_dir ourselves, ArgumentParser can't find, unless we specify
@@ -171,6 +174,8 @@ def create_build_command_from_commandline(east, raw_args):
     # If --build-type is in raw_args remove it and the following argument. The extra \s*
     # is needed to remove the space after the argument.
     build_cmd = re.sub(r"(-u|--build-type) (\S+)\s*", "", build_cmd).strip()
+    build_cmd = re.sub(r" --spdx", "", build_cmd).strip()
+    print(build_cmd)
 
     return build_cmd, opts
 
