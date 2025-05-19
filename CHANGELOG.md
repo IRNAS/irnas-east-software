@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove unwanted print statements that were added accidentally in the
+  previous release.
+
+
 ## [0.27.1] - 2025-05-19
 
 ### Fixed
