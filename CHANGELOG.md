@@ -6,11 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.27.2] - 2025-05-19
+
 ### Fixed
 
 - Remove unwanted print statements that were added accidentally in the
   previous release.
-
 
 ## [0.27.1] - 2025-05-19
 
@@ -804,7 +805,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.1...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.2...HEAD
+[0.27.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.1...v0.27.2
 [0.27.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.0...v0.27.1
 [0.27.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.3...v0.27.0
 [0.26.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.2...v0.26.3
