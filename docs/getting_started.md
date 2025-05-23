@@ -48,13 +48,13 @@ sudo apt install build-essential curl
 If on Ubuntu 20.04 or 22.04:
 
 ```bash
-sudo apt install libcurses5
+sudo apt install libncurses5
 ```
 
 If on Ubuntu 24.04 or later:
 
 ```bash
-sudo apt install libcurses6
+sudo apt install libncurses6
 ```
 
 #### Libffi
