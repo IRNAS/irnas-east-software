@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - Update version of `nrfutil device` from `v2.9.0` to `v2.11.2`.
 
+### Fixed
+
+- `east util version` command failed with traceback error if the `east.yml`
+  didn't exist. Now it displays a user-friendly error message instead.
+
 ## [0.27.2] - 2025-05-19
 
 ### Fixed
@@ -809,7 +814,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Docker scripts for building and running docker containers, for development
   purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.2...HEAD
+[unreleased]:
+  https://github.com/IRNAS/irnas-east-software/compare/v0.27.2...HEAD
 [0.27.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.1...v0.27.2
 [0.27.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.0...v0.27.1
 [0.27.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.26.3...v0.27.0
@@ -874,4 +880,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]:
+  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42

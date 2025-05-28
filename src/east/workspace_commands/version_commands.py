@@ -7,6 +7,10 @@ from ..helper_functions import get_raw_git_describe_output
 from ..modules.parsedtag import ParsedTag
 from ..modules.zephyr_semver import ZephyrSemver
 
+version_misuse_no_east_yml_msg = """
+[bold yellow]east.yml[/] not found in project's root directory, [bold yellow]east util
+version[/] needs it to determine VERSION paths, exiting!"""
+
 
 @click.command(**east_command_settings)
 @click.pass_obj
@@ -51,6 +55,10 @@ def version(east, tag, paths):
     east.pre_workspace_command_check()
 
     if not paths:
+        if not east.east_yml:
+            east.print(version_misuse_no_east_yml_msg)
+            east.exit(1)
+
         if "version" not in east.east_yml:
             msg = (
                 "[bold]VERSION[/] files couldn't be created as no paths were given.\n\n"
