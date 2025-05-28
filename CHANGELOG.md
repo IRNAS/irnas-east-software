@@ -6,12 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+- Update version of `nrfutil device` from `v2.9.0` to `v2.11.2`.
+
 ## [0.27.2] - 2025-05-19
 
 ### Fixed
 
-- Remove unwanted print statements that were added accidentally in the
-  previous release.
+- Remove unwanted print statements that were added accidentally in the previous
+  release.
 
 ## [0.27.1] - 2025-05-19
 
