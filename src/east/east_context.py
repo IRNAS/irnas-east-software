@@ -429,6 +429,7 @@ class EastContext:
             # PATH, so there is no need to run commands through nrfutil
             # toolchain-manager.
             self.use_toolchain_manager = False
+            self.detected_ncs_version_installed = True
             return
 
         # Check if ncs version was even detected, this can happen in the cases where

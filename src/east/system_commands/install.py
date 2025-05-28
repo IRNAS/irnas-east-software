@@ -31,6 +31,13 @@ def toolchain(east, force):
 
     # # We come to here if the detected ncs version is installed.
     if east.detected_ncs_version_installed:
+        if os.environ.get("EAST_NRFUTIL_CI_MODE", "0") == "1":
+            east.print(
+                "[bold cyan]EAST_NRFUTIL_CI_MODE[/] is set, NCS toolchain should be "
+                "provided by the CI environment, skipping installation."
+            )
+            east.exit(0)
+
         if not force:
             msg = (
                 f"\nVersion of [bold cyan]{east.detected_ncs_version} NCS[/] toolchain "
@@ -67,7 +74,7 @@ def nrfutil_toolchain_manager(east):
     """
     if os.environ.get("EAST_NRFUTIL_CI_MODE", "0") == "1":
         east.print(
-            "[bold cyan]EAST_NRFUTIL_CI_MODE[/] is set, skipping `nrfutil "
+            "[bold cyan]EAST_NRFUTIL_CI_MODE[/] is set, skipping nrfutil "
             "installation and configuration."
         )
         return

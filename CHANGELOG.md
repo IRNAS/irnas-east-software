@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - `east util version` command failed with traceback error if the `east.yml`
   didn't exist. Now it displays a user-friendly error message instead.
+- Correctly detect installed NCS version when running east install toolchain and
+  when EAST_NRFUTIL_CI_MODE is enabled.
 
 ## [0.27.2] - 2025-05-19
 
