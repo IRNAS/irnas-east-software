@@ -10,6 +10,7 @@ class ArtifactsToPack(NamedTuple):
 
     common_artifacts: list[str]
     proj_artifacts: dict[str, list[str]]
+    extra_artifacts: list[str]
 
     @classmethod
     def from_east_yml(cls, east_yml: dict[str, Any]):
@@ -23,6 +24,7 @@ class ArtifactsToPack(NamedTuple):
         pack = east_yml["pack"]
         common_artifacts = pack.get("artifacts", [])
         projects = pack.get("projects", [])
+        extra_artifacts = pack.get("extra", [])
 
         proj_artifacts = {}
 
@@ -38,7 +40,7 @@ class ArtifactsToPack(NamedTuple):
                     f"to East's bug tracker on {EAST_GITHUB_URL}."
                 )
 
-        return cls(common_artifacts, proj_artifacts)
+        return cls(common_artifacts, proj_artifacts, extra_artifacts)
 
     def get_artifacts_for_project(self, project: str) -> list[str]:
         """Return a list of artifacts for a given project.
