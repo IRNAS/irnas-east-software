@@ -96,3 +96,8 @@ mapping:
                 required: false
                 sequence:
                   - type: str
+      extra:
+        type: seq
+        required: false
+        sequence:
+          - type: str

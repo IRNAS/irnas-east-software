@@ -76,7 +76,7 @@ class Artifact(NamedTuple):
         shutil.copy(self.src, self.dst)
 
     def does_exist(self) -> bool:
-        """Check if the aritfact file exists."""
+        """Check if the artifact file exists."""
         return os.path.exists(self.src)
 
     @classmethod
