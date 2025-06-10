@@ -8,7 +8,7 @@ import click
 from ..constants import EAST_GITHUB_URL
 from ..east_context import east_command_settings
 from ..helper_functions import determine_version_string
-from ..modules.artifact import Artifact
+from ..modules.artifact import Artifact, ExtraArtifact, TwisterArtifact
 from ..modules.artifacts2pack import ArtifactsToPack
 from ..modules.tsuite import TSuite
 
@@ -78,22 +78,33 @@ def _pack(east, twister_out_path: str, pack_path: str, tag: str):
 
     version_str = determine_version_string(east, tag)
 
-    artifacts = create_artifacts(
+    twister_artifacts = create_twister_artifacts(
         testsuites,
         atp,
         twister_out_path,
         pack_path,
         version_str,
     )
+    # Perform checks specific for twister artifacts.
+    check_that_specific_projects_exist_as_twister_artifacts(east, atp, twister_artifacts)
+    check_that_all_twister_artifacts_exist(east, twister_artifacts)
+    check_for_duplicated_twister_artifacts(twister_artifacts)
 
-    check_for_duplicated_artifacts(artifacts)
-    check_that_specific_projects_exist_as_artifacts(east, atp, artifacts)
-    check_that_all_artifacts_exist(east, artifacts)
+    extra_artifacts = create_extra_artifacts(atp, pack_path, version_str)
 
-    # All possible checks succeeded, time to do some filesystem operations.
+    # Perform checks specific for extra artifacts.
+    check_that_all_extra_artifacts_exist(east, extra_artifacts)
+    check_for_duplicated_extra_artifacts(east, extra_artifacts)
+
+    # combine all artifacts
+    # We must only use the common methods from now on
+    artifacts = twister_artifacts + extra_artifacts
+
+    # Time to do some filesystem operations.
     sh.rmtree(pack_path, ignore_errors=True)
 
     for a in artifacts:
+        print("Copying artifact:", a.src)
         a.copy()
 
     zip_targets = os.listdir(pack_path)
@@ -125,20 +136,20 @@ def check_for_failed_testsuites(testsuites: Sequence[TSuite]):
         raise Exception(msg)
 
 
-def create_artifacts(
+def create_twister_artifacts(
     testsuites: Sequence[TSuite],
     atp: ArtifactsToPack,
     twister_out_path: str,
     pack_path: str,
     version_str: str,
-) -> Sequence["Artifact"]:
-    """Create a list of Artifact objects."""
+) -> Sequence["TwisterArtifact"]:
+    """Create a list of TwisterArtifact objects."""
 
     # Since Artifact.list_from_parts in create_artifact() returns a list of
     # artifacts and we are using it in a list comprehension, we need to flatten the list
     # of lists to a single list.
-    def create_artifact(ts: TSuite) -> Sequence["Artifact"]:
-        return Artifact.list_from_parts(
+    def create_artifact(ts: TSuite) -> Sequence["TwisterArtifact"]:
+        return TwisterArtifact.list_from_parts(
             ts, atp, version_str, twister_out_path, pack_path
         )
 
@@ -147,8 +158,15 @@ def create_artifacts(
 
     return flatten([create_artifact(ts) for ts in testsuites])
 
+def create_extra_artifacts(
+    atp: ArtifactsToPack,
+    pack_path: str,
+    version_str: str,
+) -> Sequence["ExtraArtifact"]:
+    """Create a list of ExtraArtifact objects."""
+    return ExtraArtifact.list_from_parts(atp.extra_artifacts, pack_path, version_str)
 
-def check_for_duplicated_artifacts(artifacts: Sequence[Artifact]):
+def check_for_duplicated_twister_artifacts(artifacts: Sequence[TwisterArtifact]):
     """Check if any of the artifacts are duplicated."""
     dsts = [a.dst for a in artifacts]
 
@@ -159,13 +177,27 @@ def check_for_duplicated_artifacts(artifacts: Sequence[Artifact]):
             f"{EAST_GITHUB_URL}."
         )
 
+def check_for_duplicated_extra_artifacts(east, artifacts: Sequence[ExtraArtifact]):
+    """Check if any of the extra artifacts are duplicated."""
+    dsts = [a.dst for a in artifacts]
 
-def check_that_specific_projects_exist_as_artifacts(
-    east, atp: ArtifactsToPack, artifacts: Sequence[Artifact]
+    if len(dsts) == len(set(dsts)):
+        return
+
+    header = (
+        "It looks like that the [bold magenta]pack.extra[/] field in your "
+        "[bold yellow]east.yml[/] contains files with the same name, which is not allowed.\n"
+        "All files must have unique names, even if they are in different directories.\n\n"
+    )
+
+    east.print(header)
+    east.exit(1)
+
+
+def check_that_specific_projects_exist_as_twister_artifacts(
+    east, atp: ArtifactsToPack, artifacts: Sequence[TwisterArtifact]
 ):
     """Check if all specified projects with extra or overwritten artifacts exist inside the twister-out directory.
-
-
 
     It is expected that the below error message will be printed quite often, as
     it can be easy to misconfigure the pack field in the east.yml file.
@@ -204,9 +236,8 @@ def check_that_specific_projects_exist_as_artifacts(
     )
     east.exit(1)
 
-
-def check_that_all_artifacts_exist(east, artifacts: Sequence[Artifact]):
-    """Check if all artifacts exist inside the twister-out directory.
+def check_that_all_twister_artifacts_exist(east, artifacts: Sequence[TwisterArtifact]):
+    """Check if all twister artifacts exist in the filesystem.
 
     It is expected that the below error message will be printed quite often, as
     it can be easy to misconfigure the pack field in the east.yml file.
@@ -230,7 +261,7 @@ def check_that_all_artifacts_exist(east, artifacts: Sequence[Artifact]):
         "[bold yellow]east.yml[/] file isn't correctly configured for the output "
         "generated by Twister.\n\n"
     )
-    header += "The following build projects are missing atleast one file:\n"
+    header += "The following built projects are missing atleast one file:\n"
 
     east.print(header)
 
@@ -253,6 +284,42 @@ def check_that_all_artifacts_exist(east, artifacts: Sequence[Artifact]):
                 msg += ", "
 
         msg += "\n\n"
+
+    east.print(
+        msg,
+        soft_wrap=False,
+        no_wrap=True,
+        overflow="ignore",
+        crop=False,
+    )
+    east.exit(1)
+
+def check_that_all_extra_artifacts_exist(east, artifacts: Sequence[ExtraArtifact]):
+    """Check if all extra artifacts exist in the filesystem.
+
+    It is expected that the below error message will be printed quite often, as
+    it can be easy to misconfigure the pack field in the east.yml file.
+
+    Therefore, the error message should be as informative as possible.
+    """
+    missing_artifacts = [a for a in artifacts if not a.does_exist()]
+
+    if not missing_artifacts:
+        return ""
+
+    header = (
+        "It looks like that the [bold magenta]pack.extra[/] field in your "
+        "[bold yellow]east.yml[/] file isn't correctly configured, or you forgot "
+        "to generate the extra artifacts.\n\n"
+    )
+    header += "The following extra artifacts are missing:\n"
+
+    east.print(header)
+
+    msg = ""
+
+    for a in missing_artifacts:
+        msg += f"\t- [bold cyan]{a.src}[/]\n"
 
     east.print(
         msg,
