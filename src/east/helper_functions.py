@@ -17,6 +17,9 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 
+from .modules.parsedtag import ParsedTag
+from .modules.zephyr_semver import ZephyrSemver
+
 # What west's APIs accept for paths.
 #
 # Here, os.PathLike objects should return str from their __fspath__
@@ -585,3 +588,47 @@ def configure_nrfutil(east):
         return
 
     nrfutil_cmd(f"toolchain-manager config --set install-dir={east.consts['east_dir']}")
+
+
+def _get_zephyr_semver(east, tag: str | None):
+    """Get the ZephyrSemver object from the tag or git describe output.
+
+    This function can raise an exception.
+    """
+    if tag:
+        pt = ParsedTag.from_cmd(tag)
+    else:
+        git_out = get_raw_git_describe_output(east)
+        pt = ParsedTag.from_git_describe(git_out)
+
+    return ZephyrSemver(pt)
+
+
+def determine_version_file(east, tag: str | None) -> str:
+    """Determine the VERSION file of the project.
+
+    If tag is given use it, otherwise use the output of git describe command.
+    """
+    try:
+        zs = _get_zephyr_semver(east, tag)
+        return zs.to_version_file()
+
+    except Exception as e:
+        msg = f"An error occurred while trying to parse the version: \n\n{e}"
+        east.print(msg)
+        east.exit(1)
+
+
+def determine_version_string(east, tag: str | None) -> str:
+    """Determine the version string of the project.
+
+    If tag is given use it, otherwise use the output of git describe command.
+    """
+    try:
+        zs = _get_zephyr_semver(east, tag)
+        return zs.to_string()
+
+    except Exception as e:
+        msg = f"An error occurred while trying to parse the version: \n\n{e}"
+        east.print(msg)
+        east.exit(1)
