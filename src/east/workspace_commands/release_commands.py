@@ -387,7 +387,7 @@ def non_existing_sample_msg_fmt(sample_name):
     )
 
 
-@click.command(**east_command_settings)
+@click.command(**east_command_settings, deprecated="Replaced by `east pack`")
 @click.option(
     "-d",
     "--dry-run",
