@@ -13,7 +13,7 @@ env:
 
 jobs:
   update-changelog:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -61,7 +61,7 @@ jobs:
 
   publish-release:
     needs: call-build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/east-tool
@@ -113,7 +113,7 @@ jobs:
     # Only run cleanup if either call-build or publish-release fail.
     needs: [call-build, publish-release]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
