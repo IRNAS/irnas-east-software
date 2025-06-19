@@ -1,4 +1,11 @@
-# East configuration
+# [DEPRECATED] East configuration
+
+<!-- prettier-ignore -->
+> [!WARNING]
+> This document is deprecated. It describes the old way of configuring East
+> that was used in versions v0.28.0 and earlier. It might still work with
+> newer versions, but a deprecation warning will be printed. The commands
+> will be removed in a future version of east.
 
 The `east` tool provides a way to specify the project-specific configuration.
 The configuration is done with an `east.yml` file, which needs to be placed in
@@ -329,11 +336,7 @@ This document assumes knowledge of several different concepts:
   uses that under the hood
 - [Nice blog about Zephyr configuration]
 
-[irnas's release artefact naming guidelines]:
-  https://github.com/IRNAS/irnas-guidelines-docs/blob/main/docs/github_projects_guidelines.md#release-artifacts-naming-scheme-
-[kconfig documentation page]:
-  https://docs.zephyrproject.org/latest/guides/kconfig/index.html
-[one time cmake arguments]:
-  https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#one-time-cmake-arguments
-[nice blog about zephyr configuration]:
-  https://www.jaredwolff.com/optimize-zephyr-config-and-overlays/
+[irnas's release artefact naming guidelines]: https://github.com/IRNAS/irnas-guidelines-docs/blob/main/docs/github_projects_guidelines.md#release-artifacts-naming-scheme-
+[kconfig documentation page]: https://docs.zephyrproject.org/latest/guides/kconfig/index.html
+[one time cmake arguments]: https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#one-time-cmake-arguments
+[nice blog about zephyr configuration]: https://www.jaredwolff.com/optimize-zephyr-config-and-overlays/
