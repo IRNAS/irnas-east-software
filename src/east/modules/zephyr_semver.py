@@ -98,7 +98,7 @@ class ZephyrSemver:
 
     Specific to the to_string() representation:
 
-    - If the self.tweak is equeal to 0, it will not appear in the string representation.
+    - If the self.tweak is equal to 0, it will not appear in the string representation.
     - The plus '+' after the HASH part will only appear if the repo was dirty.
     - to_string() representation will only contain HASH part if HASH was given and
       pt.on_tag is False.
@@ -108,6 +108,13 @@ class ZephyrSemver:
     """
 
     def __init__(self, pt: ParsedTag):
+        """Create a ZephyrSemver object from a ParsedTag object.
+
+        See the class docstring for the expectations about the tag.
+
+        Args:
+            pt (ParsedTag): The parsed tag to take the data from.
+        """
         self.hash = pt.hash
         self.dirty = pt.dirty
         self.on_tag = pt.on_tag

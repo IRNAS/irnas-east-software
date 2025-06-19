@@ -136,7 +136,7 @@ samples:
 """
 
 
-def create_and_write(path: str, filename: str, content: str = None):
+def create_and_write(path: str, filename: str, content: str = ""):
     """Create a file in the given path with the given content.
 
     Args:
@@ -155,6 +155,34 @@ def create_and_write(path: str, filename: str, content: str = None):
             f.write(content)
 
 
+domains_yaml_content = """
+default: APP_NAME
+build_dir: BUILD_DIR
+domains:
+  - name: APP_NAME
+    build_dir: BUILD_DIR/APP_NAME
+flash_order:
+  - APP_NAME
+"""
+
+
+def _create_domains_yaml(build_dir: str, app_name: str):
+    """Creates a domains.yaml file in the build_dir.
+
+    Args:
+        build_dir (str):    Path to the build directory.
+        app_name (str):     Name of the app.
+
+    Returns:
+        Path to the created domains.yaml file.
+    """
+    domains_yaml = domains_yaml_content.replace("APP_NAME", app_name).replace(
+        "BUILD_DIR", build_dir
+    )
+
+    create_and_write(build_dir, "domains.yaml", domains_yaml)
+
+
 dummy_config = """
 CONFIG_DEBUG=y
 """
@@ -165,6 +193,56 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(test_project)
 
 target_sources(app PRIVATE src/main.c)
+"""
+
+twister_json_content = """
+{
+    "environment":{
+        "zephyr_version":"v3.9.99-ncs1"
+    },
+    "testsuites":[
+        {
+            "name":"app/app.prod",
+            "arch":"arm",
+            "platform":"custom_board@1.0.0/nrf52840",
+            "path":"../project/app",
+            "run_id":"bedb5c7ace7e11da0465695d672a19b8",
+            "runnable":false,
+            "retries":0,
+            "status":"passed",
+            "execution_time":"0.00",
+            "build_time":"28.42",
+            "testcases":[
+                {
+                    "identifier":"app.prod",
+                    "execution_time":"0.00",
+                    "status":"skipped",
+                    "reason":"Test was built only"
+                }
+            ]
+        },
+        {
+            "name":"samples/blinky/sample.basic.blinky",
+            "arch":"arm",
+            "platform":"custom_board@1.0.0/nrf52840",
+            "path":"../project/samples/blinky",
+            "run_id":"393454037c976f0a9443588a76015733",
+            "runnable":false,
+            "retries":0,
+            "status":"passed",
+            "execution_time":"0.00",
+            "build_time":"20.75",
+            "testcases":[
+                {
+                    "identifier":"sample.basic.blinky",
+                    "execution_time":"0.00",
+                    "status":"skipped",
+                    "reason":"Test was built only"
+                }
+            ]
+        }
+    ]
+}
 """
 
 
@@ -225,6 +303,41 @@ def _create_good_west_workspace(west_top_dir):
     ]
     for board_file in board_files:
         create_and_write(west_top_dir, os.path.join(board_path, board_file))
+
+    tmp_path = "project/twister-out/custom_board@1.0.0_nrf52840"
+
+    app_path = os.path.join(tmp_path, "app/app.prod")
+    app_files = [
+        "app/zephyr/zephyr.hex",
+        "app/zephyr/zephyr.bin",
+        "merged.hex",
+    ]
+    twister_files = [os.path.join(app_path, f) for f in app_files]
+
+    sample_path = os.path.join(tmp_path, "samples/blinky/sample.basic.blinky")
+    sample_files = [
+        "zephyr/zephyr.hex",
+        "zephyr/zephyr.bin",
+    ]
+    twister_files += [os.path.join(sample_path, f) for f in sample_files]
+
+    for twister_file in twister_files:
+        create_and_write(west_top_dir, twister_file)
+
+    # Sample is a non-sysbuild app, while app.prod is a sysbuild app, that's why we only
+    # create domains.yaml for the app.prod.
+    _create_domains_yaml(os.path.join(west_top_dir, app_path), "app")
+
+    create_and_write(
+        west_top_dir,
+        os.path.join("project", "twister-out", "twister.json"),
+        twister_json_content,
+    )
+
+    # Add extra files - a script
+    create_and_write(
+        west_top_dir, os.path.join("project", "test-extra", "extra_script.sh")
+    )
 
     return os.path.join(west_top_dir, "project")
 
