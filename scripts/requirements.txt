@@ -1,6 +1,6 @@
 rich == 13.7.1
-click == 8.1.7
-rich_click == 1.8.3
+click == 8.2.1
+rich_click == 1.8.9
 requests == 2.32.3
 PyYAML >= 6.0.0
 pykwalify == 1.8.0
