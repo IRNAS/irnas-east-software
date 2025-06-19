@@ -4,15 +4,13 @@ East is a command line meta-tool, useful for creating, managing, and deploying
 [Zephyr] or [nRF Connect SDK] (NCS) projects.
 
 [zephyr]: https://docs.zephyrproject.org/latest/
-[nrf connect sdk]:
-  https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/introduction.html
+[nrf connect sdk]: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/introduction.html
 
 It is built on top of Zephyr's RTOS meta-tool [West] and Nordic's [nRF Connect
 Toolchain Manager].
 
 [west]: https://github.com/zephyrproject-rtos/west
-[nrf connect toolchain manager]:
-  https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager
+[nrf connect toolchain manager]: https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager
 
 ## Reasoning behind East
 
@@ -39,10 +37,10 @@ East automates the above tasks and tries to make the developer more productive.
 - Sandboxed development environment, thanks to the nRF Connect Toolchain
   Manager, every `build`, `flash`, etc. command runs inside of its toolchain
   environment.
-- Automated process of generating release artefacts for your entire project, no
-  matter the number of applications, samples or boards.
-- Support for build types, which is integrated into the usual build process.
+- Automated process of packaging release artifacts for your entire project.
 - RTT utility commands to connect and see the RTT stream.
+- CodeChecker integration for static code analysis.
+- Generating configuration files for the Cortex Debug VScode extension.
 
 ## Documentation
 
