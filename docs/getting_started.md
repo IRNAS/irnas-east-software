@@ -1,224 +1,87 @@
-# Getting started
+# Example project walk-through
 
-`east` intends to be fully documented inside the tool itself, (which is not
-yet). Executing `east` or `east --help` on the command line should give you
-sufficient information on how to use the tool in basic ways.
+This example showcases the use of `east` tool by using the NCS [example application] repository as a
+starting point.
 
-In the current state `east` does not fully replace `west` (and it is not yet
-clear, if it ever will), so `west` tool still needs to be installed on the
-system.
+**Note:** The link above and `east init` below both reference the `v3.0.0` version of the example
+application, to ensure that the example works. Other versions of the example application might not
+work with the steps described in this document, since the example application changes over time.
 
-<!-- prettier-ignore -->
-> [!NOTE]
-> Preferred operating system to use is Linux, specifically Ubuntu 24.04
-> or later. Older versions of Ubuntu or 20.04 and 22.04 are also supported.
-> MacOS users can also use `east` and `west` tools, however at the moment of
-> writing this instructions it is not clear what exact additional packages are
-> needed to be installed. Windows is not supported at the moment.
-
-## Installation
-
-Use the Python package manager [pipx](https://github.com/pypa/pipx) to install
-`east` and `west`:
-
-```bash
-pipx install east-tool west
-```
-
-If using Ubuntu versions earlier than 24.04, you need to install `east` and
-`west` with pip:
-
-```bash
-pip install east-tool west
-```
-
-### Additional packages and tools
-
-East depends on some additional tooling that users need to install manually.
-Some of these packages are different between Ubuntu versions.
-
-#### Common
-
-```bash
-sudo apt install build-essential curl
-```
-
-#### Libcurses
-
-If on Ubuntu 20.04 or 22.04:
-
-```bash
-sudo apt install libncurses5
-```
-
-If on Ubuntu 24.04 or later:
-
-```bash
-sudo apt install libncurses6
-```
-
-#### Libffi
-
-If on Ubuntu 20.04:
-
-```bash
-sudo apt install libffi7
-```
-
-If on Ubuntu 22.04 or later:
-
-```bash
-wget http://es.archive.ubuntu.com/ubuntu/pool/main/libf/libffi/libffi7_3.3-4_amd64.deb
-sudo dpkg -i libffi7_3.3-4_amd64.deb
-```
-
-#### J-Link
-
-J-Link Software and documentation pack is needed to flash the firmware to the
-device:
-
-1. Navigate to their [download page],
-2. select latest version of the software and download the 64-bit DEB Installer.
-3. Install it with below command:
-
-   ```bash
-   sudo dpkg -i <path-to-downloaded-deb-file>
-   ```
-
-[download page]: https://www.segger.com/downloads/jlink/
-
-#### pylink-square
-
-Install `pylink-square` dependency required by the Zephyr. If on Ubuntu 20.04 or
-22.04:
-
-```bash
-pip install pylink-square
-```
-
-If on Ubuntu 24.04 or later:
-
-```bash
-pipx install pylink-square
-```
-
-For older versions of NCS (before `v3.0.0`) the now deprecated [nRF Command Line
-Tools] (`nrfjprog`) is needed to flash the firmware to the device:
-
-1. Scroll down to the Downloads section.
-2. Choose Linux x86 64 as a platform.
-3. Download `nrf-command-line-tools_10.24.2_amd64.deb` file
-4. Install the downloaded package with below command:
-
-   ```bash
-   sudo dpkg -i <path-to-file>/nrf-command-line-tools_10.24.2_amd64.deb
-   ```
-
-[nRF Command Line Tools]:
-  https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools
-
-### First time system setup
-
-`east` needs some tools installed on the host system to function.
-
-This can be done with below command:
-
-```
-east install nrfutil-toolchain-manager
-```
-
-**Note**: You can install more tools with `east install --all` command, however
-this is not needed for this getting started guide.
-
-## Example project walk-through
-
-Below example showcases the use of `east` tool by using Zephyr's [example
-application] repository as a starting point.
-
-[example application]:
-  https://github.com/zephyrproject-rtos/example-application/tree/v3.1.0
-
-**Note:** Above link and below `east init` both reference the `v3.1.0` version
-of the example application. The `HEAD` of the `main` branch is currently broken
-/ not compatible with this guide.
-
-### Setup
+## Setup
 
 Initialize `my-workspace` folder for the `example-application`.
 
 ```bash
-east init -m https://github.com/zephyrproject-rtos/example-application --mr v3.1.0 my-workspace
-cd my-workspace/example-application
+east init -m https://github.com/nrfconnect/ncs-example-application/ --mr v3.0.0 east-example
+cd east-example/ncs-example-application
 ```
 
-#### Convert repository into a NCS project
-
-Open `west.yml` and overwrite it with below snippet:
-
-```yaml
-manifest:
-  remotes:
-    - name: nrfconnect
-      url-base: https://github.com/nrfconnect
-
-  projects:
-    - name: nrf
-      repo-path: sdk-nrf
-      remote: nrfconnect
-      revision: v2.2.0
-      import: true
-```
-
-Run west update afterwards:
+Run east update afterwards, to pull all the required repositories:
 
 ```bash
-west update
+east update # This is equivalent to `west update`
 ```
 
-There is no need to overwrite the contents of the `west.yml`, if it already
-imports NCS repo. Only `west update` is needed in that case.
+### Toolchain installation
 
-#### Toolchain installation
-
-To install required toolchain run below command:
+To install the required toolchain run:
 
 ```bash
 east install toolchain
 ```
 
-East determines the correct version of the toolchain from the `west.yml`
-manifest file and downloads it to the host machine. Toolchain only needs to be
-installed once per every NCS version and not per project.
+East determines the correct version of the toolchain from the `west.yml` manifest file and downloads
+it to the host machine. The toolchain only needs to be installed once per every NCS version and not
+per project. Some NCS versions share the same toolchain, which is also handled by `east`.
 
-#### Board overlay files
-
-This examples uses `nrf52840dk_nrf52840` and `nrf52dk_nrf52832` boards, so we
-need to create board overlay files for them:
-
-```bash
-cp app/boards/nucleo_f302r8.overlay app/boards/nrf52840dk_nrf52840.overlay
-cp app/boards/nucleo_f302r8.overlay app/boards/nrf52dk_nrf52832.overlay
-sed -i 's/gpioc/gpio0/g' app/boards/nrf52840dk_nrf52840.overlay
-sed -i 's/gpioc/gpio0/g' app/boards/nrf52dk_nrf52832.overlay
-```
-
-Above two `sed` commands open both `.overlay` files that you just copied and
-replace in both every occurrence of `gpioc` to `gpio0` (Nordic chips index their
-ports with numbers instead with letters).
-
-### Building, flashing and connecting
+## Building, flashing and connecting
 
 To build the application firmware:
 
 ```bash
 cd app
-east build -b nrf52840dk_nrf52840
+
+# classic build
+east build -b custom_plank
+
+# using twister test-suite configurations
+east build -b custom_plank . -T app.default
+east build -b custom_plank . -T app.debug
 ```
 
-To flash the firmware:
+`custom_plank` is a slight modification of the `nrf52840dk`, so if you have one, you can use the
+following command to flash the firmware to the device:
 
 ```bash
 east flash
+```
+
+## RTT logs
+
+The app logs to UART by default. To build the application with RTT support:
+
+1. Create a `rtt.conf` file next to the `prj.conf` file with the following content:
+
+   ```ini
+   CONFIG_USE_SEGGER_RTT=y
+   CONFIG_LOG_BACKEND_UART=y
+   ```
+
+In `sample.yaml`, add rtt.conf to the debug test-suite configuration:
+
+```yaml
+tests:
+  app.default: {}
+  app.debug:
+    extra_overlay_confs:
+      - debug.conf
+      - rtt.conf
+```
+
+Rebuild:
+
+```bash
+east build -b custom_plank . -T app.debug
 ```
 
 To view RTT logs:
@@ -233,62 +96,46 @@ east util rtt
 
 ## Creating a release
 
-`east release` command, performs a release process consisting of a series of
-`east build` commands to build applications and samples listed in the `east.yml`
-file. Key component of release command are also _build types_.
+Creating a release is done in two steps:
 
-Explanation on how `east.yml` and _build types_ work is explained in
-[configuration.md](configuration.md) file.
+1. Use [Twister] to build all applications we want to be part of the release.
+2. Use `east pack` to extract relevant files and prepare a release package.
 
-Below steps describe minimal basic setup to get it working.
+The `east pack` command is configured by using a `east.yml` file. For details, see
+[configuration.md](configuration.md).
 
-### Prerequisites
+The steps below describe a minimal basic setup to get it working.
 
-Make sure that you performed all steps described in
-[Example project walk-through](#Example-project-walk-through) section before
-continuing.
+1. Create a `east.yml` file in the root folder with below content:
 
-Create a `east.yml` file in the root folder with below content:
+   ```yaml
+   pack:
+     artifacts:
+       - $APP_DIR/zephyr/zephyr.hex
+       - $APP_DIR/zephyr/zephyr.bin
+       - merged.hex
+   ```
 
-```yaml
-apps:
-  - name: example_app
-    west-boards:
-      - nrf52840dk_nrf52840
-      - nrf52dk_nrf52832
+2. Use [Twister] to build the `app` for both boards:
 
-    build-types:
-      - type: debug
-        conf-files:
-          - debug.conf
-      - type: rtt
-        conf-files:
-          - debug.conf
-          - rtt.conf
-```
+   ```bash
+   # Run from the root of the repository
+   east twister -T app \
+     --build-only \
+     --overflow-as-errors \
+     -p custom_plank \
+     -p nrf54l15dk/nrf54l15/cpuapp
+   ```
 
-Enter `app` folder and run below set of commands:
+3. Use `east pack` to extract the files from the build and prepare a release package:
 
-```bash
-mkdir conf
-mv prj.conf conf/common.conf
-mv debug.conf conf
-mv rtt.conf conf
-```
+   ```bash
+   east pack --tag v0.1.0
+   ```
 
-### Release
+   A folder named `package` will be created.
 
-You can now run release command:
-
-```
-east release
-```
-
-Release procedure will build 6 different builds:
-
-- For each west board:
-  - Implicit **release** build using only `common.conf` (previously `prj.conf`)
-  - **debug** build using `common.conf` and `debug.conf`
-  - **rtt** build using `common.conf` and `rtt.conf`
-
-Build artefacts can be found inside of `release` folder in the root directory.
+[example application]: https://github.com/nrfconnect/ncs-example-application/tree/v3.0.0
+[Twister]: https://docs.zephyrproject.org/latest/develop/test/twister.html
+[nRF Command Line Tools]:
+  https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools
