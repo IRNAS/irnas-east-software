@@ -146,64 +146,10 @@ class TwisterArtifact(Artifact):
         app_build_dir: str,
         version_str: str,
     ) -> str:
-        """Rename twister artifact files by applying artifact renaming schema.
+        """Rename twister artifact files by applying the twister artifact renaming schema."""
+        # Developer note: If this ever changes, please also update the schema description
+        # in the documentation (docs/pack.md).
 
-        Artifact renaming schema:
-
-            <project_name>-[dirs-]<filename>-<version_str>.<ext>
-
-        Where:
-            project_name:       Name of the project, more specifically the name of the
-                                project's build directory as output by the twister,
-                                e.g., samples.blinky, app.prod, etc.
-            dirs:               Directories in the path to the artifact file. Optional,
-                                see below.
-            filename:           Unmodified filename of the artifact.
-            version_str:        Version string, as determined by the east gen-version
-                                command.
-            ext:                Unmodified file extension of the artifact.
-
-        The 'dirs' part is optional and is determined by the path to the artifact file
-        and its application build directory. The intention is to use 'dirs' part only
-        for the cases where artifacts don't reside in the commonly used locations.
-
-        The `dirs` part is omitted completely if the artifact is located directly in:
-          * The project's build directory.
-          * The `zephyr` directory in Sysbuild's default applications's build directory,
-            eg. under "$APP_DIR/zephyr".
-
-        If artifact is located directly in `zephyr` directory of some non-default
-        application project, the 'dirs' part contains only the name of that non-default
-        application project. For example, for "mcuboot/zephyr/zephyr.hex" the 'dirs' is
-        just "mcuboot".
-
-        For all other cases, the 'dirs' part contains the full path to the artifact file,
-        relative to the project's build directory, with slashes replaced by dots.
-
-        Examples:
-        For:
-            $APP_DIR = "blinky"
-            project_name = "blinky.prod"
-            version_str = "v1.0.0"
-
-        The following artifacts:
-            - blinky/zephyr/zephyr.hex
-            - mcuboot/zephyr/zephyr.hex
-            - blinky/Kconfig/Kconfig.dts
-            - dfu_application.zip
-            - merged.hex
-            - blinky/zephyr/arch/cmake_install.cmake
-            - mcuboot/zephyr/arch/cmake_install.cmake
-
-        are renamed to:
-            - blinky.prod-zephyr-v1.0.0.hex
-            - blinky.prod-mcuboot-zephyr-v1.0.0.hex
-            - blinky.prod-blinky.Kconfig-Kconfig-v1.0.0.dts
-            - blinky.prod-dfu_application-v1.0.0.zip
-            - blinky.prod-merged-v1.0.0.hex
-            - blinky.prod-blinky.zephyr.arch-cmake_install-v1.0.0.cmake
-            - blinky.prod-mcuboot.zephyr.arch-cmake_install-v1.0.0.cmake
-        """
         dir, file = os.path.split(artifact)
         filename, ext = os.path.splitext(file)
         app_zephyr_dir = os.path.join(app_build_dir, "zephyr")
@@ -259,26 +205,10 @@ class ExtraArtifact(Artifact):
         src_full_path: str,
         version_str: str,
     ) -> str:
-        """Rename extra artifact files by applying artifact renaming schema.
+        """Rename extra artifact files by applying the extra artifact renaming schema."""
+        # Developer note: If this ever changes, please also update the schema description
+        # in the documentation (docs/pack.md).
 
-        Artifact renaming schema:
-
-            <filename>-<version_str>.<ext>
-
-        Where:
-            filename:           Unmodified filename of the artifact.
-            version_str:        Version string, as determined by the east gen-version
-                                command.
-            ext:                Unmodified file extension of the artifact.
-
-        Examples:
-        For:
-            src_full_path = "scripts/update_docker_version.sh"
-            version_str = "v1.0.0"
-
-        The resulting file name will be:
-            update_docker_version-v1.0.0.sh
-        """
         _, file = os.path.split(src_full_path)
         filename, ext = os.path.splitext(file)
 
