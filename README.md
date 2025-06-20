@@ -46,18 +46,21 @@ East automates the above tasks and tries to make the developer more productive.
 
 `docs` directory contains several markdown documents about East:
 
-- [Getting stared] - Quickly setup an example project and get it building with
+- [Installation] - How to install East and its dependencies.
+- [Example Project] - Quickly setup an example project and get it building with
   East.
 - [How East works] - How East works under the hood and what to expect from it.
-- [Configuration] - How to configure build types and release procedure via
-  `east.yml` file.
+- [Configuration] - How to configure the `east.yml` file.
+- [Pack] - How to use `east pack` command to create a release package.
 - [Environmental variables] - How to configure East using environmental
   variables.
-- [Development guide] - How to setup development environment for working on
+- [Development guide] - How to setup the development environment for working on
   East.
 
-[getting stared]: docs/getting_started.md
+[installation]: docs/installation.md
+[Example Project]: docs/getting_started.md
 [how east works]: docs/how_east_works.md
 [configuration]: docs/configuration.md
+[pack]: docs/pack.md
 [environmental variables]: docs/environmental_variables.md
 [development guide]: docs/development_guide.md
