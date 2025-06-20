@@ -4,15 +4,13 @@ East is a command line meta-tool, useful for creating, managing, and deploying
 [Zephyr] or [nRF Connect SDK] (NCS) projects.
 
 [zephyr]: https://docs.zephyrproject.org/latest/
-[nrf connect sdk]:
-  https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/introduction.html
+[nrf connect sdk]: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/introduction.html
 
 It is built on top of Zephyr's RTOS meta-tool [West] and Nordic's [nRF Connect
 Toolchain Manager].
 
 [west]: https://github.com/zephyrproject-rtos/west
-[nrf connect toolchain manager]:
-  https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager
+[nrf connect toolchain manager]: https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager
 
 ## Reasoning behind East
 
@@ -39,27 +37,30 @@ East automates the above tasks and tries to make the developer more productive.
 - Sandboxed development environment, thanks to the nRF Connect Toolchain
   Manager, every `build`, `flash`, etc. command runs inside of its toolchain
   environment.
-- Automated process of generating release artefacts for your entire project, no
-  matter the number of applications, samples or boards.
-- Support for build types, which is integrated into the usual build process.
+- Automated process of packaging release artifacts for your entire project.
 - RTT utility commands to connect and see the RTT stream.
+- CodeChecker integration for static code analysis.
+- Generating configuration files for the Cortex Debug VScode extension.
 
 ## Documentation
 
 `docs` directory contains several markdown documents about East:
 
-- [Getting stared] - Quickly setup an example project and get it building with
+- [Installation] - How to install East and its dependencies.
+- [Example Project] - Quickly setup an example project and get it building with
   East.
 - [How East works] - How East works under the hood and what to expect from it.
-- [Configuration] - How to configure build types and release procedure via
-  `east.yml` file.
+- [Configuration] - How to configure the `east.yml` file.
+- [Pack] - How to use `east pack` command to create a release package.
 - [Environmental variables] - How to configure East using environmental
   variables.
-- [Development guide] - How to setup development environment for working on
+- [Development guide] - How to setup the development environment for working on
   East.
 
-[getting stared]: docs/getting_started.md
+[installation]: docs/installation.md
+[Example Project]: docs/getting_started.md
 [how east works]: docs/how_east_works.md
 [configuration]: docs/configuration.md
+[pack]: docs/pack.md
 [environmental variables]: docs/environmental_variables.md
 [development guide]: docs/development_guide.md
