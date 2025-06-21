@@ -48,7 +48,7 @@ jobs:
       - name: Commit Changelog, create tag and push
         run: |
           git add CHANGELOG.md
-          git commit -m "Update CHANGELOG.md for Release ${{ inputs.version }}"
+          git commit -m "docs: Update CHANGELOG.md for release ${{ inputs.version }}"
           git tag ${{ inputs.version }}
           git push
           git push origin ${{ inputs.version }}
