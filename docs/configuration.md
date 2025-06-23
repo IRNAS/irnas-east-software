@@ -36,7 +36,7 @@ pack:
     - $APP_DIR/zephyr/zephyr.hex
     - $APP_DIR/zephyr/zephyr.bin
     - merged.hex
-  projects:
+  build_configurations:
     - name: sample.blinky
       overwrite_artifacts:
         - $APP_DIR/zephyr/zephyr.hex

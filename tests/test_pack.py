@@ -12,7 +12,7 @@ pack_yaml_single_app = """
 pack:
   artifacts:
     - $APP_DIR/zephyr/merged.hex
-  projects:
+  build_configurations:
     - name: app.prod
       artifacts:
         - $APP_DIR/zephyr/zephyr.hex
@@ -34,8 +34,8 @@ def test_simple_pack_config(west_workplace):
 
     assert east_yaml is not None
     assert east_yaml["pack"]["artifacts"] == ["$APP_DIR/zephyr/merged.hex"]
-    assert east_yaml["pack"]["projects"][0]["name"] == "app.prod"
-    assert east_yaml["pack"]["projects"][0]["artifacts"] == [
+    assert east_yaml["pack"]["build_configurations"][0]["name"] == "app.prod"
+    assert east_yaml["pack"]["build_configurations"][0]["artifacts"] == [
         "$APP_DIR/zephyr/zephyr.hex",
         "dfu_application.zip",
     ]
@@ -43,7 +43,7 @@ def test_simple_pack_config(west_workplace):
 
 pack_yaml_multiple_apps = """
 pack:
-  projects:
+  build_configurations:
     - name: app.prod
       artifacts:
         - $APP_DIR/zephyr/zephyr.hex
@@ -74,14 +74,14 @@ def test_multiple_apps(west_workplace):
     east_yaml = load_east_yml(project_path)
     assert east_yaml is not None
 
-    for i, app in enumerate(east_yaml["pack"]["projects"]):
+    for i, app in enumerate(east_yaml["pack"]["build_configurations"]):
         assert app["name"] == expected_app_names[i]
         assert app["artifacts"] == ["$APP_DIR/zephyr/zephyr.hex", "dfu_application.zip"]
 
 
 pack_yaml_multiple_duplicated_apps = """
 pack:
-  projects:
+  build_configurations:
     - name: app.prod
       artifacts:
         - $APP_DIR/zephyr/zephyr.hex
@@ -109,7 +109,7 @@ def test_duplicated_multiple_apps(west_workplace):
 
 pack_yaml_two_artifact_fields = """
 pack:
-  projects:
+  build_configurations:
     - name: app.prod
       artifacts:
         - $APP_DIR/zephyr/zephyr.hex
@@ -145,7 +145,7 @@ pack_yaml_duplicated_artifact_fields1 = """
 pack:
   artifacts:
     - $APP_DIR/zephyr/zephyr.hex
-  projects:
+  build_configurations:
     - name: app.prod
       artifacts:
         - $APP_DIR/zephyr/zephyr.hex
@@ -157,7 +157,7 @@ pack:
   artifacts:
     - $APP_DIR/zephyr/zephyr.hex
     - $APP_DIR/zephyr/zephyr.hex
-  projects:
+  build_configurations:
     - name: app.prod
       artifacts:
         - $APP_DIR/zephyr/merged.hex
@@ -168,7 +168,7 @@ pack_yaml_duplicated_artifact_fields3 = """
 pack:
   artifacts:
     - $APP_DIR/zephyr/zephyr.hex
-  projects:
+  build_configurations:
     - name: app.prod
       overwrite_artifacts:
         - $APP_DIR/zephyr/merged.hex
@@ -203,7 +203,7 @@ pack:
     - $APP_DIR/zephyr/zephyr.hex
     - $APP_DIR/zephyr/zephyr.bin
     - merged.hex
-  projects:
+  build_configurations:
     - name: sample.basic.blinky
       overwrite_artifacts:
         - $APP_DIR/zephyr/zephyr.hex

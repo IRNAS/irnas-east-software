@@ -9,7 +9,7 @@ class ArtifactsToPack(NamedTuple):
     """
 
     common_artifacts: list[str]
-    proj_artifacts: dict[str, list[str]]
+    bc_artifacts: dict[str, list[str]]
     extra_artifacts: list[str]
 
     @classmethod
@@ -23,16 +23,16 @@ class ArtifactsToPack(NamedTuple):
 
         pack = east_yml["pack"]
         common_artifacts = pack.get("artifacts", [])
-        projects = pack.get("projects", [])
+        build_configs = pack.get("build_configurations", [])
         extra_artifacts = pack.get("extra", [])
 
         proj_artifacts = {}
 
-        for p in projects:
-            if "artifacts" in p:
-                proj_artifacts[p["name"]] = common_artifacts + p["artifacts"]
-            elif "overwrite_artifacts" in p:
-                proj_artifacts[p["name"]] = p["overwrite_artifacts"]
+        for bc in build_configs:
+            if "artifacts" in bc:
+                proj_artifacts[bc["name"]] = common_artifacts + bc["artifacts"]
+            elif "overwrite_artifacts" in bc:
+                proj_artifacts[bc["name"]] = bc["overwrite_artifacts"]
             else:
                 raise Exception(
                     "One of 'artifact' or 'overwrite_artifact' keys must be present in "
@@ -47,4 +47,4 @@ class ArtifactsToPack(NamedTuple):
 
         If that project is not found, return the common artifacts.
         """
-        return self.proj_artifacts.get(project, self.common_artifacts)
+        return self.bc_artifacts.get(project, self.common_artifacts)
