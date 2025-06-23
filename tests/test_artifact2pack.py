@@ -6,7 +6,7 @@ pack_yaml_single_app = """
 pack:
   artifacts:
     - $APP_DIR/zephyr/merged.hex
-  projects:
+  build_configurations:
     - name: app.prod
       artifacts:
         - $APP_DIR/zephyr/zephyr.hex

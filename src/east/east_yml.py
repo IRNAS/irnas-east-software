@@ -122,13 +122,15 @@ def load_east_yml(project_dir: str):
         common_artifacts = east_yml["pack"].get("artifacts", [])
         check_for_duplicated_items_in_list(common_artifacts, "pack.artifacts")
 
-        if "projects" in east_yml["pack"]:
+        if "build_configurations" in east_yml["pack"]:
             check_duplicated_entries(
-                east_yml["pack"]["projects"], "pack.projects", "name"
+                east_yml["pack"]["build_configurations"],
+                "pack.build_configurations",
+                "name",
             )
 
             # Validation loop
-            for p in east_yml["pack"]["projects"]:
+            for p in east_yml["pack"]["build_configurations"]:
                 if "artifacts" in p and "overwrite_artifacts" in p:
                     raise EastYmlLoadError(
                         "Both [bold]artifacts[/] and [bold]overwrite_artifacts[/] fields "
