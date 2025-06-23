@@ -44,7 +44,7 @@ cd app
 # classic build
 east build -b custom_plank
 
-# using twister test-suite configurations
+# using Twister test-suite configurations
 east build -b custom_plank . -T app.default
 east build -b custom_plank . -T app.debug
 ```
@@ -137,5 +137,3 @@ The steps below describe a minimal basic setup to get it working.
 
 [example application]: https://github.com/nrfconnect/ncs-example-application/tree/v3.0.0
 [Twister]: https://docs.zephyrproject.org/latest/develop/test/twister.html
-[nRF Command Line Tools]:
-  https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools

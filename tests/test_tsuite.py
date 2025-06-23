@@ -32,7 +32,7 @@ test_suite_json_old = {
     ],
 }
 
-# The newer zephyr version has a change in twister which puts the build targets
+# The newer zephyr version has a change in Twister which puts the build targets
 # into a different directory.
 # Also, the status for built-only testsuites is different.
 test_suite_json_new = copy.deepcopy(test_suite_json_old)

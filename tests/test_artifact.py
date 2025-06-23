@@ -47,11 +47,11 @@ def test_check_for_duplicate_artifacts():
 
 
 def test_renaming_twister_artifacts_from_project_using_sysbuild():
-    """Test renaming twister artifacts from a project using sysbuild.
+    """Test renaming Twister artifacts from a project using sysbuild.
 
-    GIVEN a list of twister artifacts from a project using sysbuild,
-    WHEN renaming twister artifacts,
-    THEN the returned list should contain the renamed twister artifacts.
+    GIVEN a list of Twister artifacts from a project using sysbuild,
+    WHEN renaming Twister artifacts,
+    THEN the returned list should contain the renamed Twister artifacts.
     """
     inputs = [
         "blinky/zephyr/zephyr.hex",
@@ -83,7 +83,7 @@ def test_renaming_twister_artifacts_from_project_using_sysbuild():
     ]
 
 
-def test_renaming_twister_artefacts_from_project_not_using_sysbuild():
+def test_renaming_twister_artifacts_from_project_not_using_sysbuild():
     """Test renaming artifacts from a project not using sysbuild.
 
     GIVEN a list of artifacts from a project using sysbuild,

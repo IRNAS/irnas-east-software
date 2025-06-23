@@ -15,7 +15,7 @@ Details are provided below, after the example.
 We have an `app`, a `sample/blinky` and a `scripts/some_script/some_script.sh` file we would like to
 pack. We build for 2 versions of our custom board (`v1.0.0` and `v1.4.0`) and the `nrf52840DK`.
 
-After running twister, we get the following `twister-out` folder structure:
+After running Twister, we get the following `twister-out` folder structure:
 
 ```text
 > tree twister-out -L 4
@@ -154,16 +154,16 @@ For more details on how to use Twister to generate build artifacts, see our
 
 <!-- prettier-ignore -->
 > [!NOTE]
-> Each configuration built by Twister is called a **test-suite** by the twister documentation,
+> Each configuration built by Twister is called a **test-suite** by the Twister documentation,
 > but will be referred to as a **build configuration** in this document.
 > The term **test-suite** makes sense in the context of Twister, since its goal is to run tests.
-> Here, we use twister to generate build artifacts.
+> Here, we use Twister to generate build artifacts.
 > Refer to the [Twister](https://docs.zephyrproject.org/latest/develop/test/twister.html)
 > documentation for more details.
 
 `east pack` has 3 inputs:
 
-- The twister output folder (and its corresponding `twister.json` file).
+- The Twister output folder (and its corresponding `twister.json` file).
 - The `east.yml` file in the root of the project.
 - The `tag`, which specifies the version tag to use when naming the files.
 
@@ -172,7 +172,7 @@ When executed it performs the following steps:
 1. For each build configuration found in `twister.json`:
    1. Create output directory `package/<build-configuration>/<board>/`.
    2. Determine which files to copy for this build configuration from `east.yml`.
-   3. Copy the files and rename them according to the twister artifact naming scheme (See below).
+   3. Copy the files and rename them according to the Twister artifact naming scheme (See below).
 2. If any extra files are specified in `east.yml`:
    1. Create output directory `package/extra/`.
    2. For each extra file:
@@ -196,7 +196,7 @@ has the following sub-keys:
   - `overwrite_artifacts` - a list of files to copy for this specific build configuration,
     overwriting the default artifacts specified in `pack.artifacts` (when using this, do not use
     `artifacts`).
-- `pack.extra` - a list of additional files to copy that are not part of the twister output, but are
+- `pack.extra` - a list of additional files to copy that are not part of the Twister output, but are
   created by other means.
 
 ### File paths and the `$APP_DIR` variable
@@ -234,7 +234,7 @@ folder as specified by the `--pack-path` option).
 
 Extra files are copied to `package/extra`.
 
-Files from twister are copied to `package/<build-configuration>/<board>/` for each build
+Files from Twister are copied to `package/<build-configuration>/<board>/` for each build
 configuration and board combination (as specified in the `sample.yaml` files).
 
 ### File renaming and versioning
@@ -243,7 +243,7 @@ When copying files, `east pack` will rename them to include the version tag, and
 the build configuration and board. The tag is either provided with the `--tag` option or is
 determined from the current git tag (`git describe --tags --always --long --dirty=+`).
 
-The files are renamed according to the file rename scheme, specified separately for twister and
+The files are renamed according to the file rename scheme, specified separately for Twister and
 extra artifacts - the specification can be found [below](#artifact-naming-scheme).
 
 To simplify:
@@ -275,7 +275,7 @@ Where:
 
 | Field          | Description                                                                                                                                     |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `project_name` | The name of the project, more specifically the name of the project's build directory as output by twister, e.g., app.prod, samples.blinky, etc. |
+| `project_name` | The name of the project, more specifically the name of the project's build directory as output by Twister, e.g., app.prod, samples.blinky, etc. |
 | `dirs`         | Directories in the path to the artifact file. Optional, see below.                                                                              |
 | `filename`     | Unmodified filename of the artifact.                                                                                                            |
 | `version_str`  | Version string.                                                                                                                                 |
