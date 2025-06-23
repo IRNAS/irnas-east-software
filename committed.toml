@@ -1,0 +1,4 @@
+subject_length = 72
+style = "conventional"
+subject_capitalized=false
+allowed_types = ["feat", "fix", "docs", "refactor", "style", "test", "infra", "misc"]

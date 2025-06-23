@@ -6,6 +6,7 @@ cscope.out.temp
 tags
 tags.lock
 tags.temp
+.vscode
 
 
 # Zepyhr / nRF5 SDK stuff
@@ -13,6 +14,9 @@ compile_commands.json
 .cache
 **/build/*
 build/*
+build*
+!.github/workflows/build.yaml
+generated
 
 # Python stuff
 __pycache__
@@ -36,3 +40,6 @@ wheels/
 share/python-wheels/
 *.egg-info/
 *.egg
+
+#envrc
+.envrc

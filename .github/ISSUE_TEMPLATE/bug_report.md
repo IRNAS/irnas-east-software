@@ -6,21 +6,25 @@ labels: "type: bug"
 assignees: ""
 ---
 
-**Describe the bug**
+#### Describe the bug
 
 <!-- A clear and concise description of what the bug is. -->
 
-**Firmware/Software Version**
+#### Firmware/software version
 
-**Hardware Version**
+<!-- Version where the bug appears. -->
 
-**To Reproduce**
+#### Hardware version
+
+<!-- Hardware version where the bug appears, if relevant. -->
+
+#### Steps to reproduce
 
 <!-- Steps to reproduce the behavior: -->
 
 <!-- 1. Go to '...' -->
 <!-- 2. Click on '....' -->
 
-**Additional context**
+#### Additional context
 
 <!-- Add any other context about the problem here. -->

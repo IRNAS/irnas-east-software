@@ -1,0 +1,9 @@
+# Disable line checking on the code blocks and tables.
+MD013:
+  "code_blocks": false
+  "tables": false
+  "line_length": 100
+# Disable checking for the multiple headings with the same content.
+MD024: false
+# Allow inline HTML, useful for positioning images.
+MD033: false

@@ -35,7 +35,7 @@ jobs:
           fi
 
       - name: Update Changelog
-        uses: thomaseizinger/keep-a-changelog-new-release@3.0.0
+        uses: thomaseizinger/keep-a-changelog-new-release@3.1.0
         with:
           tag: ${{ inputs.version }}
 
@@ -100,7 +100,7 @@ jobs:
 
       - name: Publish Release
         if: ${{ !env.ACT }}
-        uses: softprops/action-gh-release@v2.0.9
+        uses: softprops/action-gh-release@v2.3.2
         with:
           files: dist/*
           tag_name: ${{ env.release_version }}
