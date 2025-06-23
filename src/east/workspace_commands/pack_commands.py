@@ -293,7 +293,7 @@ def check_that_specific_build_configs_exist_as_twister_artifacts(
 
 
 def check_that_all_twister_artifacts_exist(east, artifacts: Sequence[TwisterArtifact]):
-    """Check if all twister artifacts exist in the filesystem.
+    """Check if all Twister artifacts exist in the filesystem.
 
     It is expected that the below error message will be printed quite often, as
     it can be easy to misconfigure the pack field in the east.yml file.
