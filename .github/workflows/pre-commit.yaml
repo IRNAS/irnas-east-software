@@ -1,0 +1,92 @@
+name: pre-commit
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  pre-commit-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Committed tool requires the full history to check commit messages.
+          fetch-depth: 0
+
+      - name: Generate commit refs for push to main branch
+        if: github.event_name == 'push'
+        run: |
+          echo "from_ref=${{ github.event.before }}" >> $GITHUB_ENV
+          echo "to_ref=${{ github.event.after }}" >> $GITHUB_ENV
+
+      - name: Generate commit refs for push to PR
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "from_ref=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+          echo "to_ref=$(git rev-parse origin/${{ github.head_ref }})" >> $GITHUB_ENV
+
+      - name: Fetch commit refs
+        run: |
+          git fetch origin ${{ env.from_ref }}
+          git fetch origin ${{ env.to_ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: v3.12
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Restore pre-commit environment from cache
+        id: cache-precommit
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pre-commit
+            committed
+          key: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Install pre-commit dependencies
+        if: steps.cache-precommit.outputs.cache-hit != 'true'
+        run: |
+          pre-commit install-hooks
+
+          wget -q https://github.com/crate-ci/committed/releases/download/v1.1.7/committed-v1.1.7-x86_64-unknown-linux-musl.tar.gz
+          mkdir committed
+          tar -xf committed-v1.1.7-x86_64-unknown-linux-musl.tar.gz --directory committed
+
+      - name: Run pre-commit
+        run: |
+          echo "Commits being checked:"
+          git log --oneline --no-decorate ${{ env.from_ref }}..${{ env.to_ref }}
+          echo ""
+
+          if ! pre-commit run --from-ref ${{ env.from_ref }} --to-ref ${{ env.to_ref }} --show-diff-on-failure; then
+            echo "::error:: If you don't have pre-commit installed, please see https://github.com/IRNAS/irnas-guidelines-docs/tree/main/tools/pre-commit for instructions."
+            echo "::error:: It looks like the code was committed without passing all pre-commit checks. Check the 'Run pre-commit' step above for more information."
+            exit 1
+          fi
+
+      # Although committed is already setup as a pre-commit hook,
+      # pre-commit is not able to run it on a range of commit
+      # messages, so we need to run it manually.
+      - name: Run committed tool
+        run: |
+          echo "Commits being checked:"
+          git log --oneline --no-decorate ${{ env.from_ref }}..${{ env.to_ref }}
+          echo ""
+
+          if ! ./committed/committed ${{ env.from_ref }}..${{ env.to_ref }} --no-merge-commit --no-wip --no-fixup ; then
+            echo "::error:: If you don't have pre-commit installed, please see https://github.com/IRNAS/irnas-guidelines-docs/tree/main/tools/pre-commit for instructions."
+            echo "::error:: It looks like the code was committed without passing commit message check. Check the 'Run committed tool' step for more information."
+            exit 1
+          fi
