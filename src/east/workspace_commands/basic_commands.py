@@ -52,6 +52,7 @@ class SpecialCommand(RichCommand):
         " [bold yellow]east.yml[/] with possible build types with specified apps and "
         "samples."
     ),
+    deprecated="Use [bold]sample.yml[/] files instead.",
 )
 @click.option(
     "--spdx",
@@ -82,9 +83,6 @@ def build(ctx, east, build_type, spdx, extra_help, args):
     \n\nTo pass additional arguments to the [bold]CMake[/] invocation performed by the [magenta
     bold]west build[/], pass them after a [bold white]"--"[/] at the end of the command line.
 
-    \n\nIf the source dir is listed in the [bold yellow]east.yml[/] then [bold yellow]build type[/] functionality is enabled. East will add a group of [bold]Kconfig[/] fragment files to the build as specified by the selected build type and [bold yellow]east.yml[/] file. See [bold]docs/configuration.md[/] for more info.
-
-    \n\n[bold]Note:[/] When using build types functionality make sure to not pass CONF_FILE and OVERLAY_CONFIG variables to the [bold]CMake[/].
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     _ = args

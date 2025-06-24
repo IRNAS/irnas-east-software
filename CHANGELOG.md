@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - Deprecate `east release`. A warning is printed when the command is used. The command will be
   removed in some future release. Use `east pack` instead.
+- Deprecate the `--build-type` option in the `east build` command. A warning is printed when the
+  option is used. The option will be removed in some future release. Use `sample.yaml` files instead
+  and build with `east build -b <board> . -T <build_config>`.
 
 ### Removed
 
