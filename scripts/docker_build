@@ -6,7 +6,7 @@
 # 	.
 
 docker build --tag east-after-sys-setup \
-	--build-arg "USER=$(whoami)" \
-	--build-arg "host_uid=$(id -u)" \
-	-f Dockerfile_after_sys_setup \
-	.
+    --build-arg "USER=$(whoami)" \
+    --build-arg "host_uid=$(id -u)" \
+    -f Dockerfile_after_sys_setup \
+    .

@@ -122,7 +122,7 @@ def install(ctx, east, all):
 
     """
     # Since we want to call commands in code and not through cli, we need to use
-    # .callback method which is actually the original funciton without click's
+    # .callback method which is actually the original function without click's
     # infrastructure.
     # WARN: There is a better way to do this: invoke method
 

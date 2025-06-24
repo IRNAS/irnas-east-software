@@ -360,7 +360,7 @@ class EastContext:
         provided one.
 
         """
-        # WARN: Check version is not yet used anywhere, behaviour yet needs to be
+        # WARN: Check version is not yet used anywhere, behavior yet needs to be
         # verified
         response = self.run(f"{exe} {version_cmd}", silent=True, return_output=True)
 
@@ -381,7 +381,7 @@ class EastContext:
         * Tries to determine the NCS version that is used in the project.
         * Tries to find the version of the toolchain in the nrfutil toolchain-manager.
 
-        This function esentially tries to answer the question: should the underlying
+        This function essentially tries to answer the question: should the underlying
         west command be passed to the nrfutil toolchain-manager or directly to the
         west.
 

@@ -44,7 +44,7 @@ jobs:
       - name: Build binary wheel and a source tarball
         run: make build
 
-      - name: Package artefacts
+      - name: Package artifacts
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
