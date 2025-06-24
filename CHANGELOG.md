@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+- The `east pack` command. This command can be used to extract release artifacts from Twister build
+  results.
+- Documentation about [packing](./docs/pack.md).
+
+### Changed
+
+- Deprecate `east release`. A warning is printed when the command is used. The command will be
+  removed in some future release. Use `east pack` instead.
+
+### Removed
+
+- Removed support for Python v3.9 and below.
+
 ## [0.28.0] - 2025-05-28
 
 ### Changed
