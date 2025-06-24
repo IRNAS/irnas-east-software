@@ -31,7 +31,7 @@ pip install east-tool west
 East depends on some additional tooling that users need to install manually. Some of these packages
 are different between Ubuntu versions.
 
-#### Common
+### Common
 
 ```bash
 sudo apt install build-essential curl

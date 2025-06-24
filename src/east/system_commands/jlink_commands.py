@@ -154,7 +154,7 @@ def rtt(east, local_echo, rtt_port, logfile, append):
     elif append:
         east.print(
             "Cannot use [bold cyan]--append[/] flag without "
-            "[bold cyan]--logile[/] flag."
+            "[bold cyan]--logfile[/] flag."
         )
         east.exit()
 

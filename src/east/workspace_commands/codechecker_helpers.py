@@ -213,7 +213,7 @@ def sizeof_on_pointer_type_found(files, diag):
 
 def cleanup_plist_files(east, output):
     """Cleanup generated plist files by removing diagnostics that are not useful."""
-    # Conveniance variable, as the listeral is quite long
+    # Convenience variable, as the literal is quite long
     hash = "issue_hash_content_of_line_in_context"
 
     for file in glob.glob(os.path.join(output, "*.plist")):
@@ -281,7 +281,7 @@ def create_codecheckerfile(east, board, build_type, build_dir, source_dir):
     The intention is that east codechecker store reads the file and uses it for
     creating the metadata of the run when storing to the server.
     """
-    # Create a file in the build folder that contains the name of the artefact
+    # Create a file in the build folder that contains the name of the artifact
     name = os.path.basename(source_dir if source_dir else east.cwd)
     build_dir = os.path.join(east.cwd, build_dir if build_dir else "build")
     source_dir = os.path.join(east.cwd, source_dir if source_dir else "")

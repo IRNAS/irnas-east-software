@@ -36,11 +36,11 @@ clean_print_args = {
 }
 
 
-def create_artefact_name(project, board, version, build_type):
-    """Create an artefact name.
+def create_artifact_name(project, board, version, build_type):
+    """Create an artifact name.
 
     Board might be in form <west_board>@<hv_version>, in that case we modify it to fit
-    the artefact name.
+    the artifact name.
 
     We also add git hash at the end if the build was not done on the clean tagged
     commit.
@@ -70,7 +70,7 @@ def create_art_dest_and_src_dir(
     build_type: str,
     is_single_app: bool,
 ):
-    """Create destination and source directories for the artefact."""
+    """Create destination and source directories for the artifact."""
     common_dest = os.path.join(release_dir, parent, name)
 
     # "Normalize" hw v2 board names
@@ -147,8 +147,8 @@ def collect_binaries_without_using_sysbuild(build_dir, dry_run):
     return [os.path.join(app_build_dir, binary) for binary in binaries]
 
 
-def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
-    """Moves build artefacts to art_dest and renames them to art_name."""
+def move_build_artifacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
+    """Moves build artifacts to art_dest and renames them to art_name."""
     os.makedirs(art_dest, exist_ok=True)
 
     build_dir = "build"
@@ -172,10 +172,10 @@ def move_build_artefacts(art_name, art_dest, job_type, spdx_app_only, dry_run):
             open(binary, "w").close()
 
         if os.path.isfile(binary):
-            exten = binary.split(".")[-1]
+            extent = binary.split(".")[-1]
             sh.copyfile(
                 binary,
-                os.path.join(art_dest, ".".join([art_name, exten])),
+                os.path.join(art_dest, ".".join([art_name, extent])),
             )
 
     if spdx_app_only and job_type == "apps":
@@ -320,7 +320,7 @@ def run_job(east, progress, job, dry_run, verbose, spdx_app_only):
             )
             progress.stop()
             if not verbose:
-                # Nicely print the build log, surounded by the rules and newlines for
+                # Nicely print the build log, surrounded by the rules and newlines for
                 # paddings.
                 east.print("")
                 east.print(Rule(title="Captured build log", style="red"))
@@ -393,8 +393,8 @@ def non_existing_sample_msg_fmt(sample_name):
     "--dry-run",
     is_flag=True,
     help=(
-        "Just echo build commands and create dummy artefacts, do not actually build."
-        " Dummy artefacts are placed in into [bold italic]release_dry_run[/] folder. "
+        "Just echo build commands and create dummy artifacts, do not actually build."
+        " Dummy artifacts are placed in into [bold italic]release_dry_run[/] folder. "
     ),
 )
 @click.option(
@@ -413,12 +413,12 @@ def non_existing_sample_msg_fmt(sample_name):
 )
 @click.pass_obj
 def release(east, dry_run, verbose, spdx_app_only):
-    """Create a release folder with release artefacts.
+    """Create a release folder with release artifacts.
 
     \b
-    \n\n[bold yellow]east release[/] command runs a release process consisting of a series of [bold yellow]east build[/] commands to build applications and samples listed in the [bold yellow]east.yml[/]. Created build artefacts are then renamed and placed into [bold magenta]release[/] folder in project's root directory.
+    \n\n[bold yellow]east release[/] command runs a release process consisting of a series of [bold yellow]east build[/] commands to build applications and samples listed in the [bold yellow]east.yml[/]. Created build artifacts are then renamed and placed into [bold magenta]release[/] folder in project's root directory.
 
-    \n\nVersion number is inferred from [bold italic cyan]git describe --tags --always --long --dirty=+[/] command. If the [bold yellow]east release[/] command is run directly on a commit with a version tag (such as [bold cyan]v1.0.2[/]), and there are no local changes, then only version tag is added to the name of artefacts, otherwise the additional git hash qualifier is added. If there is no version tag then default of [bold cyan]v0.0.0[/] is used.
+    \n\nVersion number is inferred from [bold italic cyan]git describe --tags --always --long --dirty=+[/] command. If the [bold yellow]east release[/] command is run directly on a commit with a version tag (such as [bold cyan]v1.0.2[/]), and there are no local changes, then only version tag is added to the name of artifacts, otherwise the additional git hash qualifier is added. If there is no version tag then default of [bold cyan]v0.0.0[/] is used.
 
     \n\nAs both [bold]apps[/] and [bold]samples[/] keys in [bold yellow]east.yml[/] are optional, release process for a specific key will be skipped, if it is not present.
 
@@ -521,8 +521,8 @@ def release(east, dry_run, verbose, spdx_app_only):
                         is_single_app,
                     )
 
-                    # Create name for job artefact
-                    name = create_artefact_name(
+                    # Create name for job artifact
+                    name = create_artifact_name(
                         target["name"], board, version, build_type
                     )
 
@@ -534,8 +534,8 @@ def release(east, dry_run, verbose, spdx_app_only):
                         "src_dir": src_dir,
                         "board": board,
                         "build_type": build_type,
-                        "artefact_name": name,
-                        "artefact_destination": dst,
+                        "artifact_name": name,
+                        "artifact_destination": dst,
                     }
                     jobs.append(job)
 
@@ -560,10 +560,10 @@ def release(east, dry_run, verbose, spdx_app_only):
             # Run job build
             run_job(east, progress, job, dry_run, verbose, spdx_app_only)
 
-            # Move and rename created artefacts
-            move_build_artefacts(
-                job["artefact_name"],
-                job["artefact_destination"],
+            # Move and rename created artifacts
+            move_build_artifacts(
+                job["artifact_name"],
+                job["artifact_destination"],
                 job["subdir"],
                 spdx_app_only,
                 dry_run,
@@ -619,7 +619,7 @@ def release(east, dry_run, verbose, spdx_app_only):
     east.print(
         Panel(
             f"[bold]Done with jobs 🎉 \n\nCheck [magenta]{release_dir}[/] folder for"
-            " artefacts.[/]",
+            " artifacts.[/]",
             padding=1,
             border_style="green",
         )

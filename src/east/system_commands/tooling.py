@@ -120,7 +120,7 @@ def _install_clang_llvm(east: EastContext, exe_path: str):
     # Remove old clang dir if it exists
     shutil.rmtree(clang_dir, ignore_errors=True)
 
-    east.print("[bold blue]Extracing clang+llvm binaries, this will take some time...")
+    east.print("[bold blue]Extracting clang+llvm binaries, this will take some time...")
     shutil.unpack_archive(exe_path, east.consts["tooling_dir"], format="gztar")
     east.print("[bold green]Done!")
 

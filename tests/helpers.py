@@ -409,7 +409,7 @@ def helper_test_against_west_run(
     east_cmd,
     expected_west_cmd=None,
     expected_west_cmds=None,
-    should_succed=True,
+    should_succeed=True,
 ):
     """Helper function for making tests easier to read.
 
@@ -420,17 +420,17 @@ def helper_test_against_west_run(
         east_cmd ():            which east command should be called
         expected_west_cmd ():   A single expected west cmd, a string.
         expected_west_cmds ():  A List of expected west_cmds.
-        should_succed ():       If true then the command should succeded.
+        should_succeed ():       If true then the command should succeeded.
 
     Only a expected_west_cmd or expected_west_cmds can be given, both not both.
-    If none is given then no run_west call should happend.
+    If none is given then no run_west call should happen.
 
     Returns:
         Result object, which can be further checked.
     """
     runner = CliRunner()
 
-    # Mock output of git commmand, so tests do not have to depend on it
+    # Mock output of git command, so tests do not have to depend on it
     mocker.patch(
         "east.workspace_commands.release_commands.get_git_version",
         return_value={"tag": "v1.0.0.", "hash": ""},
@@ -465,7 +465,7 @@ def helper_test_against_west_run(
     else:
         run_west.assert_not_called()
 
-    expected_return_code = 0 if should_succed else 1
+    expected_return_code = 0 if should_succeed else 1
 
     assert result.exit_code == expected_return_code
     return result
@@ -478,7 +478,7 @@ def helper_test_against_west_dbg(
     east_cmd,
     expected_west_cmd=None,
     expected_west_cmds=None,
-    should_succed=True,
+    should_succeed=True,
 ):
     """Helper function for tests easier to debug.
 
@@ -492,15 +492,15 @@ def helper_test_against_west_dbg(
         east_cmd ():            which east command should be called
         expected_west_cmd ():   Not used
         expected_west_cmds ():  Not used
-        should_succed ():       Not used
+        should_succeed ():       Not used
     """
     _ = expected_west_cmd
     _ = expected_west_cmds
-    _ = should_succed
+    _ = should_succeed
 
     runner = CliRunner()
 
-    # Mock output of git commmand, so tests do not have to depend on it
+    # Mock output of git command, so tests do not have to depend on it
     mocker.patch(
         "east.workspace_commands.release_commands.get_git_version",
         return_value={"tag": "v1.0.0.", "hash": ""},

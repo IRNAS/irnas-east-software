@@ -133,7 +133,7 @@ def west_workplace_parametrized(tmp_path_factory, monkeypatch, mocker, request):
 
     The return dictionary contains all keys that the test should need.
 
-    Use this fixture when behaviour under test should be the same in both single and
+    Use this fixture when behavior under test should be the same in both single and
     multi app setup.
 
         tmp_path_factory ():

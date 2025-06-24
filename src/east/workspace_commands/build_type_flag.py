@@ -17,7 +17,7 @@ def is_child_in_parent(parent, child):
 
     # Compare the common path of the parent and child path with the common path of
     # just the parent path. Using the commonpath method on just the parent path will
-    # regularise the path name in the same way as the comparison that deals with
+    # regularize the path name in the same way as the comparison that deals with
     # both paths, removing any trailing path separator
     return os.path.commonpath([parent]) == os.path.commonpath([parent, child])
 
@@ -141,10 +141,10 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     * contents of east.yml file
     * contents of build folder if found
 
-    The function behaviour is described:
+    The function behavior is described:
     * in docs/configuration.md document - That document basically describes how should
     east build behave.
-    * in tests/test_build_type.py - Tests the behaviour east build command in a
+    * in tests/test_build_type.py - Tests the behavior east build command in a
     variety of different scenarios.
 
         east ():            East context
@@ -161,7 +161,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     if not east.east_yml:
         if not build_type:
             # east.yml is optional, if it is not present present then default to plain
-            # west behaviour: no cmake args
+            # west behavior: no cmake args
             return ("", "")
         else:
             east.print(build_type_misuse_no_east_yml_msg)
@@ -190,7 +190,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             east.exit()
         if not build_type and not inside_sample:
             # We are not inside app and not inside sample, no build type was given, we
-            # are default to plain west behaviour: no cmake args.
+            # are default to plain west behavior: no cmake args.
             return ("", "")
 
     # We get past this point if we are inside app or sample.
@@ -205,7 +205,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
     # If inside samples determine in which sample are we, get its element
     if inside_sample:
         # samples key is optional, if it is not present in east_yml then we default to
-        # plain west behaviour: no cmake args
+        # plain west behavior: no cmake args
         sample_array = east.east_yml.get("samples")
         if not sample_array:
             return ("", "")
@@ -233,7 +233,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
 
     if inside_app:
         # If we do not have an app array and we there is no build type, we default to
-        # plaing west behaviour: no cmake args.
+        # plaing west behavior: no cmake args.
         if not app_array:
             return ("", "")
 
@@ -246,7 +246,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
 
             if not app:
                 # We are inside app folder that is not listed in east.yaml, we default
-                # to plain west behaviour: no cmake args.
+                # to plain west behavior: no cmake args.
                 return ("", "")
         path_prefix = ""
         cmake_build_type = f' -DEAST_BUILD_TYPE="{build_types_str}"'
@@ -257,7 +257,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
             east.exit()
         else:
             # If no --build-type is given and there is not build-types key in the app,
-            # we default to plain west behaviour: no cmake args.
+            # we default to plain west behavior: no cmake args.
             return ("", "")
 
     # "release" is a special, implicit, default, build type. Samples can request to

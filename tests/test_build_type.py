@@ -54,7 +54,7 @@ def test_build_type_outside_project_dir(west_workplace, monkeypatch):
     assert result.exit_code == 1
 
 
-# in single app folder behaviour
+# in single app folder behavior
 @pytest.mark.parametrize(
     "build_type_flag, cmake_arg",
     [
@@ -69,13 +69,13 @@ def test_build_type_outside_project_dir(west_workplace, monkeypatch):
         ),
     ],
 )
-def test_build_type_single_app_behaviour(
+def test_build_type_single_app_behavior(
     west_workplace, monkeypatch, mocker, build_type_flag, cmake_arg
 ):
-    """Build command needs to parse the --build-type flag into appopriate command line
+    """Build command needs to parse the --build-type flag into appropriate command line
     arguments.
 
-    This test case is for a single app behaviour.
+    This test case is for a single app behavior.
     """
     project_path = west_workplace
     helper_test_against_west_run(
@@ -128,13 +128,13 @@ def test_build_type_single_app_behaviour(
         ),
     ],
 )
-def test_build_type_multi_app_behaviour(
+def test_build_type_multi_app_behavior(
     west_workplace_multi_app, monkeypatch, mocker, multiapp, build_type_flag, cmake_arg
 ):
-    """Build command needs to parse the --build-type flag into appopriate command line
+    """Build command needs to parse the --build-type flag into appropriate command line
     arguments.
 
-    This test case is for a multi app behaviour.
+    This test case is for a multi app behavior.
     """
     project_path = west_workplace_multi_app
 
@@ -166,7 +166,7 @@ def create_last_build_type_file(app_path, build_type, build_dir="build"):
         "--build-type uart",
     ],
 )
-def test_build_type_build_folder_behaviour_same_flags(
+def test_build_type_build_folder_behavior_same_flags(
     west_workplace_parametrized, monkeypatch, mocker, build_type_flag
 ):
     """If the build folder with same conf files with that --build-type expects exits then
@@ -197,7 +197,7 @@ def test_build_type_build_folder_behaviour_same_flags(
         ),
     ],
 )
-def test_build_type_build_folder_behaviour_different_flags(
+def test_build_type_build_folder_behavior_different_flags(
     west_workplace_parametrized, monkeypatch, mocker, build_type_flag, overlay_configs
 ):
     """If the build folder exists but it has build flags that are not expected by the east
@@ -220,7 +220,7 @@ def test_build_type_build_folder_behaviour_different_flags(
     )
 
 
-def test_build_type_non_existant_type(west_workplace_parametrized, monkeypatch, mocker):
+def test_build_type_non_existent_type(west_workplace_parametrized, monkeypatch, mocker):
     """If given --build-type does not exists then east needs to exit and throw message."""
     app_path = west_workplace_parametrized["app"]
 
@@ -229,7 +229,7 @@ def test_build_type_non_existant_type(west_workplace_parametrized, monkeypatch, 
         mocker,
         app_path,
         "build --build-type asasdada",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -245,7 +245,7 @@ def test_build_type_samples_with_build_type_option(
         mocker,
         sample_path,
         "build --build-type debug",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -266,15 +266,15 @@ def test_build_type_samples_inherit(west_workplace_parametrized, monkeypatch, mo
         sample_path,
         "build",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
-        should_succed=True,
+        should_succeed=True,
     )
 
 
 def test_build_type_samples_inherit_build_folder_same_flag(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """In case where sample (with an inherit keword) has a existing build folder from
-    before, no extra cmake args should be emmited.
+    """In case where sample (with an inherit keyword) has a existing build folder from
+    before, no extra cmake args should be emitted.
     """
     project_path = west_workplace_parametrized["project"]
 
@@ -288,7 +288,7 @@ def test_build_type_samples_inherit_build_folder_same_flag(
         sample_path,
         "build",
         expected_west_cmd="build",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -305,14 +305,14 @@ def test_build_type_samples_no_inherit(
         sample_path,
         "build",
         expected_west_cmd="build",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
 def test_build_type_samples_does_not_exist(
     west_workplace_parametrized, monkeypatch, mocker
 ):
-    """In case where sample does not exist in east.yml we default to basic west behaviour:
+    """In case where sample does not exist in east.yml we default to basic west behavior:
     no cmake args.
 
     """
@@ -327,7 +327,7 @@ def test_build_type_samples_does_not_exist(
         sample_path,
         "build",
         expected_west_cmd="build",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -368,7 +368,7 @@ def test_non_existing_inherited_app(west_workplace_parametrized, monkeypatch, mo
         mocker,
         project_path,
         "build",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -456,7 +456,7 @@ def test_inheriting_from_release_build_type(
         sample_path,
         "build",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -588,7 +588,7 @@ def test_duplicated_names_in_east_yml(
         mocker,
         west_workplace_multi_app,
         "build",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -664,7 +664,7 @@ def test_searching_for_west_board_specific_confs(
         project_path,
         east_cmd,
         expected_west_cmd,
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -685,7 +685,7 @@ def test_different_build_dir_path_empty_dir(
         f"build -d {build_dir}",
         f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf "
         '-DEAST_BUILD_TYPE="release"',
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -709,7 +709,7 @@ def test_different_build_dir_path_full_dir_same_build_type(
         project_path,
         f"build -d {build_dir} {build_type}",
         f"build -d {build_dir}",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -739,7 +739,7 @@ def test_different_build_dir_path_full_dir_different_build_type(
         f"build -d {build_dir} {new_build_type}",
         f"build -d {build_dir} -- -DCONF_FILE=conf/common.conf"
         f' -DOVERLAY_CONFIG="{new_overlay_configs}" -DEAST_BUILD_TYPE="debug"',
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -813,7 +813,7 @@ def test_using_different_source_dirs(
         project_path,
         east_cmd,
         expected_west_cmd,
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -835,7 +835,7 @@ def test_sample_with_inherit_and_with_source_dir(
         project_path,
         "build samples/settings",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -859,7 +859,7 @@ def test_sample_with_inherit_and_with_source_dir_and_board(
         project_path,
         "build -b nrf52840dk_nrf52840 samples/settings",
         expected_west_cmd=west_cmd_fmt(west_workplace_parametrized["prefix"]),
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -889,7 +889,7 @@ def test_no_apps_key_in_east_yml_build_type(
         mocker,
         west_workplace_parametrized["app"],
         "build --build-type debug",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -932,7 +932,7 @@ def test_no_apps_key_in_east_yml_sample(
         os.path.join(west_workplace_parametrized["project"], "samples", "settings"),
         "build",
         "build",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -967,7 +967,7 @@ def test_no_samples_key_in_east_yml(west_workplace_parametrized, monkeypatch, mo
         os.path.join(west_workplace_parametrized["project"], "samples", "settings"),
         "build",
         "build",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -989,7 +989,7 @@ def test_empty_apps_key(west_workplace_parametrized, monkeypatch, mocker):
         mocker,
         west_workplace_parametrized["app"],
         "build",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -1010,7 +1010,7 @@ def test_building_outside_of_app_and_samples(
         west_workplace_parametrized[build_path],
         "build -b native_posix",
         "build -b native_posix",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -1031,7 +1031,7 @@ def test_building_app_that_is_not_in_east_yaml(
         west_workplace_parametrized["project"],
         "build -b native_posix app/test_three",
         "build -b native_posix app/test_three",
-        should_succed=True,
+        should_succeed=True,
     )
 
     helper_test_against_west_run(
@@ -1040,7 +1040,7 @@ def test_building_app_that_is_not_in_east_yaml(
         unlisted_app,
         "build -b native_posix",
         "build -b native_posix",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -1055,7 +1055,7 @@ def test_empty_east_yml_is_valid(west_workplace_parametrized, monkeypatch, mocke
         west_workplace_parametrized["app"],
         "build -b native_posix",
         "build -b native_posix",
-        should_succed=True,
+        should_succeed=True,
     )
 
 
@@ -1105,7 +1105,7 @@ def test_build_type_as_arg_is_not_ok_if_not_in_east_yml(
         mocker,
         west_workplace_parametrized["app"],
         "build -b custom_nrf52840dk --build-type debug",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -1143,7 +1143,7 @@ def test_inheriting_from_an_app_without_build_type_should_fail(
         mocker,
         sample_path,
         "build -b custom_nrf52840dk",
-        should_succed=False,
+        should_succeed=False,
     )
 
 

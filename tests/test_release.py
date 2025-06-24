@@ -38,7 +38,7 @@ def test_no_east_yml_with_release(west_workplace_parametrized, monkeypatch, mock
         mocker,
         west_workplace_parametrized["project"],
         "release",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -120,7 +120,7 @@ expected_app_release_west_commands = [
 ]
 
 
-def test_basic_app_release_behaviour(west_workplace, monkeypatch, mocker):
+def test_basic_app_release_behavior(west_workplace, monkeypatch, mocker):
     """Running east release with no samples key, should skip build process for samples and
     build apps.
     """
@@ -143,7 +143,7 @@ def test_basic_app_release_behaviour(west_workplace, monkeypatch, mocker):
     )
 
 
-def test_basic_app_release_behaviour_no_samples_folder(
+def test_basic_app_release_behavior_no_samples_folder(
     west_workplace, monkeypatch, mocker
 ):
     """Running east release with no samples key and no samples folder should skip build
@@ -193,7 +193,7 @@ expected_samples_release_west_commands = [
 ]
 
 
-def test_basic_samples_release_behaviour(
+def test_basic_samples_release_behavior(
     west_workplace_parametrized, monkeypatch, mocker
 ):
     """Running east release with no apps key, should skip build process for apps and build
@@ -216,7 +216,7 @@ def test_basic_samples_release_behaviour(
     )
 
 
-def test_basic_release_behaviour(west_workplace, monkeypatch, mocker):
+def test_basic_release_behavior(west_workplace, monkeypatch, mocker):
     """Running east release with both apps and samples keys should run normally."""
     project_path = west_workplace
 
@@ -253,7 +253,7 @@ expected_app_release_west_commands_no_build_types = [
 ]
 
 
-def test_basic_app_release_behaviour_no_build_type(west_workplace, monkeypatch, mocker):
+def test_basic_app_release_behavior_no_build_type(west_workplace, monkeypatch, mocker):
     """Running east release on applications without any build types should just build
     apps.
     """
@@ -310,7 +310,7 @@ expected_app_samples_release_west_commands = [
 ]
 
 
-def test_basic_app_release_behaviour_no_build_type_with_samples(
+def test_basic_app_release_behavior_no_build_type_with_samples(
     west_workplace, monkeypatch, mocker
 ):
     """Running east release on applications and samples without any build types should
@@ -354,7 +354,7 @@ samples:
 """
 
 
-def test_east_yml_with_non_existant_samples(
+def test_east_yml_with_non_existent_samples(
     west_workplace_parametrized, monkeypatch, mocker
 ):
     """Running east release when east.yml contains non-existing samples should abort before
@@ -371,7 +371,7 @@ def test_east_yml_with_non_existant_samples(
         mocker,
         west_workplace_parametrized["project"],
         "release",
-        should_succed=False,
+        should_succeed=False,
     )
 
 
@@ -406,7 +406,7 @@ apps:
 """
 
 
-def test_east_yml_with_non_existant_apps(west_workplace_multi_app, monkeypatch, mocker):
+def test_east_yml_with_non_existent_apps(west_workplace_multi_app, monkeypatch, mocker):
     """Running east release when east.yml contains non-existing apps should abort before
     issuing any of the west build commands. This only make sense in multi app
     workspaces.
@@ -424,7 +424,7 @@ def test_east_yml_with_non_existant_apps(west_workplace_multi_app, monkeypatch, 
         mocker,
         project,
         "release",
-        should_succed=False,
+        should_succeed=False,
     )
 
 

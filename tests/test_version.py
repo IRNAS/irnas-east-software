@@ -87,7 +87,7 @@ def test_basic_case(mocker, monkeypatch, west_workplace_multi_app):
         helper_assert_file_content(p, expected_version_file)
 
 
-def test_overridding_tag_on_cmd(mocker, monkeypatch, west_workplace_multi_app):
+def test_overriding_tag_on_cmd(mocker, monkeypatch, west_workplace_multi_app):
     """Test giving tag as an cmd arg."""
     project_path = west_workplace_multi_app
 
@@ -111,7 +111,7 @@ def test_overridding_tag_on_cmd(mocker, monkeypatch, west_workplace_multi_app):
         helper_assert_file_content(p, expected_version_file)
 
 
-def test_overridding_paths_on_cmd(mocker, monkeypatch, west_workplace_multi_app):
+def test_overriding_paths_on_cmd(mocker, monkeypatch, west_workplace_multi_app):
     """Test giving path as an cmd arg."""
     project_path = west_workplace_multi_app
 
@@ -131,9 +131,7 @@ def test_overridding_paths_on_cmd(mocker, monkeypatch, west_workplace_multi_app)
     )
 
 
-def test_overridding_tag_and_paths_on_cmd(
-    mocker, monkeypatch, west_workplace_multi_app
-):
+def test_overriding_tag_and_paths_on_cmd(mocker, monkeypatch, west_workplace_multi_app):
     """Test giving version and paths as an cmd arg."""
     project_path = west_workplace_multi_app
 
@@ -176,7 +174,7 @@ def helper_run_cmd(infra, east_cmd):
 
     runner = CliRunner()
 
-    # Mock output of git commmand, so tests do not have to depend on it
+    # Mock output of git command, so tests do not have to depend on it
     infra["mocker"].patch(
         "east.helper_functions.get_raw_git_describe_output",
         return_value=infra["git"],

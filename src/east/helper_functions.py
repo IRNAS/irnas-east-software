@@ -347,11 +347,11 @@ def clean_up_extra_args(args):
     return f"{' '.join(list(map(add_back_double_quotes, args)))}"
 
 
-def create_artefact_name(project, board, version, build_type):
-    """Create an artefact name.
+def create_artifact_name(project, board, version, build_type):
+    """Create an artifact name.
 
     Board might be in form <west_board>@<hv_version>, in that case we modify it to fit
-    the artefact name.
+    the artifact name.
 
     We also add git hash at the end if the build was not done on the clean tagged
     commit.

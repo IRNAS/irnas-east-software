@@ -64,7 +64,7 @@ clean_print_args = {
     "-a",
     "--only-analyze",
     is_flag=True,
-    help="Only perfrom analyze step and cleanup plist (if enabled). Default: false.",
+    help="Only perform analyze step and cleanup plist (if enabled). Default: false.",
 )
 @click.option(
     "-d",
@@ -159,7 +159,7 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze, build_d
     "--build-dir",
     default="build",
     type=str,
-    help="Analysed build directory. Default: 'build'.",
+    help="Analyzed build directory. Default: 'build'.",
 )
 @click.command(**east_command_settings)
 @click.pass_obj
@@ -197,7 +197,7 @@ analyzer:
   - clang-tidy
   - clangsa
   - --enable=guideline:sei-cert
-  # Enable for cross translation unit analyis, but analysis will take longer.
+  # Enable for cross translation unit analysis, but analysis will take longer.
   # - --ctu
 
 parse:
@@ -222,7 +222,7 @@ store:
     "--build-dir",
     default="build",
     type=str,
-    help="Analysed build directory that should be stored. Default: 'build'.",
+    help="Analyzed build directory that should be stored. Default: 'build'.",
 )
 @click.command(**east_command_settings)
 @click.pass_obj
