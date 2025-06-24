@@ -20,6 +20,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
   option is used. The option will be removed in some future release. Use `sample.yaml` files instead
   and build with `east build -b <board> . -T <build_config>`.
 
+### Fixed
+
+- Fixed `east build` esaping to many quotes when providing extra config values that are strings.
+  Command such as `east build -b <board> ---DCONFIG_SOMETHING=\"string\"` now work as expected.
+
 ### Removed
 
 - Removed support for Python v3.9 and below.

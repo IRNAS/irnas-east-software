@@ -334,9 +334,14 @@ def clean_up_extra_args(args):
 
     def add_back_double_quotes(arg):
         if arg.startswith("-") and "=" in arg:
-            # Split by the first "=" and add double quotes to the value
+            # Split by the first "="
             split = arg.split("=", 1)
-            arg = f'{split[0]}="{split[1]}"'
+            # If the value is already quoted, add a backspace to escape the quote.
+            # If not quoted, do nothing.
+            if split[1].startswith('"') and split[1].endswith('"'):
+                split[1] = split[1].replace('"', '\\"')
+            # Rejoin the split parts with an equal sign
+            arg = f"{split[0]}={split[1]}"
         else:
             # The arg is not an option of any kind, just add double quotes if it
             # contains a space
