@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.29.0] - 2025-06-24
+
 ### Added
 
 - The `east pack` command. This command can be used to extract release artifacts from Twister build
@@ -186,7 +188,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
   same subdirectory structure. This feature allows users to organize their samples in a more
   structured way, instead of having all samples in the root `samples` directory. This feature is
   documented in the `docs/configuration.md` file under `Samples` section. Suggested by @Finwood in
-  #111.
+  \#111.
 
 ### Fixed
 
@@ -665,7 +667,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 - Fixed release artifacts naming issue where build type would not appear correctly.
-- Create a `release_dry_run` folder instead of release folder when using \--dry-run option with
+- Create a `release_dry_run` folder instead of release folder when using --dry-run option with
   _east release_ command.
 - `east release` command now runs a pre-check on the apps and samples from `east.yml`, if they
   exists before running the release process. That way you can catch a typo, or a mistake before you
@@ -701,7 +703,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 - Make east.yml optional for everything, except for the usage of east build command with
-  --build-type option.
+  \--build-type option.
 - Make apps key and samples key inside east.yml optional. This is useful for driver projects, which
   do not need apps, or any project that might not have samples.
 
@@ -770,7 +772,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Makefile for development.
 - Docker scripts for building and running docker containers, for development purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.28.0...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.0...HEAD
+[0.29.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.2...v0.28.0
 [0.27.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.1...v0.27.2
 [0.27.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.27.0...v0.27.1
@@ -836,5 +839,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]:
-  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
