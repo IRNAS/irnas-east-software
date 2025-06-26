@@ -52,7 +52,7 @@ class SpecialCommand(RichCommand):
         " [bold yellow]east.yml[/] with possible build types with specified apps and "
         "samples."
     ),
-    deprecated="Use [bold]sample.yml[/] files instead.",
+    deprecated="Use sample.yml files instead.",
 )
 @click.option(
     "--spdx",
