@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed Test Suite out path being incorrect for native_sim builds. The path is now correctly
+  determined by checking the `toolchain` key in the testsuite json.
+
 ## [0.29.0] - 2025-06-24
 
 ### Added
@@ -667,8 +672,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 - Fixed release artifacts naming issue where build type would not appear correctly.
-- Create a `release_dry_run` folder instead of release folder when using --dry-run option with
-  _east release_ command.
+- Create a `release_dry_run` folder instead of release folder when using --dry-run option with _east
+  release_ command.
 - `east release` command now runs a pre-check on the apps and samples from `east.yml`, if they
   exists before running the release process. That way you can catch a typo, or a mistake before you
   spent some time waiting through the release process.
@@ -839,4 +844,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]:
+  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
