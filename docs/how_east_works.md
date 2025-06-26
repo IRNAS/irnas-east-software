@@ -1,25 +1,29 @@
+<!-- prettier-ignore-start -->
+<!-- omit in toc -->
 # How East works?
+<!-- prettier-ignore-end -->
 
 This document describes how East works, how it detects NCS SDK versions, what checks it runs before
 every Workspace command, etc.
 
 Reading this document is a not prerequisite for using East, however, it is recommended.
 
+<!-- prettier-ignore-start -->
+<!-- omit in toc -->
 ## Table of Contents
+<!-- prettier-ignore-end -->
 
 <!-- vim-markdown-toc GFM -->
 
-- [How East works?](#how-east-works)
-  - [Table of Contents](#table-of-contents)
-  - [East and nRF Toolchain Manager](#east-and-nrf-toolchain-manager)
-    - [nRF Toolchain Manager executable](#nrf-toolchain-manager-executable)
-      - [Isolated environments of nRF Toolchain Manager](#isolated-environments-of-nrf-toolchain-manager)
-  - [System and Workspace commands](#system-and-workspace-commands)
-    - [System commands](#system-commands)
-    - [Workspace commands](#workspace-commands)
-    - [Pre-workspace check](#pre-workspace-check)
-      - [Supported West workspaces in isolated environments](#supported-west-workspaces-in-isolated-environments)
-  - [East storage location](#east-storage-location)
+- [East and nRF Toolchain Manager](#east-and-nrf-toolchain-manager)
+  - [nRF Toolchain Manager executable](#nrf-toolchain-manager-executable)
+    - [Isolated environments of nRF Toolchain Manager](#isolated-environments-of-nrf-toolchain-manager)
+- [System and Workspace commands](#system-and-workspace-commands)
+  - [System commands](#system-commands)
+  - [Workspace commands](#workspace-commands)
+  - [Pre-workspace check](#pre-workspace-check)
+    - [Supported West workspaces in isolated environments](#supported-west-workspaces-in-isolated-environments)
+- [East storage location](#east-storage-location)
 
 <!-- vim-markdown-toc -->
 
