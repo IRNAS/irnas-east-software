@@ -4,31 +4,23 @@ from typing import NamedTuple, Sequence
 from ..constants import EAST_GITHUB_URL
 
 
-def tsuite_determine_path(board: str, name: str, zephyr_version: str) -> str:
+def tsuite_determine_path(board: str, name: str, toolchain: str | None) -> str:
     """Determine the path to the testsuite's build directory.
 
     Args:
         board (str): Normalized board name,
         name (str): The testsuite name as it appears in twister.json,
-        zephyr_version (str): The Zephyr version used to run the testsuites, as it appears in twister.json.
-
-    Raises:
-        ValueError: When an unsupported Zephyr version is provided.
+        toolchain (str): The toolchain used for this testsuite, as it appears in twister.json.
 
     Returns:
         str: The path to the testsuite's build directory.
     """
     # if the version is v4.0.0 or later, the paths used are different
     # from v3.x versions, so we need to adjust the paths accordingly.
-    if zephyr_version.startswith("v4."):
-        return os.path.join(board, "zephyr", name)
-    elif zephyr_version.startswith("v3."):
-        return os.path.join(board, name)
+    if toolchain:
+        return os.path.join(board, toolchain, name)
     else:
-        # Unsupported Zephyr version, raise an error
-        # Developer note: check if the unsupported Zephyr version (probably v5.x) still generates
-        # the same path to the build directory as v4.x did.
-        raise ValueError(f"Unsupported Zephyr version: {zephyr_version}")
+        return os.path.join(board, name)
 
 
 class TSuite(NamedTuple):
@@ -53,6 +45,10 @@ class TSuite(NamedTuple):
     # Is the testsuite runnable or not
     runnable: bool
 
+    # The "toolchain" used to build the testsuite. For Zephyr v3, this will not exist.
+    # See commit by Anas: https://github.com/zephyrproject-rtos/zephyr/commit/11e656bb6a38614b663383a40e044c4941d0c841#diff-0a0df38c6d70056ac2d7f06a7a16f8a148d1013d87fae6222d6a64323b6702cb
+    toolchain: str | None
+
     @classmethod
     def list_from_twister_json(cls, twister_json: dict) -> Sequence["TSuite"]:
         """Create a list of TSuite objects from a list of testsuites from twister.json."""
@@ -63,11 +59,6 @@ class TSuite(NamedTuple):
                 f"to East's bug tracker on {EAST_GITHUB_URL}."
             )
             raise Exception(msg)
-
-        # fetch Zephyr version used to run the testsuites
-        zephyr_version = twister_json.get("environment", {}).get(
-            "zephyr_version", "unknown"
-        )
 
         # WARN: All accessed fields should be checked for existence.
         required_keys = set(["name", "platform", "run_id", "status", "runnable"])
@@ -91,17 +82,17 @@ class TSuite(NamedTuple):
 
             board = d["platform"].replace("/", "_")
             name = os.path.basename(d["name"])
+            toolchain = d.get("toolchain", None)
 
             return cls(
                 name,
                 board=board,
                 raw_board=d["platform"],
                 path=os.path.dirname(d["name"]),
-                twister_out_path=tsuite_determine_path(
-                    board, d["name"], zephyr_version
-                ),
+                twister_out_path=tsuite_determine_path(board, d["name"], toolchain),
                 status=d["status"],
                 runnable=d["runnable"],
+                toolchain=toolchain,
             )
 
         return [create_tsuite(ts) for ts in twister_json["testsuites"]]

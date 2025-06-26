@@ -4,13 +4,11 @@ import pytest
 
 from east.modules.tsuite import TSuite
 
-test_suite_json_old = {
-    "environment": {
-        "zephyr_version": "v3.9.99-ncs1",
-    },
+test_suite_json = {
+    # This is a Zephyr v3 "style" testsuite
     "testsuites": [
         {
-            "name": "app/app.prod",
+            "name": "app/app.v3",
             "arch": "arm",
             "platform": "custom_board@1.0.0/nrf52840",
             "path": "../project/app",
@@ -22,54 +20,95 @@ test_suite_json_old = {
             "build_time": "26.15",
             "testcases": [
                 {
-                    "identifier": "app.prod",
+                    "identifier": "app.v3",
                     "execution_time": "0.00",
                     "status": "skipped",
                     "reason": "Test was built only",
                 }
             ],
-        }
+        },
+        # This is a Zephyr v4 "style" testsuite
+        {
+            "name": "app/app.v4",
+            "arch": "arm",
+            "platform": "custom_board@1.0.0/nrf52840",
+            "path": "../project/app",
+            "run_id": "953b256c22f70c8293b9b625baea26ef",
+            "runnable": False,
+            "retries": 0,
+            "status": "not run",
+            "execution_time": "0.00",
+            "build_time": "26.15",
+            "toolchain": "zephyr",
+            "testcases": [
+                {
+                    "identifier": "app.v4",
+                    "execution_time": "0.00",
+                    "status": "not run",
+                    "reason": "Test was built only",
+                }
+            ],
+        },
+        # This is a Zephyr v4 "style" testsuite for native sim
+        {
+            "name": "app/app.native",
+            "arch": "arm",
+            "platform": "native_sim/native",
+            "path": "../project/app",
+            "run_id": "953b256c22f70c8293b9b625baea26ef",
+            "runnable": False,
+            "retries": 0,
+            "status": "not run",
+            "execution_time": "0.00",
+            "build_time": "26.15",
+            "toolchain": "host",
+            "testcases": [
+                {
+                    "identifier": "app.native",
+                    "execution_time": "0.00",
+                    "status": "not run",
+                    "reason": "Test was built only",
+                }
+            ],
+        },
     ],
 }
 
-# The newer zephyr version has a change in Twister which puts the build targets
-# into a different directory.
-# Also, the status for built-only testsuites is different.
-test_suite_json_new = copy.deepcopy(test_suite_json_old)
-test_suite_json_new["environment"]["zephyr_version"] = "v4.0.0-ncs1"
-test_suite_json_new["testsuites"][0]["status"] = "not run"
 
-
-@pytest.mark.parametrize(
-    "twister_json, expected_twister_out_path, expected_status",
-    [
-        (test_suite_json_old, "custom_board@1.0.0_nrf52840/app/app.prod", "passed"),
-        (
-            test_suite_json_new,
-            "custom_board@1.0.0_nrf52840/zephyr/app/app.prod",
-            "not run",
-        ),
-    ],
-)
-def test_creating_a_tsuite_instance(
-    twister_json, expected_twister_out_path, expected_status
-):
+def test_creating_tsuite_instances():
     """Test creating a list of TSuite instances.
 
     GIVEN a testsuite JSON object,
     WHEN creating a list of TSuite instances,
     THEN the instance should have the correct attributes.
     """
-    ts = TSuite.list_from_twister_json(twister_json)[0]
+    ts = TSuite.list_from_twister_json(test_suite_json)
+    assert len(ts) == 3
 
-    # exp_twist_path = os.path.join(ts.board, twister_json["testsuites"][0]["name"])
+    v3 = ts[0]
+    v4 = ts[1]
+    native = ts[2]
 
-    assert ts.name == "app.prod"
-    assert ts.board == "custom_board@1.0.0_nrf52840"
-    assert ts.raw_board == "custom_board@1.0.0/nrf52840"
-    assert ts.path == "app"
-    assert ts.twister_out_path == expected_twister_out_path
-    assert ts.status == expected_status
+    assert v3.name == "app.v3"
+    assert v3.board == "custom_board@1.0.0_nrf52840"
+    assert v3.raw_board == "custom_board@1.0.0/nrf52840"
+    assert v3.path == "app"
+    assert v3.twister_out_path == "custom_board@1.0.0_nrf52840/app/app.v3"
+    assert v3.status == "passed"
+
+    assert v4.name == "app.v4"
+    assert v4.board == "custom_board@1.0.0_nrf52840"
+    assert v4.raw_board == "custom_board@1.0.0/nrf52840"
+    assert v4.path == "app"
+    assert v4.twister_out_path == "custom_board@1.0.0_nrf52840/zephyr/app/app.v4"
+    assert v4.status == "not run"
+
+    assert native.name == "app.native"
+    assert native.board == "native_sim_native"
+    assert native.raw_board == "native_sim/native"
+    assert native.path == "app"
+    assert native.twister_out_path == "native_sim_native/host/app/app.native"
+    assert native.status == "not run"
 
 
 def test_checking_for_a_failed_testsuite_status():
@@ -79,7 +118,7 @@ def test_checking_for_a_failed_testsuite_status():
     WHEN creating a TSuite instance,
     THEN list of bad testsuites should contain an entry
     """
-    bad_test_suite_json = copy.deepcopy(test_suite_json_old)
+    bad_test_suite_json = copy.deepcopy(test_suite_json)
     bad_test_suite_json["testsuites"][0]["status"] = "failed"
 
     testsuites = TSuite.list_from_twister_json(bad_test_suite_json)
@@ -87,40 +126,26 @@ def test_checking_for_a_failed_testsuite_status():
     assert any([ts.did_fail() for ts in testsuites])
 
 
-@pytest.mark.parametrize(
-    "twister_json",
-    [
-        test_suite_json_old,
-        test_suite_json_new,
-    ],
-)
-def test_checking_for_all_built_testsuite(twister_json):
+def test_checking_for_all_built_testsuite():
     """Test checking for a built testsuite.
 
     GIVEN a testsuite JSON object with all testsuites successfully built,
     WHEN creating a TSuite instance,
     THEN all testsuites should be marked as built.
     """
-    testsuites = TSuite.list_from_twister_json(twister_json)
+    testsuites = TSuite.list_from_twister_json(test_suite_json)
 
     assert all([ts.did_build() for ts in testsuites])
 
 
-@pytest.mark.parametrize(
-    "twister_json",
-    [
-        test_suite_json_old,
-        test_suite_json_new,
-    ],
-)
-def test_checking_for_not_built_testsuite(twister_json):
+def test_checking_for_not_built_testsuite():
     """Test checking for a not built testsuite.
 
     GIVEN a testsuite JSON object with at least one testsuite not built successfully,
     WHEN creating a TSuite instance,
     THEN at least one testsuite should be marked as not built.
     """
-    not_built_test_suite_json = copy.deepcopy(twister_json)
+    not_built_test_suite_json = copy.deepcopy(test_suite_json)
     not_built_test_suite_json["testsuites"][0]["status"] = "failed"
 
     testsuites = TSuite.list_from_twister_json(not_built_test_suite_json)
