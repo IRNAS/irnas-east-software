@@ -12,6 +12,26 @@ It is built on top of Zephyr's RTOS meta-tool [West] and Nordic's [nRF Connect T
 [nrf connect toolchain manager]:
   https://github.com/NordicSemiconductor/pc-nrfconnect-toolchain-manager
 
+## Documentation
+
+`docs` directory contains several markdown documents about East:
+
+- [Installation] - How to install East and its dependencies.
+- [Example Project] - Quickly setup an example project and get it building with East.
+- [How East works] - How East works under the hood and what to expect from it.
+- [Configuration] - How to configure the `east.yml` file.
+- [Pack] - How to use `east pack` command to create a release package.
+- [Environmental variables] - How to configure East using environmental variables.
+- [Development guide] - How to setup the development environment for working on East.
+
+[installation]: docs/installation.md
+[Example Project]: docs/getting_started.md
+[how east works]: docs/how_east_works.md
+[configuration]: docs/configuration.md
+[pack]: docs/pack.md
+[environmental variables]: docs/environmental_variables.md
+[development guide]: docs/development_guide.md
+
 ## Reasoning behind East
 
 There are several reasons why someone would like to create yet another tool on top of `west`:
@@ -36,23 +56,3 @@ East automates the above tasks and tries to make the developer more productive.
 - RTT utility commands to connect and see the RTT stream.
 - CodeChecker integration for static code analysis.
 - Generating configuration files for the Cortex Debug VScode extension.
-
-## Documentation
-
-`docs` directory contains several markdown documents about East:
-
-- [Installation] - How to install East and its dependencies.
-- [Example Project] - Quickly setup an example project and get it building with East.
-- [How East works] - How East works under the hood and what to expect from it.
-- [Configuration] - How to configure the `east.yml` file.
-- [Pack] - How to use `east pack` command to create a release package.
-- [Environmental variables] - How to configure East using environmental variables.
-- [Development guide] - How to setup the development environment for working on East.
-
-[installation]: docs/installation.md
-[Example Project]: docs/getting_started.md
-[how east works]: docs/how_east_works.md
-[configuration]: docs/configuration.md
-[pack]: docs/pack.md
-[environmental variables]: docs/environmental_variables.md
-[development guide]: docs/development_guide.md
