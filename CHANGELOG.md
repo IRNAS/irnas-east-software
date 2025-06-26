@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+
+- Reword and restructure docs a bit to increase clarity.
+
 ### Fixed
 
 - Fixed Test Suite out path being incorrect for native_sim builds. The path is now correctly

@@ -1,17 +1,21 @@
+<!-- prettier-ignore-start -->
+<!-- omit in toc -->
 # Developing East
+<!-- prettier-ignore-end -->
 
+<!-- prettier-ignore-start -->
+<!-- omit in toc -->
 ## Table of Contents
+<!-- prettier-ignore-end -->
 
 <!-- vim-markdown-toc GFM -->
 
-- [Developing East](#developing-east)
-  - [Table of Contents](#table-of-contents)
-  - [Setup](#setup)
-  - [Running unit tests](#running-unit-tests)
-  - [Formatting](#formatting)
-  - [Known issues](#known-issues)
-    - [Editable install does not work](#editable-install-does-not-work)
-    - [Test for version check fails](#test-for-version-check-fails)
+- [Setup](#setup)
+- [Running unit tests](#running-unit-tests)
+- [Formatting](#formatting)
+- [Known issues](#known-issues)
+  - [Editable install does not work](#editable-install-does-not-work)
+  - [Test for version check fails](#test-for-version-check-fails)
 
 <!-- vim-markdown-toc -->
 
