@@ -95,7 +95,11 @@ class TSuite(NamedTuple):
                 toolchain=toolchain,
             )
 
-        return [create_tsuite(ts) for ts in twister_json["testsuites"]]
+        return [
+            create_tsuite(ts)
+            for ts in twister_json["testsuites"]
+            if ts.get("status", "") != "filtered"
+        ]
 
     def did_fail(self) -> bool:
         """Check if the testsuite failed."""
