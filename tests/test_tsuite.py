@@ -71,6 +71,32 @@ test_suite_json = {
                 }
             ],
         },
+        # This is a testsuite that was filtered out
+        # This happens on older NCSs. On new ones, filtered testsuites are
+        # not in twister.json at all.
+        #
+        # After parsing, it should not appear in any TSuite list
+        {
+            "name": "app/app.filtered",
+            "arch": "arm",
+            "platform": "custom_board@1.0.0/nrf52840",
+            "path": "../project/app",
+            "run_id": "953b256c22f70c8293b9b625baea26ef",
+            "runnable": False,
+            "retries": 0,
+            "status": "filtered",
+            "execution_time": "0.00",
+            "build_time": "26.15",
+            "toolchain": "host",
+            "testcases": [
+                {
+                    "identifier": "app.filtered",
+                    "execution_time": "0.00",
+                    "status": "filtered",
+                    "reason": "Not in testsuite platform allow list",
+                }
+            ],
+        },
     ],
 }
 
@@ -83,6 +109,10 @@ def test_creating_tsuite_instances():
     THEN the instance should have the correct attributes.
     """
     ts = TSuite.list_from_twister_json(test_suite_json)
+
+    # With this assertion we ensure that the testsuite JSON
+    # contains the expected number of testsuites.
+    # The fourth testsuite is filtered out, so it should not be in the list.
     assert len(ts) == 3
 
     v3 = ts[0]
