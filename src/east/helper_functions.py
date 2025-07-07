@@ -580,13 +580,13 @@ def configure_nrfutil(east):
     nrfutil_cmd("install toolchain-manager=0.15.0")
 
     # Output of --version flag on linux:
-    # nrfutil-device 2.11.2 (481d897 2025-05-26)
-    # commit-hash: 481d897514d9cdb5b565c726e709cca667a0985c
-    # commit-date: 2025-05-26
+    # nrfutil-device 2.12.2 (4f9071b 2025-07-03)
+    # commit-hash: 4f9071baae8c8fa8925e5c5bfc0eabcb9a36fffe
+    # commit-date: 2025-07-03
     # host: x86_64-unknown-linux-gnu
-    # build-timestamp: 2025-05-26T11:18:41.811426586Z
+    # build-timestamp: 2025-07-03T11:52:21.942709574Z
     # classification: nrf-external
-    nrfutil_cmd("install device=2.11.2")
+    nrfutil_cmd("install device=2.12.2")
 
     # Below step shouldn't be done on macOS, the install-dir is hardcoded there.
     if platform.system() == "Darwin":
