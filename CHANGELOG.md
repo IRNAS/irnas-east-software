@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Limit major, minor, patch numbers in the `east util version` command to 255, error out if they are
+  exceeded. This is done to ensure compatibility with the Zephyr's VERSION file, which only
+  allocates 1 byte for each version number. It is important to respect this due to the MCUboot.
+  Limit the tweak number also to 255, but don't error out in that case, just set it to 0. It is a
+  valid used case to be more than 255 commits away from the last tagged commit. We can clamp the
+  tweak number as it is always 0 in the cases of the release, so the above MCUboot consideration
+  doesn't apply to it.
+
 ## [0.29.2] - 2025-06-30
 
 ### Fixed

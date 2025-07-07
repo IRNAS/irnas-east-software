@@ -50,6 +50,36 @@ def _parse_tag(tag: str) -> Tuple[int, int, int, str, int]:
     minor = _parse_int_version(parts[1], tag, "Minor")
     patch = _parse_int_version(parts[2], tag, "Patch")
 
+    def check_255_limit(ver, name):
+        """Check if the version part is within the 255 limit.
+
+        This is needed as the Zephyr' VERSION file only alloacates 1 byte for each
+        field.
+        """
+        if ver > 255:
+            raise Exception(
+                f"{name} (ver) exceeded limit of 1 byte (255). Zephyr's "
+                "VERSION file only allows 1 byte for each field."
+            )
+        return ver
+
+    def clamp_tweak(tweak):
+        """Clamp tweak number to 255, if above that.
+
+        Zephyr's VERSION file only alloacates 1 byte for the tweak field. However, in
+        the case of the tweak we clamp it to 255, instead of erroring, since being 255
+        commits from the tag is a valid use case.
+        """
+        if tweak > 255:
+            print(f"Warning: Tweak number ({tweak}) exceeds 255, clamping it to 255.")
+            return 255
+        return tweak
+
+    major = check_255_limit(major, "major")
+    minor = check_255_limit(minor, "minor")
+    patch = check_255_limit(patch, "patch")
+    tweak = clamp_tweak(tweak)
+
     return major, minor, patch, extra, tweak
 
 
