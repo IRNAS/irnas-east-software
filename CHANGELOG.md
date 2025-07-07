@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.29.3] - 2025-07-07
+
 ### Fixed
 
 - Limit major, minor, patch numbers in the `east util version` command to 255, error out if they are
@@ -800,7 +802,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Makefile for development.
 - Docker scripts for building and running docker containers, for development purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.2...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.3...HEAD
+[0.29.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.2...v0.29.3
 [0.29.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.1...v0.29.2
 [0.29.1]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.0...v0.29.1
 [0.29.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.28.0...v0.29.0
