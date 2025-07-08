@@ -63,22 +63,9 @@ def _parse_tag(tag: str) -> Tuple[int, int, int, str, int]:
             )
         return ver
 
-    def clamp_tweak(tweak):
-        """Clamp tweak number to 255, if above that.
-
-        Zephyr's VERSION file only alloacates 1 byte for the tweak field. However, in
-        the case of the tweak we clamp it to 255, instead of erroring, since being 255
-        commits from the tag is a valid use case.
-        """
-        if tweak > 255:
-            print(f"Warning: Tweak number ({tweak}) exceeds 255, clamping it to 255.")
-            return 255
-        return tweak
-
     major = check_255_limit(major, "major")
     minor = check_255_limit(minor, "minor")
     patch = check_255_limit(patch, "patch")
-    tweak = clamp_tweak(tweak)
 
     return major, minor, patch, extra, tweak
 
@@ -167,6 +154,22 @@ class ZephyrSemver:
         if self.on_tag and self.dirty:
             # We are directly on a dirty tag
             self.tweak = 255
+
+        def clamp_tweak(tweak):
+            """Clamp tweak number to 255, if above that.
+
+            Zephyr's VERSION file only alloacates 1 byte for the tweak field. However, in
+            the case of the tweak we clamp it to 255, instead of erroring, since being 255
+            commits from the tag is a valid use case.
+            """
+            if tweak > 255:
+                print(
+                    f"Warning: Tweak number ({tweak}) exceeds 255, clamping it to 255."
+                )
+                return 255
+            return tweak
+
+        self.tweak = clamp_tweak(self.tweak)
 
     def to_string(self) -> str:
         """Convert the object to a string representation.

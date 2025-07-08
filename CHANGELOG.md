@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix the `east util version` command, as it wasn't correctly handling the clamping of tweak number.
+
 ## [0.29.4] - 2025-07-07
 
 ### Changed
