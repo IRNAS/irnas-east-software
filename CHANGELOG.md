@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.29.6] - 2025-09-04
+
 ### Fixed
 
 - Actually pin dependencies to specific versions in the `pyproject.toml` file. The way dependencies
@@ -820,7 +822,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Makefile for development.
 - Docker scripts for building and running docker containers, for development purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.5...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.6...HEAD
+[0.29.6]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.5...v0.29.6
 [0.29.5]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.4...v0.29.5
 [0.29.4]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.3...v0.29.4
 [0.29.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.2...v0.29.3
@@ -892,5 +895,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]:
-  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
