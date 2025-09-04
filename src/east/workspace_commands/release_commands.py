@@ -387,7 +387,7 @@ def non_existing_sample_msg_fmt(sample_name):
     )
 
 
-@click.command(**east_command_settings, deprecated="Replaced by `east pack`")
+@click.command(**east_command_settings)
 @click.option(
     "-d",
     "--dry-run",
@@ -414,6 +414,10 @@ def non_existing_sample_msg_fmt(sample_name):
 @click.pass_obj
 def release(east, dry_run, verbose, spdx_app_only):
     """Create a release folder with release artifacts.
+
+    \b
+    \n\n[bold red]DEPRECATED:[/] This command is deprecated and will be removed in
+    future. use [bold yellow]east pack[/] instead.
 
     \b
     \n\n[bold yellow]east release[/] command runs a release process consisting of a series of [bold yellow]east build[/] commands to build applications and samples listed in the [bold yellow]east.yml[/]. Created build artifacts are then renamed and placed into [bold magenta]release[/] folder in project's root directory.

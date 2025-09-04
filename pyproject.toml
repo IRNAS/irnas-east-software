@@ -9,7 +9,7 @@ enabled = true
 name = "east-tool"
 description="Tool built on top of West for managing nRF Connect SDK projects."
 readme = "README.md"
-dynamic = ["version", "dependencies", "optional-dependencies"]
+dynamic = ["version", "optional-dependencies"]
 authors = [{ name = "Marko Sagadin", email = "marko.sagadin42@gmail.com" }]
 license = { file = "LICENSE" }
 classifiers = [
@@ -17,6 +17,18 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 requires-python = ">=3.10"
+dependencies = [
+    "rich>=13.9.0",
+    "click>=8.0",
+    "rich_click>=1.8",
+    "requests>=2.32",
+    "PyYAML>=6.0.0",
+    "pykwalify==1.8.0",
+    "ansi2txt==0.2.0",
+    # Below two are needed for the codechecker to work inside the virtualvenv
+    "portalocker",
+    "psutil"
+]
 
 [project.urls]
 Homepage = "https://github.com/IRNAS/irnas-east-software"
@@ -25,7 +37,6 @@ Homepage = "https://github.com/IRNAS/irnas-east-software"
 east = "east.__main__:main"
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["scripts/requirements.txt"]}
 optional-dependencies.dev = {file = ["scripts/requirements-dev.txt"]}
 
 [tool.setuptools_scm]

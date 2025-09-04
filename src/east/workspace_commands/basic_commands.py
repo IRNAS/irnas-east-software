@@ -50,9 +50,8 @@ class SpecialCommand(RichCommand):
     help=(
         "Which build type (a group of [bold]Kconfig[/] fragment files) to use. Requires"
         " [bold yellow]east.yml[/] with possible build types with specified apps and "
-        "samples."
+        "samples. [bold]WARNING[/]: This option is deprecated. Use sample.yml files instead."
     ),
-    deprecated="Use sample.yml files instead.",
 )
 @click.option(
     "--spdx",
