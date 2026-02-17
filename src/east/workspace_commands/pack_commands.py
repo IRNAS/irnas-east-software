@@ -101,7 +101,7 @@ def _pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
             "Run the [bold magenta]east twister[/] command and try again."
         )
 
-    testsuites = TSuite.list_from_twister_json(twister_json)
+    testsuites = TSuite.list_from_twister_json(twister_json, twister_out_path)
     atp = ArtifactsToPack.from_east_yml(east.east_yml)
 
     check_for_failed_testsuites(testsuites)

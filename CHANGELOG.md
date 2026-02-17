@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix a bug in east pack. Recent version of Zephyr (v4.2.0 onwards) changed the generated Twister
+  structure which broke the east pack command. Now east pack should work with all versions of
+  Zephyr.
+
 ## [0.29.6] - 2025-09-04
 
 ### Fixed

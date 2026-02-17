@@ -8,7 +8,7 @@ test_suite_json = {
     # This is a Zephyr v3 "style" testsuite
     "testsuites": [
         {
-            "name": "app/app.v3",
+            "name": "app.v3",
             "arch": "arm",
             "platform": "custom_board@1.0.0/nrf52840",
             "path": "../project/app",
@@ -29,7 +29,7 @@ test_suite_json = {
         },
         # This is a Zephyr v4 "style" testsuite
         {
-            "name": "app/app.v4",
+            "name": "app.v4",
             "arch": "arm",
             "platform": "custom_board@1.0.0/nrf52840",
             "path": "../project/app",
@@ -51,7 +51,7 @@ test_suite_json = {
         },
         # This is a Zephyr v4 "style" testsuite for native sim
         {
-            "name": "app/app.native",
+            "name": "app.native",
             "arch": "arm",
             "platform": "native_sim/native",
             "path": "../project/app",
@@ -77,7 +77,7 @@ test_suite_json = {
         #
         # After parsing, it should not appear in any TSuite list
         {
-            "name": "app/app.filtered",
+            "name": "app.filtered",
             "arch": "arm",
             "platform": "custom_board@1.0.0/nrf52840",
             "path": "../project/app",
@@ -108,7 +108,7 @@ def test_creating_tsuite_instances():
     WHEN creating a list of TSuite instances,
     THEN the instance should have the correct attributes.
     """
-    ts = TSuite.list_from_twister_json(test_suite_json)
+    ts = TSuite.list_from_twister_json(test_suite_json, "")
 
     # With this assertion we ensure that the testsuite JSON
     # contains the expected number of testsuites.
@@ -122,22 +122,22 @@ def test_creating_tsuite_instances():
     assert v3.name == "app.v3"
     assert v3.board == "custom_board@1.0.0_nrf52840"
     assert v3.raw_board == "custom_board@1.0.0/nrf52840"
-    assert v3.path == "app"
-    assert v3.twister_out_path == "custom_board@1.0.0_nrf52840/app/app.v3"
+    # assert v3.path == "app"
+    assert v3.twister_out_path == "custom_board@1.0.0_nrf52840/app.v3"
     assert v3.status == "passed"
 
     assert v4.name == "app.v4"
     assert v4.board == "custom_board@1.0.0_nrf52840"
     assert v4.raw_board == "custom_board@1.0.0/nrf52840"
-    assert v4.path == "app"
-    assert v4.twister_out_path == "custom_board@1.0.0_nrf52840/zephyr/app/app.v4"
+    # assert v4.path == "app"
+    assert v4.twister_out_path == "custom_board@1.0.0_nrf52840/zephyr/app.v4"
     assert v4.status == "not run"
 
     assert native.name == "app.native"
     assert native.board == "native_sim_native"
     assert native.raw_board == "native_sim/native"
-    assert native.path == "app"
-    assert native.twister_out_path == "native_sim_native/host/app/app.native"
+    # assert native.path == "app"
+    assert native.twister_out_path == "native_sim_native/host/app.native"
     assert native.status == "not run"
 
 
@@ -151,7 +151,7 @@ def test_checking_for_a_failed_testsuite_status():
     bad_test_suite_json = copy.deepcopy(test_suite_json)
     bad_test_suite_json["testsuites"][0]["status"] = "failed"
 
-    testsuites = TSuite.list_from_twister_json(bad_test_suite_json)
+    testsuites = TSuite.list_from_twister_json(bad_test_suite_json, "")
 
     assert any([ts.did_fail() for ts in testsuites])
 
@@ -163,7 +163,7 @@ def test_checking_for_all_built_testsuite():
     WHEN creating a TSuite instance,
     THEN all testsuites should be marked as built.
     """
-    testsuites = TSuite.list_from_twister_json(test_suite_json)
+    testsuites = TSuite.list_from_twister_json(test_suite_json, "")
 
     assert all([ts.did_build() for ts in testsuites])
 
@@ -178,7 +178,7 @@ def test_checking_for_not_built_testsuite():
     not_built_test_suite_json = copy.deepcopy(test_suite_json)
     not_built_test_suite_json["testsuites"][0]["status"] = "failed"
 
-    testsuites = TSuite.list_from_twister_json(not_built_test_suite_json)
+    testsuites = TSuite.list_from_twister_json(not_built_test_suite_json, "")
 
     assert any([not ts.did_build() for ts in testsuites])
 

@@ -4,21 +4,45 @@ from typing import NamedTuple, Sequence
 from ..constants import EAST_GITHUB_URL
 
 
-def tsuite_determine_path(board: str, name: str, toolchain: str | None) -> str:
+def tsuite_determine_path(
+    path: str, board: str, name: str, toolchain: str | None, twister_out_path: str
+) -> str:
     """Determine the path to the testsuite's build directory.
 
     Args:
+        topdir (str): The top directory of the Zephyr project, as returned by
+        west_topdir(),
         board (str): Normalized board name,
         name (str): The testsuite name as it appears in twister.json,
+        path (str): Path as it appears in twister.json,
         toolchain (str): The toolchain used for this testsuite, as it appears in twister.json.
+        twister_out_path (str): The path to the twister_out directory.
 
     Returns:
-        str: The path to the testsuite's build directory.
+        list[str]: A list of paths to the potential testsuite's build directory.
     """
     # if the version is v4.0.0 or later, the paths used are different
     # from v3.x versions, so we need to adjust the paths accordingly.
+
     if toolchain:
-        return os.path.join(board, toolchain, name)
+        # return os.path.join(board, toolchain, path, name)
+        # The path from twister.json always starts with "../", by removing it we get
+        # relative path from west_topdir to the location of the app/sample/test.
+        # This is also can be used for the path that is used for the build directory
+        # structure of twister_out from Zephyr v4.2.0 onwards, so we can use it directly.
+        path = path[3:]
+
+        # But since Zephyr between v4.0.0 and v4.2.0 used a different structure for the
+        # build directory in twister_out, we return both kinds of paths.
+
+        # Determine which path in twister_out_paths exists and use it as src_dir.
+        path1 = os.path.join(board, toolchain, path, name)
+        path2 = os.path.join(board, toolchain, name)
+
+        if os.path.exists(os.path.join(twister_out_path, path1)):
+            return path1
+        else:
+            return path2
     else:
         return os.path.join(board, name)
 
@@ -36,9 +60,7 @@ class TSuite(NamedTuple):
     board: str
     # Raw board name from twister.json, e.g., nrf52840dk/nrf52840
     raw_board: str
-    # Path to the project where the testsuite is located.
-    path: str
-    # Path to the testsuite's build directory inside the twister_out directory.
+    # Testsuite's build directory inside the twister_out directory.
     twister_out_path: str
     # Status of the testsuite, e.g., passed, failed, skipped
     status: str
@@ -50,7 +72,9 @@ class TSuite(NamedTuple):
     toolchain: str | None
 
     @classmethod
-    def list_from_twister_json(cls, twister_json: dict) -> Sequence["TSuite"]:
+    def list_from_twister_json(
+        cls, twister_json: dict, twister_out_path
+    ) -> list["TSuite"]:
         """Create a list of TSuite objects from a list of testsuites from twister.json."""
         if "testsuites" not in twister_json:
             msg = (
@@ -61,7 +85,9 @@ class TSuite(NamedTuple):
             raise Exception(msg)
 
         # WARN: All accessed fields should be checked for existence.
-        required_keys = set(["name", "platform", "run_id", "status", "runnable"])
+        required_keys = set(
+            ["name", "platform", "run_id", "status", "runnable", "path"]
+        )
 
         # Error due to missing required keys is not expected to happen often, so
         # we error out immediately, if it happens.
@@ -81,15 +107,15 @@ class TSuite(NamedTuple):
                 raise Exception(msg)
 
             board = d["platform"].replace("/", "_")
-            name = os.path.basename(d["name"])
             toolchain = d.get("toolchain", None)
 
             return cls(
-                name,
+                name=d["name"],
                 board=board,
                 raw_board=d["platform"],
-                path=os.path.dirname(d["name"]),
-                twister_out_path=tsuite_determine_path(board, d["name"], toolchain),
+                twister_out_path=tsuite_determine_path(
+                    d["path"], board, d["name"], toolchain, twister_out_path
+                ),
                 status=d["status"],
                 runnable=d["runnable"],
                 toolchain=toolchain,

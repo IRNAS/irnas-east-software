@@ -202,7 +202,7 @@ twister_json_content = """
     },
     "testsuites":[
         {
-            "name":"app/app.prod",
+            "name":"app.prod",
             "arch":"arm",
             "platform":"custom_board@1.0.0/nrf52840",
             "path":"../project/app",
@@ -222,7 +222,7 @@ twister_json_content = """
             ]
         },
         {
-            "name":"samples/blinky/sample.basic.blinky",
+            "name":"sample.basic.blinky",
             "arch":"arm",
             "platform":"custom_board@1.0.0/nrf52840",
             "path":"../project/samples/blinky",
@@ -306,7 +306,7 @@ def _create_good_west_workspace(west_top_dir):
 
     tmp_path = "project/twister-out/custom_board@1.0.0_nrf52840"
 
-    app_path = os.path.join(tmp_path, "app/app.prod")
+    app_path = os.path.join(tmp_path, "app.prod")
     app_files = [
         "app/zephyr/zephyr.hex",
         "app/zephyr/zephyr.bin",
@@ -314,7 +314,7 @@ def _create_good_west_workspace(west_top_dir):
     ]
     twister_files = [os.path.join(app_path, f) for f in app_files]
 
-    sample_path = os.path.join(tmp_path, "samples/blinky/sample.basic.blinky")
+    sample_path = os.path.join(tmp_path, "sample.basic.blinky")
     sample_files = [
         "zephyr/zephyr.hex",
         "zephyr/zephyr.bin",
