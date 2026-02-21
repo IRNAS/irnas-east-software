@@ -324,7 +324,7 @@ class EastContext:
         # The toolchain-manager does not provide it, so must avoid cases where system
         # could have some nrfutil install on the PATH but it would be different from the
         # one used by the east.
-        # Concretly, this is needed for the west flash command that recently started to
+        # Concretely, this is needed for the west flash command that recently started to
         # use nrfutil device command to flash devices.
         nrfutil = self.consts["nrfutil_path"]
         nrfutil_dir = os.path.dirname(nrfutil)

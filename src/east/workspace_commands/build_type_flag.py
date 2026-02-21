@@ -233,7 +233,7 @@ def construct_extra_cmake_arguments(east, build_type, board, build_dir, source_d
 
     if inside_app:
         # If we do not have an app array and we there is no build type, we default to
-        # plaing west behavior: no cmake args.
+        # plain west behavior: no cmake args.
         if not app_array:
             return ("", "")
 
