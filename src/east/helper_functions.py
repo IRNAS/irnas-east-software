@@ -150,7 +150,7 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
                                     the caller to provide a correct value.
 
     Returns:
-        Revision string of nrf-sdk project, absolute
+        Revision string of nrf-sdk project, absolute path to the projects directory.
 
     Raises:
         WestConfigNotFound or WestYamlNotFound
@@ -158,7 +158,7 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     config = ConfigParser()
     config_path = os.path.join(west_dir_path, ".west", "config")
 
-    # ".west/config file could not exist, in that case we should raise an exception"
+    # .west/config file could not exist, in that case we should raise an exception
     if not os.path.isfile(config_path):
         raise WestConfigNotFound(".west/conifg file does not exists.")
 
@@ -171,7 +171,7 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     if not os.path.isfile(west_yaml):
         raise WestYmlNotFound("No west.yml was found ")
 
-    # Get ncs version
+    # Get path to sdk-nrf repo
     with open(west_yaml, "r") as file:
         manifest = yaml.safe_load(file)["manifest"]
 
@@ -187,9 +187,12 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
     if len(ncs) == 0:
         return None, project_path
 
-    # Attempt to extract the NCS revision, which is optional.
-    # (We can safely access the first element, since we checked the length above)
-    revision = ncs[0].get("revision", None)
+    # Access path to the sdk-nrf repo and read the VERSION file.
+    sdk_repo_path = ncs[0]["name"]
+    with open(os.path.join(west_dir_path, sdk_repo_path, "VERSION"), "r") as file:
+        # Add "v" since toolchain manager expects version in format like "v3.3.0", but
+        # VERSION file contains only "3.3.0"
+        revision = "v" + file.read().strip()
 
     return (revision, project_path)
 

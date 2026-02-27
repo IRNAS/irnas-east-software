@@ -268,6 +268,7 @@ def _create_good_west_workspace(west_top_dir):
         west_top_dir, "project/app/conf/nrf52840dk_nrf52840.conf", dummy_config
     )
     create_and_write(west_top_dir, "project/app/CMakeLists.txt", dummy_cmakelists_txt)
+    create_and_write(west_top_dir, "nrf/VERSION", "2.1.0")
 
     # Board files, just create them, you do not need to write anything.
     board_path = "project/boards/arm/custom_nrf52840dk"
