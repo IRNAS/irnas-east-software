@@ -96,6 +96,9 @@ mapping:
                 required: false
                 sequence:
                   - type: str
+              nrfutil_flash_pack:
+                type: bool
+                required: false
       extra:
         type: seq
         required: false

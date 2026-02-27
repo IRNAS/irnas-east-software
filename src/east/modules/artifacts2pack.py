@@ -1,6 +1,18 @@
 from typing import Any, NamedTuple
 
 from ..constants import EAST_GITHUB_URL
+from .batchfile import BatchFile
+
+
+class Project(NamedTuple):
+    """Project object representing a build configuration for a project."""
+
+    name: str
+    artifacts: list[str]
+    nrfutil_flash_pack: bool
+    # Batch files are are not explicitly defined in the east.yml file, but are
+    # determined by looking at the output west flash --dry-run command.
+    batch_files: list[BatchFile] = []
 
 
 class ArtifactsToPack(NamedTuple):
@@ -9,7 +21,7 @@ class ArtifactsToPack(NamedTuple):
     """
 
     common_artifacts: list[str]
-    bc_artifacts: dict[str, list[str]]
+    projects: list[Project]
     extra_artifacts: list[str]
 
     @classmethod
@@ -26,13 +38,13 @@ class ArtifactsToPack(NamedTuple):
         build_configs = pack.get("build_configurations", [])
         extra_artifacts = pack.get("extra", [])
 
-        proj_artifacts = {}
+        projects = []
 
         for bc in build_configs:
             if "artifacts" in bc:
-                proj_artifacts[bc["name"]] = common_artifacts + bc["artifacts"]
+                artifacts = common_artifacts + bc["artifacts"]
             elif "overwrite_artifacts" in bc:
-                proj_artifacts[bc["name"]] = bc["overwrite_artifacts"]
+                artifacts = bc["overwrite_artifacts"]
             else:
                 raise Exception(
                     "One of 'artifact' or 'overwrite_artifact' keys must be present in "
@@ -40,11 +52,50 @@ class ArtifactsToPack(NamedTuple):
                     f"to East's bug tracker on {EAST_GITHUB_URL}."
                 )
 
-        return cls(common_artifacts, proj_artifacts, extra_artifacts)
+            projects.append(
+                Project(
+                    name=bc["name"],
+                    artifacts=artifacts,
+                    nrfutil_flash_pack=bc.get("nrfutil_flash_pack", False),
+                )
+            )
+
+        return cls(common_artifacts, projects, extra_artifacts)
 
     def get_artifacts_for_project(self, project: str) -> list[str]:
         """Return a list of artifacts for a given project.
 
         If that project is not found, return the common artifacts.
         """
-        return self.bc_artifacts.get(project, self.common_artifacts)
+        for p in self.projects:
+            if p.name == project:
+                return p.artifacts
+
+        return self.common_artifacts
+
+    def get_batch_files_for_project(self, project: str) -> list[BatchFile]:
+        """Return a list of BatchFile objects for a given project.
+
+        If that project is not found, return an empty list.
+        """
+        for p in self.projects:
+            if p.name == project:
+                return p.batch_files
+
+        return []
+
+    def if_has_project(self, project: str) -> bool:
+        """Return whether the given project is defined in the ArtifactsToPack object."""
+        for p in self.projects:
+            if p.name == project:
+                return True
+
+        return False
+
+    def uses_nrfutil_flash_packing(self, project: str) -> bool:
+        """Return whether the given project should be packed using nrfutil flash packing."""
+        for p in self.projects:
+            if p.name == project:
+                return p.nrfutil_flash_pack
+
+        return False

@@ -90,8 +90,14 @@ class TwisterArtifact(Artifact):
     def __repr__(self):
         """Return a string representation of the TwisterArtifact object."""
         return (
-            f"TwisterArtifact(src={self.src}, dst={self.dst}, ts={self.ts.name}, "
-            f"raw_name={self.raw_name}, name={self.name}, renamed_name={self.renamed_name})"
+            f"TwisterArtifact(\n"
+            f"    src={self.src}, \n"
+            f"    dst={self.dst}, \n"
+            f"    ts={self.ts.name}, \n"
+            f"    raw_name={self.raw_name}, \n"
+            f"    name={self.name}, \n"
+            f"    renamed_name={self.renamed_name}, \n"
+            f")"
         )
 
     @classmethod
@@ -125,12 +131,20 @@ class TwisterArtifact(Artifact):
 
         raw_arts = atp.get_artifacts_for_project(ts.name)
 
-        def create_artifact(raw_name: str) -> Artifact:
+        def create_artifact(raw_name: str) -> "TwisterArtifact":
             name = raw_name.replace("$APP_DIR/", replace_text)
-            renamed_name = cls._rename(name, ts.name, app_build_dir, version_str)
 
-            src = os.path.join(src_dir, name)
-            dst = os.path.join(dst_dir, renamed_name)
+            if os.path.isabs(name):
+                # This is some file that is outside of the build dir, those ones are
+                # are not renamed, but we still want to create an artifact for them, so
+                # we just use the basename of the file as the renamed name.
+                renamed_name = os.path.basename(name)
+                src = name
+                dst = os.path.join(dst_dir, renamed_name)
+            else:
+                renamed_name = cls._rename(name, ts.name, app_build_dir, version_str)
+                src = os.path.join(src_dir, name)
+                dst = os.path.join(dst_dir, renamed_name)
 
             art = cls(src, dst, ts, raw_name, name, renamed_name)
 
@@ -213,3 +227,42 @@ class ExtraArtifact(Artifact):
         filename, ext = os.path.splitext(file)
 
         return f"{filename}-{version_str}{ext}"
+
+
+class WriteArtifact(Artifact):
+    """Artifact object that represents an artifact that needs to be written.
+
+    This Artifact doesn't have a source, only content which was generated in some way
+    and needs to be written to the destination path.
+    """
+
+    content: str
+    executable: bool
+
+    def __init__(self, content: str, dst: str, executable: bool = False):
+        """Initialize the WriteArtifact object.
+
+        @param content: The content to write to the file.
+        @param dst: The destination path.
+        @param executable: If True, set the executable permission bit after writing.
+        """
+        super().__init__(src="", dst=dst)
+        self.content = content
+        self.executable = executable
+
+    def __repr__(self):
+        """Return a string representation of the Artifact object."""
+        repr = f"Artifact(src={self.src}\ndst={self.dst}\ncontent={self.content}\n)"
+        return repr
+
+    def copy(self):
+        """Write the content to the destination path.
+
+        Override the copy method to write the content to the destination path instead of
+        copying.
+        """
+        os.makedirs(os.path.dirname(self.dst), exist_ok=True)
+        with open(self.dst, "w") as f:
+            f.write(self.content)
+        if self.executable:
+            os.chmod(self.dst, os.stat(self.dst).st_mode | 0o111)

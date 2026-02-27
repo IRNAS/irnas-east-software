@@ -8,8 +8,19 @@ import click
 from ..constants import EAST_GITHUB_URL
 from ..east_context import east_command_settings
 from ..helper_functions import determine_version_string
-from ..modules.artifact import Artifact, ExtraArtifact, TwisterArtifact
+from ..modules.artifact import Artifact, ExtraArtifact, TwisterArtifact, WriteArtifact
 from ..modules.artifacts2pack import ArtifactsToPack
+from ..modules.batchfile import BatchFile
+from ..modules.nrfutil_scripts import (
+    generate_flash_script_bash,
+    generate_flash_script_bat,
+    generate_readme,
+    generate_setup_script_bash,
+    generate_setup_script_bat,
+    get_all_helper_scripts_bash,
+    get_all_helper_scripts_bat,
+)
+from ..modules.pack_nrfutil import nrfutil_flash_packing
 from ..modules.tsuite import TSuite
 
 no_east_yml_msg = """[bold yellow]east.yml[/] not found in project's root directory, [bold yellow]east pack[/] needs it to determine what to pack, exiting!"""
@@ -55,17 +66,19 @@ def pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
     \b
     \n\nIn short, this command will:
 
-    \n\n1. Check [bold yellow]east.yml[/] to see which files are relevant for the release.
-    \n\n2. Copy those files from the Twister output to the [bold cyan]package[/] directory.
-    \n\n3. Rename the files to include the project name and version.
-    \n\n4. Copy any extra files specified in [bold yellow]east.yml[/] to [bold cyan]package/extra[/].
-    \n\n5. Rename the extra files to include the version.
-    \n\n6. Create ZIP files from the contents of the [bold cyan]package[/] directory.
+    \b
+    \n1. Check [bold yellow]east.yml[/] to see which files are relevant for the release.
+    \n2. Copy those files from the Twister output to the [bold cyan]package[/] directory.
+    \n3. Rename the files to include the project name and version.
+    \n4. Copy any extra files specified in [bold yellow]east.yml[/] to [bold cyan]package/extra[/].
+    \n5. Rename the extra files to include the version.
+    \n6. Create ZIP files from the contents of the [bold cyan]package[/] directory.
 
     \b
-    \n\n For details, see the documentation.
+    \n\nIf you set `nrfutil_flash_pack` to true for any of the projects in [bold yellow]east.yml[/], the command will also provide a self-contained flash package generated alongside the normal pack output. This package allows users to flash firmware using only the `nrfutil` binary, without needing east, west, or Zephyr installed.
 
-    \b
+    \n\nFor details, see the documentation.
+
     \n\n[bold]Note:[/] This command requires [bold yellow]east.yml[/] with [bold yellow]pack[/] field to function.
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -108,6 +121,8 @@ def _pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
 
     version_str = determine_version_string(east, tag)
 
+    atp = nrfutil_flash_packing(east, testsuites, atp, twister_out_path)
+
     twister_artifacts = create_twister_artifacts(
         testsuites,
         atp,
@@ -115,6 +130,7 @@ def _pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
         pack_path,
         version_str,
     )
+
     # Perform checks specific for twister artifacts.
     check_that_specific_build_configs_exist_as_twister_artifacts(
         east, atp, twister_artifacts
@@ -124,20 +140,35 @@ def _pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
 
     extra_artifacts = create_extra_artifacts(atp, pack_path, version_str)
 
+    batch_artifacts, updated_batch_files = create_batch_file_artifacts(
+        twister_artifacts, atp
+    )
+
+    script_artifacts = create_nrfutil_script_artifacts(
+        twister_artifacts, atp, updated_batch_files
+    )
+
     # Perform checks specific for extra artifacts.
     check_that_all_extra_artifacts_exist(east, extra_artifacts)
     check_for_duplicated_extra_artifacts(east, extra_artifacts)
 
     # combine all artifacts
     # We must only use the common Artifacts methods from now on
-    artifacts = twister_artifacts + extra_artifacts
+    artifacts = twister_artifacts + extra_artifacts + batch_artifacts + script_artifacts
 
     # Time to do some filesystem operations.
     sh.rmtree(pack_path, ignore_errors=True)
 
+    p_args = {
+        "overflow": "ignore",
+        "crop": False,
+        "highlight": False,
+        "soft_wrap": False,
+        "no_wrap": True,
+    }
     for a in artifacts:
         if verbose:
-            print(f"Copying artifact {a.src} -> {a.dst}")
+            east.print(f"[bold green]Copying:[/] {os.path.basename(a.dst)}", **p_args)
         a.copy()
 
     zip_targets = os.listdir(pack_path)
@@ -145,6 +176,8 @@ def _pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
     for z in zip_targets:
         in_folder = os.path.join(pack_path, z)
         out_zip = os.path.join(pack_path, f"{z}-{version_str}")
+        if verbose:
+            east.print(f"[bold cyan]Creating ZIP:[/] {out_zip}.zip", **p_args)
 
         sh.make_archive(out_zip, "zip", in_folder)
 
@@ -199,6 +232,155 @@ def create_extra_artifacts(
 ) -> Sequence["ExtraArtifact"]:
     """Create a list of ExtraArtifact objects."""
     return ExtraArtifact.list_from_parts(atp.extra_artifacts, pack_path, version_str)
+
+
+def create_batch_file_artifacts(
+    artifacts: Sequence["TwisterArtifact"], atp: ArtifactsToPack
+) -> tuple[Sequence["WriteArtifact"], dict[str, list["BatchFile"]]]:
+    """Create a list of WriteArtifact objects for the batch files.
+
+    Content of the batch files is updated to match the renamed artifacts. The
+    destination of the batch files is also updated to be in the same folder as the
+    renamed artifacts.
+
+    Returns:
+        A tuple of:
+        - List of WriteArtifact objects for the batch files.
+        - Dict mapping project name to its list of updated BatchFile objects
+          (with renamed firmware paths and ext_mem_config_name preserved).
+    """
+    write_artifacts = []
+    updated_batch_files: dict[str, list["BatchFile"]] = {}
+
+    for p in atp.projects:
+        if not p.batch_files:
+            continue
+
+        updated_bfs = []
+        for bf in p.batch_files:
+            arts = [a for a in artifacts if a.ts.name == p.name]
+
+            # Scan through arts, if their src appears in the content of the batch file,
+            # replace it with the renamed name.
+            for a in arts:
+                bf = bf.update_matching_fw_file(a.src, a.renamed_name)
+
+            # Since all artifacts in arts come from the same project, we can just take
+            # the dst of the first
+            dir = os.path.dirname(arts[0].dst)
+            dst = os.path.join(dir, bf.name)
+            write_artifacts.append(WriteArtifact(content=bf.content, dst=dst))
+            updated_bfs.append(bf)
+
+        updated_batch_files[p.name] = updated_bfs
+
+    return write_artifacts, updated_batch_files
+
+
+def create_nrfutil_script_artifacts(
+    artifacts: Sequence["TwisterArtifact"],
+    atp: ArtifactsToPack,
+    updated_batch_files: dict[str, list[BatchFile]],
+) -> list[WriteArtifact]:
+    """Create WriteArtifact objects for nrfutil flash scripts and README.
+
+    For each project with nrfutil_flash_pack enabled, generates:
+    - linux/nrfutil_setup.sh, flash.sh, erase.sh, reset.sh, recover.sh
+    - windows/nrfutil_setup.bat, flash.bat, erase.bat, reset.bat, recover.bat
+    - README.md (in the build output root)
+
+    Args:
+        artifacts: List of TwisterArtifact objects (used to determine output directories).
+        atp: ArtifactsToPack with project definitions.
+        updated_batch_files: Dict mapping project name to updated BatchFile objects
+            (with renamed firmware paths and ext_mem_config_name set).
+    """
+    script_artifacts: list[WriteArtifact] = []
+
+    for p in atp.projects:
+        if not p.nrfutil_flash_pack:
+            continue
+
+        batch_files = updated_batch_files.get(p.name, [])
+        if not batch_files:
+            continue
+
+        # Determine the output directory from the first artifact for this project.
+        project_arts = [a for a in artifacts if a.ts.name == p.name]
+        if not project_arts:
+            continue
+        out_dir = os.path.dirname(project_arts[0].dst)
+
+        # Extract device version from the first batch file. All batch files
+        # produced by west flash contain the nrfutil_device_version field.
+        device_version = batch_files[0].get_device_version()
+        if device_version is None:
+            raise Exception(
+                f"Batch file [bold magenta]{batch_files[0].name}[/] for project "
+                f"[bold cyan]{p.name}[/] is missing the "
+                "[bold yellow]nrfutil_device_version[/] field. "
+                "This field is expected in all batch files generated by west flash."
+            )
+
+        linux_dir = os.path.join(out_dir, "linux")
+        windows_dir = os.path.join(out_dir, "windows")
+
+        # Setup scripts
+        script_artifacts.append(
+            WriteArtifact(
+                content=generate_setup_script_bash(),
+                dst=os.path.join(linux_dir, "nrfutil_setup.sh"),
+                executable=True,
+            )
+        )
+        script_artifacts.append(
+            WriteArtifact(
+                content=generate_setup_script_bat(),
+                dst=os.path.join(windows_dir, "nrfutil_setup.bat"),
+            )
+        )
+
+        # Flash scripts
+        script_artifacts.append(
+            WriteArtifact(
+                content=generate_flash_script_bash(batch_files, device_version),
+                dst=os.path.join(linux_dir, "flash.sh"),
+                executable=True,
+            )
+        )
+        script_artifacts.append(
+            WriteArtifact(
+                content=generate_flash_script_bat(batch_files, device_version),
+                dst=os.path.join(windows_dir, "flash.bat"),
+            )
+        )
+
+        # Helper scripts (erase, reset, recover)
+        for filename, content in get_all_helper_scripts_bash(device_version).items():
+            script_artifacts.append(
+                WriteArtifact(
+                    content=content,
+                    dst=os.path.join(linux_dir, filename),
+                    executable=True,
+                )
+            )
+        for filename, content in get_all_helper_scripts_bat(device_version).items():
+            script_artifacts.append(
+                WriteArtifact(
+                    content=content,
+                    dst=os.path.join(windows_dir, filename),
+                )
+            )
+
+        # README
+        script_artifacts.append(
+            WriteArtifact(
+                content=generate_readme(),
+                dst=os.path.join(out_dir, "README.md"),
+            )
+        )
+
+    return script_artifacts
 
 
 def check_for_duplicated_twister_artifacts(artifacts: Sequence[TwisterArtifact]):
@@ -260,10 +442,11 @@ def check_that_specific_build_configs_exist_as_twister_artifacts(
     Therefore, the error message should be as informative as possible.
     """
     # atp.bc_artifacts.keys() must be found within all artifact.ts.name
-    missing_bcs = [
-        p for p in atp.bc_artifacts.keys() if p not in {a.ts.name for a in artifacts}
+    project_names = [p.name for p in atp.projects]
+    missing_project_names = [
+        p for p in project_names if p not in {a.ts.name for a in artifacts}
     ]
-    if len(missing_bcs) == 0:
+    if len(missing_project_names) == 0:
         return
 
     header = (
@@ -277,7 +460,7 @@ def check_that_specific_build_configs_exist_as_twister_artifacts(
 
     msg = ""
 
-    for bc in missing_bcs:
+    for bc in missing_project_names:
         msg += f"Project:\t[bold cyan]{bc}[/]\n"
 
     msg += "\n\n"

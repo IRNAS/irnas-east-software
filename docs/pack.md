@@ -351,3 +351,49 @@ Extra artifacts will be renamed as follows:
 | scripts/install/install.py        | install-v1.0.0.py                |
 | scripts/update_docker_versions.sh | update_docker_versions-v1.0.0.sh |
 | some/dir/generated.zip            | generated-v1.0.0.zip             |
+
+## nrfutil flash pack
+
+Build configurations with `nrfutil_flash_pack: True` in `east.yml` get a self-contained flash
+package generated alongside the normal pack output. This package allows users to flash firmware
+using only the `nrfutil` binary, without needing east, west, or Zephyr installed.
+
+### Configuration
+
+Set `nrfutil_flash_pack: True` on a build configuration in `east.yml`:
+
+```yaml
+pack:
+  build_configurations:
+    - name: app.prod
+      nrfutil_flash_pack: True
+```
+
+### What gets generated
+
+For each build configuration with `nrfutil_flash_pack: True`, the following files are added to the
+build output directory inside `package/`:
+
+```text
+package/app.prod/
+├── <batch files and firmware files>
+├── README.md
+├── linux/
+│   ├── flash.sh
+│   ├── erase.sh
+│   ├── reset.sh
+│   ├── recover.sh
+│   └── nrfutil_setup.sh
+└── windows/
+    ├── flash.bat
+    ├── erase.bat
+    ├── reset.bat
+    ├── recover.bat
+    └── nrfutil_setup.bat
+```
+
+The batch JSON files and firmware binaries are discovered automatically by running
+`west flash --dry-run` on each board's build output.
+
+The README.md file contains instructions on how to use the flash package, and the `nrfutil_setup`
+scripts check for the required tools and install the correct version of `nrfutil` if necessary.
