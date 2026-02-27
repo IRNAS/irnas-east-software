@@ -518,7 +518,7 @@ class EastContext:
             # Print a message that there is a new version available
             msg = (
                 "\n[bold yellow]New version of east is available![/]\n"
-                "Run [bold]pip install --upgrade east-tool[/] to update.\n"
+                "Run [bold]pipx install --upgrade east-tool[/] to update.\n"
             )
             self.print(Panel(msg))
 
