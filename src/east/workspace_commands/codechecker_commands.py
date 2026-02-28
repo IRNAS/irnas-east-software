@@ -77,8 +77,7 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze, build_d
     """Run [magenta bold]Codechecker[/] analysis for a built project.
 
     \b
-    \n\nExpects that a CodeChecker config file (codechecker_config.yaml) exists in the
-    project's root dir. That file is used to configure the analysis. See https://github.com/Ericsson/codechecker/tree/master/docs/config_file.md for more information. Run [bold magenta]east codechecker example-config[/] to see a suggested config file.
+    \n\nExpects that a CodeChecker config file (codechecker_config.yaml) exists in the project's root dir. That file is used to configure the analysis. See https://github.com/Ericsson/codechecker/tree/master/docs/config_file.md for more information. Run [bold magenta]east codechecker example-config[/] to see a suggested config file.
 
     \n\nResults of analysis are printed in the terminal by default. If --html flag is given, a html report is generated instead.
 
@@ -427,12 +426,10 @@ def codechecker(east):
     """Command with several subcommands related to [magenta bold]CodeChecker[/].
 
     \b
-    \n\nIf running CodeChecker inside continuous integration environment, run [bold cyan]export EAST_CODECHECKER_CI_MODE=1[/] before running any [bold cyan]east codechecker[/] commands.
-    This will make [bold cyan]east[/] use the [magenta bold]CodeChecker[/] executable that is on the system path instead of the one in the tooling directory. The system provided [magenta bold]CodeChecker[/] will normally also want to use the system provided clang, clang-tidy and cppcheck.
+    \n\nIf running CodeChecker inside continuous integration environment, run [bold cyan]export EAST_CODECHECKER_CI_MODE=1[/] before running any [bold cyan]east codechecker[/] commands. This will make [bold cyan]east[/] use the [magenta bold]CodeChecker[/] executable that is on the system path instead of the one in the tooling directory. The system provided [magenta bold]CodeChecker[/] will normally also want to use the system provided clang, clang-tidy and cppcheck.
 
     \b
-    \n\nThis way users can leverage the programs provided by continuous integration
-    environment and not by [bold cyan]east[/], which is usually faster due to caching.
+    \n\nThis way users can leverage the programs provided by continuous integration environment and not by [bold cyan]east[/], which is usually faster due to caching.
     """
     pass
 

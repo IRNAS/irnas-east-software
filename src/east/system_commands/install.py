@@ -19,8 +19,7 @@ def toolchain(east, force):
     """Install NCS toolchain for the current West workspace.
 
     \b
-    \n\nDetermines the version of the NCS that is being used in the current West
-    workspace and downloads the correct version of the toolchain for it.
+    \n\nDetermines the version of the NCS that is being used in the current West workspace and downloads the correct version of the toolchain for it.
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -69,8 +68,7 @@ def nrfutil_toolchain_manager(east):
     """Install and configure [bold magenta]nrfutil toolchain-manager[/].
 
     \b
-    \n\nIf [bold]EAST_NRFUTIL_CI_MODE[/] is set to [bold]1[/], this command
-    doesn't do anything.
+    \n\nIf [bold]EAST_NRFUTIL_CI_MODE[/] is set to [bold]1[/], this command doesn't do anything.
     """
     if os.environ.get("EAST_NRFUTIL_CI_MODE", "0") == "1":
         east.print(

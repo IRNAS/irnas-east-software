@@ -394,7 +394,7 @@ def non_existing_sample_msg_fmt(sample_name):
     is_flag=True,
     help=(
         "Just echo build commands and create dummy artifacts, do not actually build."
-        " Dummy artifacts are placed in into [bold italic]release_dry_run[/] folder. "
+        " Dummy artifacts are placed in into [bold ]release_dry_run[/] folder. "
     ),
 )
 @click.option(
@@ -416,17 +416,15 @@ def release(east, dry_run, verbose, spdx_app_only):
     """Create a release folder with release artifacts.
 
     \b
-    \n\n[bold red]DEPRECATED:[/] This command is deprecated and will be removed in
-    future. use [bold yellow]east pack[/] instead.
+    \n\n[bold red]DEPRECATED:[/] This command is deprecated and will be removed in future. use [bold yellow]east pack[/] instead.
 
-    \b
     \n\n[bold yellow]east release[/] command runs a release process consisting of a series of [bold yellow]east build[/] commands to build applications and samples listed in the [bold yellow]east.yml[/]. Created build artifacts are then renamed and placed into [bold magenta]release[/] folder in project's root directory.
 
-    \n\nVersion number is inferred from [bold italic cyan]git describe --tags --always --long --dirty=+[/] command. If the [bold yellow]east release[/] command is run directly on a commit with a version tag (such as [bold cyan]v1.0.2[/]), and there are no local changes, then only version tag is added to the name of artifacts, otherwise the additional git hash qualifier is added. If there is no version tag then default of [bold cyan]v0.0.0[/] is used.
+    \n\nVersion number is inferred from [bold cyan]git describe --tags --always --long --dirty=+[/] command. If the [bold yellow]east release[/] command is run directly on a commit with a version tag (such as [bold cyan]v1.0.2[/]), and there are no local changes, then only version tag is added to the name of artifacts, otherwise the additional git hash qualifier is added. If there is no version tag then default of [bold cyan]v0.0.0[/] is used.
 
     \n\nAs both [bold]apps[/] and [bold]samples[/] keys in [bold yellow]east.yml[/] are optional, release process for a specific key will be skipped, if it is not present.
 
-    \n\nDifferent hardware versions of listed boards are picked up automatically from the `board` directory.
+    \n\nDifferent hardware versions of listed boards are picked up automatically from the [bold cyan]board[/] directory.
 
     \n\n[bold]Note:[/] This command requires [bold yellow]east.yml[/] to function.
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].

@@ -100,16 +100,12 @@ def cli(ctx, echo):
     deploying [bold cyan]nRF Connect SDK[/] projects.
 
     \b
-    \n\nWant to learn what each command does?
+    \n\nWant to learn what each command does? Run [bold yellow]east \\[command] --help[/] to show documentation for that command.
 
-    Run [bold]east \\[command] --help[/] to show documentation for that command.
-
-    \b
     \n\nNote that commands are split into two groups:
 
-    - [bold]Workspace:[/] Can only be run from inside of [bold yellow]West workspace[/].
-
-    - [bold]System:[/] Can be run from anywhere.
+    \n- [bold]Workspace:[/] Can only be run from inside of [bold yellow]West workspace[/].
+    \n- [bold]System:[/] Can be run from anywhere.
     """
     # EastContext object is passed to other subcommands due to the @click.pass_context
     # decorator. Additionally, the subcommands need to be decorated with @click.pass_obj

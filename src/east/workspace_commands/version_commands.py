@@ -32,10 +32,9 @@ def version(east, tag, paths):
     \n\nThe command accepts the [bold cyan]PATHs[/] from two sources:
 
     \b
-    \n\n- As positional command line arguments, if provided, e.g., command [bold yellow]east util version app/test_one app/test_two[/] creates [bold white]VERSION[/] files in those directories.\n
-    - From [bold yellow]east.yml file[/], if no arguments are not provided, the [bold cyan]PATHs[/] are taken from the [bold magenta]version.paths[/] field in the [bold yellow]east.yml[/] file.\n
+    \n\n- As positional command line arguments, if provided, e.g., command [bold yellow]east util version app/test_one app/test_two[/] creates [bold white]VERSION[/] files in those directories.
+    - From [bold yellow]east.yml file[/], if no arguments are not provided, the [bold cyan]PATHs[/] are taken from the [bold magenta]version.paths[/] field in the [bold yellow]east.yml[/] file.
 
-    \b
     \n\nExample [bold yellow]east.yml[/]:
 
     \b\n
@@ -44,10 +43,8 @@ def version(east, tag, paths):
     \b\t  - app/test_one\n
     \b\t  - app/test_two\n
 
-    \b
-    \n\nRegardless of the source, the [bold cyan]PATHs[/] should always be relative to the project directory.\n
+    \n\nRegardless of the source, the [bold cyan]PATHs[/] should always be relative to the project directory.
 
-    \b
     \n\nFor version information the output of the [bold cyan]git describe --tags --always --long --dirty=+[/] command is used. Giving the [bold cyan]--tag[/] flag overrides the git command output.
     """
     east.pre_workspace_command_check()

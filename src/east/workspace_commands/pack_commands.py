@@ -75,7 +75,7 @@ def pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
     \n6. Create ZIP files from the contents of the [bold cyan]package[/] directory.
 
     \b
-    \n\nIf you set `nrfutil_flash_pack` to true for any of the projects in [bold yellow]east.yml[/], the command will also provide a self-contained flash package generated alongside the normal pack output. This package allows users to flash firmware using only the `nrfutil` binary, without needing east, west, or Zephyr installed.
+    \n\nIf you set [bold yellow]nrfutil_flash_pack[/] to true for any of the projects in [bold yellow]east.yml[/], the command will also provide a self-contained flash package generated alongside the normal pack output. This package allows users to flash firmware using only the [bold magenta]nrfutil[/] binary, without needing east, west, or Zephyr installed.
 
     \n\nFor details, see the documentation.
 

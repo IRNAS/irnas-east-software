@@ -72,10 +72,8 @@ def cortex_debug(
     \b
     \n\nRunning this command inside the application project directory creates a [bold].vscode/launch.json[/] file that configures the [bold green]Cortex Debug[/] for debugging that project.
 
-    \b
     \n\nIf the command is run without any extra options then it will try to infer the required info from the [bold]runners.yaml[/] file. If that is not desired then the --device, --gdb and --elf options can be used to provide info directly.
 
-    \b
     \n\nSVD files for Nordic chips are determined automatically. You can override this with the --svd-file option.
 
     """

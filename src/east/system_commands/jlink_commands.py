@@ -30,7 +30,6 @@ def fmt_runner_error_msg(flag, exception_msg):
     help=("Build directory of the project. Default: build."),
 )
 @click.option(
-    "-d",
     "--device",
     type=str,
     help=(

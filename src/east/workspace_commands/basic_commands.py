@@ -75,9 +75,7 @@ def build(ctx, east, build_type, spdx, extra_help, args):
     \b
     \n\nInternally runs [magenta bold]west build[/] command, all given arguments are passed directly to it. To learn more about possible [magenta bold]west build[/] arguments and options use --extra-help flag.
 
-
     \n\nAfter the build step, if the file [bold]compile_commands.json[/] is found in build dir it will be copied to the project and top west directory. This makes job of locating this file easier for [bold yellow]clangd[/].
-
 
     \n\nTo pass additional arguments to the [bold]CMake[/] invocation performed by the [magenta
     bold]west build[/], pass them after a [bold white]"--"[/] at the end of the command line.
@@ -210,10 +208,7 @@ def flash(east, extra_help, args):
     """Flash binary to the board's flash.
 
     \b
-    \n\nInternally runs [magenta bold]west flash[/] command, all given arguments are passed directly to it.
-
-    \n\nTo learn more about possible [magenta bold]west flash[/] arguments and options use --extra-help flag.
-
+    \n\nInternally runs [magenta bold]west flash[/] command, all given arguments are passed directly to it. To learn more about possible [magenta bold]west flash[/] arguments and options use --extra-help flag.
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -250,17 +245,15 @@ def bypass(east, shell, args):
     """Bypass any set of commands directly to the [magenta bold]nrfutil toolchain-manager[/].
 
     \b
-    \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to
-    the [bold magenta]nrfutil toolchain-manager[/] executable.
+    \n\nPassing any set of commands after double dash [bold]--[/] will pass them directly to the [bold magenta]nrfutil toolchain-manager[/] executable.
 
     \n\nThose commands will run in the context of the isolated environment, which is provided by the executable.
 
-    \n\nExample:
+    \n\nFor example, command:
 
-    \n\nCommand [bold]east bypass -- west build -b nrf52840dk_nrf52840[/]
-    \n\nbecomes [bold]west build -b nrf52840dk_nrf52840[/]
-
-
+    [bold yellow]east bypass -- west build -b nrf52840dk_nrf52840[/]
+    \n\nbecomes:
+    [bold yellow]west build -b nrf52840dk_nrf52840[/]
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
@@ -305,9 +298,7 @@ def debug(east, extra_help, args):
     """Connect to the board, flash the program, and start a debugging session.
 
     \b
-    \n\nInternally runs [magenta bold]west debug[/] command, all given arguments are passed directly to it.
-
-    \n\nTo learn more about possible [magenta bold]west debug[/] arguments and options use --extra-help flag.
+    \n\nInternally runs [magenta bold]west debug[/] command, all given arguments are passed directly to it. learn more about possible [magenta bold]west debug[/] arguments and options use --extra-help flag.
 
     \n\n[bold]Note:[/] Add --tui flag to use Text User Interface.
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
@@ -335,9 +326,7 @@ def attach(east, extra_help, args):
     """Like "east debug", but doesn't reflash the program.
 
     \b
-    \n\nInternally runs [magenta bold]west attach[/] command, all given arguments are passed directly to it.
-
-    \n\nTo learn more about possible [magenta bold]west attach[/] arguments and options use --extra-help flag.
+    \n\nInternally runs [magenta bold]west attach[/] command, all given arguments are passed directly to it. To learn more about possible [magenta bold]west attach[/] arguments and options use --extra-help flag.
 
     \n\n[bold]Note:[/] Add --tui flag to use Text User Interface.
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
@@ -365,10 +354,7 @@ def twister(east, extra_help, args):
     """Run Twister, a test runner tool.
 
     \b
-    \n\nInternally runs [magenta bold]west twister[/] command, all given arguments are passed directly to it.
-
-    \n\nTo learn more about possible Twister arguments and options use --extra-help flag.
-
+    \n\nInternally runs [magenta bold]west twister[/] command, all given arguments are passed directly to it. learn more about possible Twister arguments and options use --extra-help flag.
 
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
