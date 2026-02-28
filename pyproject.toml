@@ -25,6 +25,9 @@ dependencies = [
     "PyYAML>=6.0.0",
     "pykwalify==1.8.0",
     "ansi2txt==0.2.0",
+    # Limit charder version due to the warning coming from the requests library.
+    # More info: https://github.com/psf/requests/issues/7223
+    "chardet>=3.0.2,<6",
     # Below two are needed for the codechecker to work inside the virtualvenv
     "portalocker",
     "psutil"
