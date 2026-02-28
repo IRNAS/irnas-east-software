@@ -18,7 +18,7 @@ def nrfutil_flash_packing(
 
     for ts in testsuites:
         # We only want to process the testsuites that are in the atp. If a testsuite is
-        # not in the atp, it means that it definetly doesn't have
+        # not in the atp, it means that it definitely doesn't have
         # nrfutil_flash_pack enabled.
         if not atp.if_has_project(ts.name):
             continue

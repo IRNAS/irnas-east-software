@@ -7,11 +7,12 @@ using nrfutil.
 
 1. **nrfutil** must be installed and available on your PATH.
 
-   Download and install nrfutil from: https://www.nordicsemi.com/Products/Development-tools/nRF-Util
+   Download and install nrfutil from:
+   <https://www.nordicsemi.com/Products/Development-tools/nRF-Util>
 
 2. **SEGGER J-Link** software must be installed and available on your PATH.
 
-   Download and install J-Link from: https://www.segger.com/downloads/jlink/
+   Download and install J-Link from: <https://www.segger.com/downloads/jlink/>
 
    **TIP**: On Windows J-Link is typically installed in `C:\Program Files (x86)\SEGGER\JLink`. You
    may need to add this directory to your PATH environment variable.
@@ -76,7 +77,7 @@ Below options are common to all scripts.
 To run the Windows scripts, open a Command Prompt type `cmd` in the path window of the File Explorer
 and press Enter. Then run the desired script, for example:
 
-```
+```cmd
 windows\flash.bat
 ```
 
@@ -86,7 +87,7 @@ You can also run the scripts directly by double-clicking them in the File Explor
 
 To list all connected devices and their serial numbers:
 
-```
+```bash
 nrfutil device list
 ```
 
@@ -101,17 +102,19 @@ nrfutil device list
 **Permission denied (Linux):**
 
 - Add udev rules for Nordic devices:
-  ```
+
+  ```bash
   sudo cp 99-nordic.rules /etc/udev/rules.d/
   sudo udevadm control --reload-rules
   ```
+
 - Or run the script with sudo (not recommended)
 
 **Device is locked/bricked:**
 
 Example of an error message:
 
-```
+```text
 Flashing domain: hci_ipc
 [00:00:00] ###### 100% [2/1 853003224] Batch failed, Failed to attach to target: The Network Error: One or more batch tasks failed:
  * 853003224: Failed to attach to target: The Network core access port is protected (All) (NotAvailableBecauseProtection)

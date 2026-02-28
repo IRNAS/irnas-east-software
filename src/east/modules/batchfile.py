@@ -12,7 +12,9 @@ class BatchFile(NamedTuple):
     ext_mem_config_name: str | None = None
 
     @classmethod
-    def from_path(cls, path: str, ext_mem_config_name: str | None = None) -> "BatchFile":
+    def from_path(
+        cls, path: str, ext_mem_config_name: str | None = None
+    ) -> "BatchFile":
         """Create a BatchFile object by reading the content from the given path.
 
         Args:

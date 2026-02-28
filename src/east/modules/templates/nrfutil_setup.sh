@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck disable=SC2148
 # Common setup script for nrfutil flash operations
 # This script is sourced by flash.sh, erase.sh, reset.sh, and recover.sh
 #
