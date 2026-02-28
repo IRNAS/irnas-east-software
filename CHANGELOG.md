@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-02-28
+
 ### Added
 
 - Add `--east-yml-path` option to the `east pack` command. With it users can specify a different
@@ -844,7 +846,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Makefile for development.
 - Docker scripts for building and running docker containers, for development purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.30.0...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.0...HEAD
+[0.31.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.30.0...v0.31.0
 [0.30.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.6...v0.30.0
 [0.29.6]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.5...v0.29.6
 [0.29.5]: https://github.com/IRNAS/irnas-east-software/compare/v0.29.4...v0.29.5
@@ -918,5 +921,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]:
-  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
