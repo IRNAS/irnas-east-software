@@ -19,7 +19,7 @@ from .workspace_commands import (
 )
 
 rich_click.rich_click.MAX_WIDTH = 80
-rich_click.rich_click.USE_RICH_MARKUP = True
+rich_click.rich_click.TEXT_MARKUP = "rich"
 
 rich_click.rich_click.COMMAND_GROUPS = {
     "east": [
