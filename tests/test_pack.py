@@ -30,7 +30,7 @@ def test_simple_pack_config(west_workplace):
         pack_yaml_single_app,
     )
 
-    east_yaml = load_east_yml(project_path)
+    east_yaml = load_east_yml(os.path.join(project_path, "east.yml"))
 
     assert east_yaml is not None
     assert east_yaml["pack"]["artifacts"] == ["$APP_DIR/zephyr/merged.hex"]
@@ -71,7 +71,7 @@ def test_multiple_apps(west_workplace):
         pack_yaml_multiple_apps,
     )
 
-    east_yaml = load_east_yml(project_path)
+    east_yaml = load_east_yml(os.path.join(project_path, "east.yml"))
     assert east_yaml is not None
 
     for i, app in enumerate(east_yaml["pack"]["build_configurations"]):
@@ -104,7 +104,7 @@ def test_duplicated_multiple_apps(west_workplace):
     )
 
     with pytest.raises(EastYmlLoadError):
-        load_east_yml(project_path)
+        load_east_yml(os.path.join(project_path, "east.yml"))
 
 
 pack_yaml_two_artifact_fields = """
@@ -138,7 +138,7 @@ def test_that_two_artifact_related_fields_raise_an_error(west_workplace):
     )
 
     with pytest.raises(EastYmlLoadError):
-        load_east_yml(project_path)
+        load_east_yml(os.path.join(project_path, "east.yml"))
 
 
 pack_yaml_duplicated_artifact_fields1 = """
@@ -194,7 +194,7 @@ def test_that_duplicated_artifacts_raise_an_error(west_workplace):
         )
 
         with pytest.raises(EastYmlLoadError):
-            load_east_yml(project_path)
+            load_east_yml(os.path.join(project_path, "east.yml"))
 
 
 east_pack_file = """

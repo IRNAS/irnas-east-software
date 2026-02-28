@@ -26,7 +26,7 @@ def test_simple_version_config(west_workplace):
         two_apps,
     )
 
-    east_yaml = load_east_yml(project_path)
+    east_yaml = load_east_yml(os.path.join(project_path, "east.yml"))
     assert east_yaml is not None
 
     paths = east_yaml["version"]["paths"]
@@ -52,7 +52,7 @@ def test_simple_pack_config(west_workplace):
     )
 
     with pytest.raises(EastYmlLoadError):
-        load_east_yml(project_path)
+        load_east_yml(os.path.join(project_path, "east.yml"))
 
 
 expected_version_file = """

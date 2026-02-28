@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 import pykwalify.core
 import pykwalify.errors
@@ -22,25 +23,23 @@ def format_east_yml_load_error_msg(exception_msg):
     )
 
 
-def load_east_yml(project_dir: str):
-    """Try to load east.yml. If that succeeds validate it.
+def load_east_yml(east_yml_path: str) -> dict[str, Any] | None:
+    """Try to load east.yml from given path, if that succeeds validate it.
 
-        project_dir (str): Path to project directory, where east.yml should be located.
+        east_yml_path (str): Path to east.yml.
 
     Returns:
         dict with east.yml contents if east.yml is found and correctly validated. If it
         can not be found it returns None.
 
     """
-    east_yml = os.path.join(project_dir, "east.yml")
-
-    if not os.path.isfile(east_yml):
+    if not os.path.isfile(east_yml_path):
         return None
 
     # Validate yaml
     schema_yml = os.path.join(os.path.dirname(__file__), "configuration-schema.yaml")
     try:
-        c = pykwalify.core.Core(source_file=east_yml, schema_files=[schema_yml])
+        c = pykwalify.core.Core(source_file=east_yml_path, schema_files=[schema_yml])
     except pykwalify.errors.CoreError:
         # This error is raised when east.yml is empty, which is allowed.
         return None
@@ -51,7 +50,7 @@ def load_east_yml(project_dir: str):
         raise EastYmlLoadError(e)
 
     # Load file
-    with open(east_yml, "r") as file:
+    with open(east_yml_path, "r") as file:
         east_yml = yaml.safe_load(file)
 
     # Handle duplicated entries in app name, samples names and build types under each

@@ -7,6 +7,7 @@ import subprocess
 import sys
 import time
 from shutil import which
+from typing import NoReturn
 
 import requests
 from rich.console import Console
@@ -153,7 +154,7 @@ class EastContext:
 
         self.print(Markdown(*objects, **markdown_kwargs), **print_kwargs)
 
-    def exit(self, return_code: int = 1):
+    def exit(self, return_code: int = 1) -> NoReturn:
         """Exit program with given return_code."""
         sys.exit(return_code)
 
@@ -409,7 +410,7 @@ class EastContext:
         """
         # Workspace commands can only be run inside west workspace, so exit if that is
         # not the case.
-        if not self.west_dir_path:
+        if not self.west_dir_path or not self.project_dir:
             self.print(not_in_west_workspace_msg, highlight=False)
             self.exit()
 
@@ -419,7 +420,7 @@ class EastContext:
         # Exit if east.yml could not be loaded from the project dir; it is not an error
         # if it does not exist, we support that.
         try:
-            self.east_yml = load_east_yml(self.project_dir)
+            self.east_yml = load_east_yml(os.path.join(self.project_dir, "east.yml"))
         except EastYmlLoadError as msg:
             self.print(format_east_yml_load_error_msg(msg), highlight=False)
             self.exit()

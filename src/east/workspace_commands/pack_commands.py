@@ -6,7 +6,8 @@ from typing import Sequence
 import click
 
 from ..constants import EAST_GITHUB_URL
-from ..east_context import east_command_settings
+from ..east_context import EastContext, east_command_settings
+from ..east_yml import EastYmlLoadError, format_east_yml_load_error_msg, load_east_yml
 from ..helper_functions import determine_version_string
 from ..modules.artifact import Artifact, ExtraArtifact, TwisterArtifact, WriteArtifact
 from ..modules.artifacts2pack import ArtifactsToPack
@@ -51,6 +52,13 @@ no_east_yml_msg = """[bold yellow]east.yml[/] not found in project's root direct
     help=("Path to the generated directory. Default: [bold cyan]package[/]."),
 )
 @click.option(
+    "-e",
+    "--east-yml-path",
+    type=str,
+    default="",
+    help=("Use a custom east.yml file instead of the one in the project root"),
+)
+@click.option(
     "-v",
     "--verbose",
     type=bool,
@@ -60,7 +68,14 @@ no_east_yml_msg = """[bold yellow]east.yml[/] not found in project's root direct
 )
 @click.command(**east_command_settings)
 @click.pass_obj
-def pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
+def pack(
+    east,
+    twister_out_path: str,
+    pack_path: str,
+    east_yml_path: str,
+    tag: str,
+    verbose: bool,
+):
     """Create a release package from twister-generated build folders and other extra files.
 
     \b
@@ -83,18 +98,52 @@ def pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
     \n\n[bold]Note:[/] This command can be only run from inside of a [bold yellow]West workspace[/].
     """
     try:
-        _pack(east, twister_out_path, pack_path, tag, verbose)
+        _pack(east, twister_out_path, pack_path, east_yml_path, tag, verbose)
     except Exception as e:
         east.print(str(e))
         east.exit(1)
 
 
-def _pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
+def _pack(
+    east: EastContext,
+    twister_out_path: str,
+    pack_path: str,
+    east_yml_path: str,
+    tag: str,
+    verbose: bool,
+):
     east.pre_workspace_command_check()
 
-    # Check that east.yml exists
-    if not east.east_yml:
-        raise Exception(no_east_yml_msg)
+    east_yml = None
+    if east_yml_path:
+        if not os.path.exists(east_yml_path):
+            east.print(
+                f"[bold magenta]{east_yml_path}[/] file couldn't be found from "
+                "current working directory. \n"
+            )
+            east.exit()
+
+        try:
+            east_yml = load_east_yml(east_yml_path)
+        except EastYmlLoadError as msg:
+            east.print(format_east_yml_load_error_msg(msg), highlight=False)
+            east.exit()
+    else:
+        # Check that east.yml exists
+        if not east.east_yml:
+            east.print(no_east_yml_msg)
+            east.exit()
+        east_yml = east.east_yml
+
+    # This check is needed to discern between east.yml present, but empty and east.yml
+    # not present at all. Both cases are handled above, but we need to check that
+    # east.yml is not empty before proceeding.
+    if not east_yml:
+        east.print(
+            "The [bold yellow]east.yml[/] file is empty, but it is required for the "
+            "[bold magenta]east pack[/] command to work. Please fill it and try again."
+        )
+        east.exit()
 
     # Check that twister_out_path exists
     if not os.path.exists(twister_out_path):
@@ -115,7 +164,7 @@ def _pack(east, twister_out_path: str, pack_path: str, tag: str, verbose: bool):
         )
 
     testsuites = TSuite.list_from_twister_json(twister_json, twister_out_path)
-    atp = ArtifactsToPack.from_east_yml(east.east_yml)
+    atp = ArtifactsToPack.from_east_yml(east_yml)
 
     check_for_failed_testsuites(testsuites)
 

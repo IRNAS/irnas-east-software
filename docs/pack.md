@@ -397,3 +397,19 @@ The batch JSON files and firmware binaries are discovered automatically by runni
 
 The README.md file contains instructions on how to use the flash package, and the `nrfutil_setup`
 scripts check for the required tools and install the correct version of `nrfutil` if necessary.
+
+## Projects with several twister-out folders
+
+In some cases it is required for a project to run several Twister runs, due to the clashing command
+line arguments. For example, Twister run for the production projects needs different arguments than
+the one that generates radio test images.
+
+Such setup would create several `twister-out` folders, e.g., `twister-out-prod` and
+`twister-out-radio`. In such case a single `east.yml` can't be used to specify the packing
+configuration for both Twister runs, since `east pack` always makes sure that the artifacts for the
+build configurations specified in `east.yml` are present in the `twister-our` dir, and thus it can
+only be used with one.
+
+For this use case the `east pack` command can be run with the `--east-yml-path`, `--pack-path` and
+`--twister-out-path` options, providing a way to specify the path to the `twister-out` folder, the
+output `package` folder and most importantly, a different `east.yml` file.
