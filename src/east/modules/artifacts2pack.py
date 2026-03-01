@@ -39,15 +39,20 @@ class ArtifactsToPack(NamedTuple):
         extra_artifacts = pack.get("extra", [])
 
         projects = []
+        artifacts = []
 
         for bc in build_configs:
             if "artifacts" in bc:
                 artifacts = common_artifacts + bc["artifacts"]
             elif "overwrite_artifacts" in bc:
                 artifacts = bc["overwrite_artifacts"]
+            elif "nrfutil_flash_pack" in bc:
+                # Nothing do do here, just check if it is present.
+                pass
             else:
                 raise Exception(
-                    "One of 'artifact' or 'overwrite_artifact' keys must be present in "
+                    "One of 'artifact', 'overwrite_artifact' or "
+                    "'nrfutil_flash_pack: True' keys must be present in "
                     "the project.\n\nThis shouldn't happen. Please report this "
                     f"to East's bug tracker on {EAST_GITHUB_URL}."
                 )

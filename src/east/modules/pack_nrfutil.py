@@ -1,3 +1,4 @@
+import copy
 import os
 import re
 
@@ -23,7 +24,9 @@ def nrfutil_flash_packing(
         if not atp.if_has_project(ts.name):
             continue
 
-        artifacts = atp.get_artifacts_for_project(ts.name)
+        # Below function returns a reference to a list. We need to create a copy of it,
+        # if we want to modify it.
+        artifacts = copy.copy(atp.get_artifacts_for_project(ts.name))
         uses_nrfutil = atp.uses_nrfutil_flash_packing(ts.name)
 
         # Doesn't use nrfutil flash packing, we can just add it as is.

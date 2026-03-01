@@ -136,7 +136,11 @@ def load_east_yml(east_yml_path: str) -> dict[str, Any] | None:
                         f"are set for the [bold]pack.project.{p['name']}[/] in the "
                         "[bold]east.yml[/], this is not allowed!"
                     )
-                if "artifacts" not in p and "overwrite_artifacts" not in p:
+                if (
+                    "artifacts" not in p
+                    and "overwrite_artifacts" not in p
+                    and "nrfutil_flash_pack" not in p
+                ):
                     raise EastYmlLoadError(
                         f"[bold]pack.project.{p['name']}[/] field should have atleast one "
                         "of [bold]artifacts[/] and [bold]overwrite_artifacts[/] fields but "
