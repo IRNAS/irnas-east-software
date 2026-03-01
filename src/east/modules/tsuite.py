@@ -60,6 +60,8 @@ class TSuite(NamedTuple):
     board: str
     # Raw board name from twister.json, e.g., nrf52840dk/nrf52840
     raw_board: str
+    # Path to the project where the testsuite is located.
+    path: str
     # Testsuite's build directory inside the twister_out directory.
     twister_out_path: str
     # Status of the testsuite, e.g., passed, failed, skipped
@@ -113,6 +115,7 @@ class TSuite(NamedTuple):
                 name=d["name"],
                 board=board,
                 raw_board=d["platform"],
+                path=os.path.dirname(d["name"]),
                 twister_out_path=tsuite_determine_path(
                     d["path"], board, d["name"], toolchain, twister_out_path
                 ),
