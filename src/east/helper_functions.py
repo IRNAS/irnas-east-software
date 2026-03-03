@@ -140,7 +140,7 @@ def west_topdir(start: Optional[PathType] = None) -> str:
         cur_dir = parent_dir
 
 
-def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
+def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str | None, str]:
     """Returns version of nrf-sdk project and absolute path to the projects directory.
 
     This is combined, so we avoid reading .west/config file twice.
@@ -189,7 +189,12 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str, str]:
 
     # Access path to the sdk-nrf repo and read the VERSION file.
     sdk_repo_path = ncs[0]["name"]
-    with open(os.path.join(west_dir_path, sdk_repo_path, "VERSION"), "r") as file:
+
+    version_file_path = os.path.join(west_dir_path, sdk_repo_path, "VERSION")
+    if not os.path.isfile(version_file_path):
+        return None, project_path
+
+    with open(version_file_path) as file:
         # Add "v" since toolchain manager expects version in format like "v3.3.0", but
         # VERSION file contains only "3.3.0"
         revision = "v" + file.read().strip()
