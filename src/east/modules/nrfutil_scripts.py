@@ -145,7 +145,6 @@ def generate_flash_script_bat(batch_files: list[BatchFile], device_version: str)
         "REM   EXTRA_ARGS                Any additional arguments, they will be passed to"
         "REM                             nrfutil directly (e.g. --core Network)",
         "",
-        "setlocal enabledelayedexpansion",
         "",
         "set SCRIPT_DIR=%~dp0",
         "",
@@ -258,8 +257,6 @@ def generate_helper_script_bat(
 @echo off
 REM {description}
 REM Usage: {name}.bat [--serial-number <SERIAL>] [--version-agnostic] [EXTRA_ARGS]
-
-setlocal enabledelayedexpansion
 
 set SCRIPT_DIR=%~dp0
 set REQUIRED_DEVICE_VERSION={device_version}
