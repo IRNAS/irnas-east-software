@@ -18,6 +18,7 @@ using nrfutil.
    may need to add this directory to your PATH environment variable.
 
 The required **nrfutil device** command will be checked and installed automatically by the scripts.
+Connect to the device with a J-Link programmer and make sure that device is powered on.
 
 ## Available Scripts
 
@@ -48,6 +49,10 @@ The required **nrfutil device** command will be checked and installed automatica
 | ------------- | --------------------- |
 | Linux / macOS | `./linux/recover.sh`  |
 | Windows       | `windows\recover.bat` |
+
+**Note**: in some few cases running above scripts would fail, if the device was also connected to
+the Host PC via the USB (which was used for logging/shell purposes). If that is the case for you,
+make sure that USB cable isn't connected to the PC, when trying to run the above scripts.
 
 ## Common Options
 
@@ -124,3 +129,16 @@ Flashing domain: hci_ipc
 - This will unlock and erase the device
 - Depending on the mentioned core you might need to use `--core` option to specify the core to
   recover (e.g. `--core Network` for the above error)
+
+**The operation is not supported:**
+
+In some cases it can happen that you can see the below message when trying to run the
+`flash.bat/flash.sh` script:
+
+```text
+The operation is either not supported for this type of device or the device has issues and it cannot
+be recognized (NotFound).
+```
+
+This might by caused by additional USB cable that is connected to the device for the debugging
+purposes (shell/logs). Try disconnecting the USB cable from the PC before executing flash script.
