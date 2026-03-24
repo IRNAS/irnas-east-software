@@ -112,7 +112,7 @@ class TSuite(NamedTuple):
             toolchain = d.get("toolchain", None)
 
             return cls(
-                name=d["name"],
+                name=os.path.basename(d["name"]),
                 board=board,
                 raw_board=d["platform"],
                 path=os.path.dirname(d["name"]),

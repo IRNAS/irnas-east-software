@@ -17,28 +17,19 @@ def nrfutil_flash_packing(
     """Pack the given test suites and extra artifacts using nrfutil flash packing."""
     projects = []
 
-    for ts in testsuites:
-        # We only want to process the testsuites that are in the atp. If a testsuite is
-        # not in the atp, it means that it definitely doesn't have
-        # nrfutil_flash_pack enabled.
-        if not atp.if_has_project(ts.name):
-            continue
-
+    for p in atp.projects:
         # Below function returns a reference to a list. We need to create a copy of it,
         # if we want to modify it.
-        artifacts = copy.copy(atp.get_artifacts_for_project(ts.name))
-        uses_nrfutil = atp.uses_nrfutil_flash_packing(ts.name)
+        artifacts = copy.copy(p.artifacts)
+        uses_nrfutil = p.nrfutil_flash_pack
 
         # Doesn't use nrfutil flash packing, we can just add it as is.
         if not uses_nrfutil:
-            projects.append(
-                Project(name=ts.name, artifacts=artifacts, nrfutil_flash_pack=False)
-            )
+            projects.append(p)
             continue
 
-        # This testsuite should be packed using nrfutil flash packing, we need to find
-        # the list of artifacts that would be flashed if we were to flash this testsuite
-        # and add them to the atp.
+        # Find the matching tsuite from the project name
+        ts = next(filter(lambda ts: ts == p.name, testsuites))
 
         # find build folder
         build_dir = os.path.join(twister_out_path, ts.twister_out_path)
@@ -66,7 +57,7 @@ def nrfutil_flash_packing(
 
         projects.append(
             Project(
-                name=ts.name,
+                name=p.name,
                 artifacts=artifacts,
                 nrfutil_flash_pack=True,
                 batch_files=batch_files,
