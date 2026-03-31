@@ -1,3 +1,4 @@
+import glob
 import os
 import pathlib
 import platform
@@ -521,37 +522,30 @@ def determine_svd_file(east, device):
     Only Nordic devices are supported at the moment, unsupported devices will return
     None.
     """
-    mdk_dir = os.path.join(
-        east.west_dir_path,
-        "modules",
-        "hal",
-        "nordic",
-        "nrfx",
-        "mdk",
-    )
+    mdk_dir = os.path.join(east.west_dir_path, "modules", "hal", "nordic", "nrfx")
 
-    if device.startswith("nRF5340"):
-        if device.endwith("NET"):
+    svd_files = glob.glob("**/*.svd", root_dir=mdk_dir, recursive=True)
+
+    if device.startswith("nRF5340") or device.startswith("nrf5340"):
+        if device.endswith("NET") or device.endswith("net"):
             svd = "nrf5340_network"
-        elif device.endwith("APP"):
+        elif device.endswith("APP") or device.endswith("app"):
             svd = "nrf5340_application"
         else:
             return None
-    elif device.startswith("nRF52832"):
+    elif device.startswith("nRF52832") or device.startswith("nrf52832"):
         svd = "nrf52"
-    elif device.startswith("nRF51"):
+    elif device.startswith("nRF51") or device.startswith("nrf52832"):
         svd = "nrf51"
     else:
         svd = device.split("_")[0].lower()
 
-    return next(
-        (
-            os.path.join(mdk_dir, file)
-            for file in os.listdir(mdk_dir)
-            if svd == os.path.splitext(file)[0] and file.endswith(".svd")
-        ),
-        None,
-    )
+    for s in svd_files:
+        print(os.path.splitext(os.path.basename(s))[0])
+        if svd == os.path.splitext(os.path.basename(s))[0]:
+            return os.path.join(mdk_dir, s)
+
+    return None
 
 
 def configure_nrfutil(east):
