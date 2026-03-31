@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.31.5] - 2026-03-31
+
 ### Fixed
 
 - Make search for SVD files in `east util cortex-debug` command more robust.
@@ -878,7 +880,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Makefile for development.
 - Docker scripts for building and running docker containers, for development purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.4...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.5...HEAD
+[0.31.5]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.4...v0.31.5
 [0.31.4]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.3...v0.31.4
 [0.31.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.2...v0.31.3
 [0.31.2]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.1...v0.31.2
@@ -957,5 +960,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]:
-  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
