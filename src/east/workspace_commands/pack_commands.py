@@ -1,6 +1,7 @@
 import json
 import os
 import shutil as sh
+import traceback
 from typing import Sequence
 
 import click
@@ -100,7 +101,9 @@ def pack(
     try:
         _pack(east, twister_out_path, pack_path, east_yml_path, tag, verbose)
     except Exception as e:
-        east.print(str(e))
+        msg = str(e) or f"Unexpected error: {type(e).__name__}"
+        east.print(msg)
+        east.print(traceback.format_exc())
         east.exit(1)
 
 
