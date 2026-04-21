@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.31.6] - 2026-04-21
+
 ### Fixed
 
 - Improve error messages in case `east pack` errors out.
@@ -886,7 +888,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Makefile for development.
 - Docker scripts for building and running docker containers, for development purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.5...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.6...HEAD
+[0.31.6]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.5...v0.31.6
 [0.31.5]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.4...v0.31.5
 [0.31.4]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.3...v0.31.4
 [0.31.3]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.2...v0.31.3
