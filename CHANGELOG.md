@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 - Improve error messages in case `east pack` errors out.
+- Fix a bug in `east pack`, which would command to silently fail, without generating the package
+  folder.
 
 ## [0.31.5] - 2026-03-31
 

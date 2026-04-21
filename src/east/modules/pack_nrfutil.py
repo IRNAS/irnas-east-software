@@ -29,7 +29,7 @@ def nrfutil_flash_packing(
             continue
 
         # Find the matching tsuite from the project name
-        ts = next(filter(lambda ts: ts == p.name, testsuites))
+        ts = next(filter(lambda ts: ts.name == p.name, testsuites))
 
         # find build folder
         build_dir = os.path.join(twister_out_path, ts.twister_out_path)
