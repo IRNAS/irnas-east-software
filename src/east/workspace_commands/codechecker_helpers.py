@@ -90,7 +90,7 @@ def check_for_codechecker_config_yaml(east, cfg):
 
 
 def detect_problematic_zephyr_macros(diag):
-    """Return true if a problematic Zephyr macros is flagged by clang-tidy diagnostics.
+    """Return true if a problematic Zephyr macros are flagged by clang-tidy diagnostics.
 
     Macros are always connected to a specific description.
     Different problematic macros can have the same description.
@@ -131,6 +131,28 @@ def detect_problematic_zephyr_macros(diag):
                     for pattern in bad_diagnostic["patterns"]:
                         if re.search(pattern, path["message"]):
                             return True
+    return False
+
+
+def detect_problematic_arm_intrinsics(diag):
+    """Return true if a problematic ARM intrinsics builtins are flagged by
+    clangsa/clang-tidy diagnostics.
+
+    Builtins are always connected to a specific description.
+    """
+    bad_diagnostics = [
+        {
+            "description": "argument to '__builtin_arm_.*' must be a constant integer",
+        }
+    ]
+
+    # Iterate through all bad diagnostics and first check if the descriptions match.
+    # If yes, then traverse the paths and check if any of the patterns appear in the
+    # "message" field.
+    for bad_diagnostic in bad_diagnostics:
+        if re.search(bad_diagnostic["description"], diag["description"]):
+            return True
+
     return False
 
 
@@ -231,6 +253,7 @@ def cleanup_plist_files(east, output):
         for diag in diags:
             if (
                 detect_problematic_zephyr_macros(diag)
+                or detect_problematic_arm_intrinsics(diag)
                 or var_never_read_before_disabled_macro_found(data["files"], diag)
                 or sizeof_on_pointer_type_found(data["files"], diag)
             ):

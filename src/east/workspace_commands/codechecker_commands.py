@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 
@@ -28,6 +29,26 @@ clean_print_args = {
     "soft_wrap": False,
     "no_wrap": True,
 }
+
+
+def append_compiler_flag(ccdb_path: str, new_ccdb_path: str, text: str) -> None:
+    with open(ccdb_path, "r") as f:
+        db = json.load(f)
+
+    if not isinstance(db, list):
+        raise ValueError("compile_commands.json must be a list")
+
+    for entry in db:
+        # Prefer arguments array form
+        if "arguments" in entry and isinstance(entry["arguments"], list):
+            entry["arguments"].append(text)
+
+        # Fallback to command string form
+        elif "command" in entry and isinstance(entry["command"], str):
+            entry["command"] += " " + text
+
+    with open(new_ccdb_path, "w") as f:
+        json.dump(db, f, indent=2)
 
 
 @click.command(**east_command_settings)
@@ -105,22 +126,31 @@ def check(east, html, dont_cleanup_plist, skip_file, file, only_analyze, build_d
     cc = east.consts["codechecker_path"]
     cfg = os.path.join(east.project_dir, "codechecker_config.yaml")
     cc_output_dir = os.path.join(build_dir, "codechecker")
-    compile_commands = os.path.join(
+    old_compile_commands = os.path.join(
         find_app_build_dir(build_dir), "compile_commands.json"
+    )
+    compile_commands = os.path.join(
+        find_app_build_dir(build_dir), "new_compile_commands.json"
     )
 
     check_for_codechecker(east)
     check_for_build_folder(east, build_dir)
-    check_for_compile_commands_json(east, compile_commands)
-    cleanup_compile_commands_json(compile_commands)
+    check_for_compile_commands_json(east, old_compile_commands)
+    cleanup_compile_commands_json(old_compile_commands)
     check_for_codechecker_config_yaml(east, cfg)
+
+    append_compiler_flag(
+        old_compile_commands,
+        compile_commands,
+        "-D__ARM_ACLE -isystem ~/workdir/project/my_clang_headers",
+    )
 
     if not skip_file:
         skip_file = create_skip_file(east, build_dir, cc_output_dir)
 
     # Run analyze command
     analyze_cmd = (
-        f"{cc} analyze --skip {skip_file} --output {cc_output_dir} "
+        f"{cc} analyze --skip {skip_file} --output {cc_output_dir} --verbose debug "
         f"{compile_commands} --config {cfg} "
     )
 
