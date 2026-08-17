@@ -18,8 +18,9 @@ def nrfutil_flash_packing(
     projects = []
 
     for p in atp.projects:
-        # Below function returns a reference to a list. We need to create a copy of it,
-        # if we want to modify it.
+        # The artifact list is extended in place further below, so copy it to avoid
+        # mutating the given ArtifactsToPack. from_east_yml() already gives every
+        # project its own list, so this is currently only a safeguard.
         artifacts = copy.copy(p.artifacts)
         uses_nrfutil = p.nrfutil_flash_pack
 
