@@ -39,16 +39,17 @@ class ArtifactsToPack(NamedTuple):
         extra_artifacts = pack.get("extra", [])
 
         projects = []
-        artifacts = []
 
         for bc in build_configs:
+            # Every build configuration gets its own, fresh list of artifacts, it must
+            # never be carried over from the previous loop iteration.
             if "artifacts" in bc:
                 artifacts = common_artifacts + bc["artifacts"]
             elif "overwrite_artifacts" in bc:
-                artifacts = bc["overwrite_artifacts"]
+                artifacts = list(bc["overwrite_artifacts"])
             elif "nrfutil_flash_pack" in bc:
-                # Nothing do do here, just check if it is present.
-                pass
+                # No artifact keys are given, use the common artifacts.
+                artifacts = list(common_artifacts)
             else:
                 raise Exception(
                     "One of 'artifact', 'overwrite_artifact' or "
