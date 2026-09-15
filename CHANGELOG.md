@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.31.8] - 2026-09-15
+
 ### Fixed
 
 - Correctly parse new VERSION file format, which was introduced in NCS v3.4.0.
@@ -898,7 +900,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Makefile for development.
 - Docker scripts for building and running docker containers, for development purposes.
 
-[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.7...HEAD
+[unreleased]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.8...HEAD
+[0.31.8]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.7...v0.31.8
 [0.31.7]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.6...v0.31.7
 [0.31.6]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.5...v0.31.6
 [0.31.5]: https://github.com/IRNAS/irnas-east-software/compare/v0.31.4...v0.31.5
@@ -980,5 +983,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]:
-  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
