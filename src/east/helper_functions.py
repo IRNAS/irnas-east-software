@@ -196,9 +196,22 @@ def get_ncs_and_project_dir(west_dir_path: str) -> Tuple[str | None, str]:
         return None, project_path
 
     with open(version_file_path) as file:
-        # Add "v" since toolchain manager expects version in format like "v3.3.0", but
-        # VERSION file contains only "3.3.0"
-        revision = "v" + file.read().strip()
+        contents = file.read().strip()
+
+    if "VERSION_MAJOR" in contents:
+        # New format of VERSION file, parse it
+        version_major = re.search(r"VERSION_MAJOR\s*=\s*(\d+)", contents).group(1)
+        version_minor = re.search(r"VERSION_MINOR\s*=\s*(\d+)", contents).group(1)
+        version_patch = re.search(r"VERSION_TWEAK\s*=\s*(\d+)", contents).group(1)
+
+        revision = f"{version_major}.{version_minor}.{version_patch}"
+    else:
+        # Old format of VERSION file, just read it
+        revision = contents.strip()
+
+    # Add "v" since toolchain manager expects version in format like "v3.3.0", but
+    # VERSION file contains only "3.3.0"
+    revision = "v" + revision
 
     return (revision, project_path)
 
