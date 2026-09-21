@@ -38,9 +38,16 @@ def nrfutil_flash_packing(
         # run west flash --dry-run to find all the artifacts that would be flashed
         out = east.run_west(
             f"flash --dry-run --skip-rebuild -d {build_dir}",
+            exit_on_error=False,
             return_output=True,
             silent=True,
         )
+
+        if out["returncode"] != 0:
+            raise Exception(
+                f"Failed to run 'west flash --dry-run' for testsuite {ts.name} in "
+                f"{build_dir}. Output:\n\n{out['output']}"
+            )
 
         binary_files, ext_mem_cgs, batch_files = parse_dry_run_output(out["output"])
 

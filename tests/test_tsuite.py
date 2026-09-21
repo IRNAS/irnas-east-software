@@ -49,6 +49,29 @@ test_suite_json = {
                 }
             ],
         },
+        # This is a Zephyr v4.4 "style" testsuite, toolchain is different from the
+        # previous one, but the rest is the same.
+        {
+            "name": "app.v4_4",
+            "arch": "arm",
+            "platform": "custom_board@1.0.0/nrf52840",
+            "path": "../project/app",
+            "run_id": "953b256c22f70c8293b9b625baea26ef",
+            "runnable": False,
+            "retries": 0,
+            "status": "not run",
+            "execution_time": "0.00",
+            "build_time": "26.15",
+            "toolchain": "zephyr/gnu",
+            "testcases": [
+                {
+                    "identifier": "app.v4",
+                    "execution_time": "0.00",
+                    "status": "not run",
+                    "reason": "Test was built only",
+                }
+            ],
+        },
         # This is a Zephyr v4 "style" testsuite for native sim
         {
             "name": "app.native",
@@ -113,11 +136,12 @@ def test_creating_tsuite_instances():
     # With this assertion we ensure that the testsuite JSON
     # contains the expected number of testsuites.
     # The fourth testsuite is filtered out, so it should not be in the list.
-    assert len(ts) == 3
+    assert len(ts) == 4
 
     v3 = ts[0]
     v4 = ts[1]
-    native = ts[2]
+    v4_4 = ts[2]
+    native = ts[3]
 
     assert v3.name == "app.v3"
     assert v3.board == "custom_board@1.0.0_nrf52840"
@@ -132,6 +156,13 @@ def test_creating_tsuite_instances():
     # assert v4.path == "app"
     assert v4.twister_out_path == "custom_board@1.0.0_nrf52840/zephyr/app.v4"
     assert v4.status == "not run"
+
+    assert v4_4.name == "app.v4_4"
+    assert v4_4.board == "custom_board@1.0.0_nrf52840"
+    assert v4_4.raw_board == "custom_board@1.0.0/nrf52840"
+    # assert v4.path == "app"
+    assert v4_4.twister_out_path == "custom_board@1.0.0_nrf52840/zephyr_gnu/app.v4_4"
+    assert v4_4.status == "not run"
 
     assert native.name == "app.native"
     assert native.board == "native_sim_native"

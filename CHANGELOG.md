@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Adapt tsuite path derivation in `east pack` for Zephyr v4.4.0.
+
 ## [0.31.8] - 2026-09-15
 
 ### Fixed
@@ -983,4 +987,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 [0.4.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IRNAS/irnas-east-software/compare/v0.1.42...v0.2.0
-[0.1.42]: https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42
+[0.1.42]:
+  https://github.com/IRNAS/irnas-east-software/compare/5a4f734ca077a91cc2c77b42080f0c9814a489ed...v0.1.42

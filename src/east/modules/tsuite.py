@@ -24,27 +24,32 @@ def tsuite_determine_path(
     # if the version is v4.0.0 or later, the paths used are different
     # from v3.x versions, so we need to adjust the paths accordingly.
 
-    if toolchain:
-        # return os.path.join(board, toolchain, path, name)
-        # The path from twister.json always starts with "../", by removing it we get
-        # relative path from west_topdir to the location of the app/sample/test.
-        # This is also can be used for the path that is used for the build directory
-        # structure of twister_out from Zephyr v4.2.0 onwards, so we can use it directly.
-        path = path[3:]
-
-        # But since Zephyr between v4.0.0 and v4.2.0 used a different structure for the
-        # build directory in twister_out, we return both kinds of paths.
-
-        # Determine which path in twister_out_paths exists and use it as src_dir.
-        path1 = os.path.join(board, toolchain, path, name)
-        path2 = os.path.join(board, toolchain, name)
-
-        if os.path.exists(os.path.join(twister_out_path, path1)):
-            return path1
-        else:
-            return path2
-    else:
+    if not toolchain:
+        # v3.x versions
         return os.path.join(board, name)
+
+    # return os.path.join(board, toolchain, path, name)
+    # The path from twister.json always starts with "../", by removing it we get
+    # relative path from west_topdir to the location of the app/sample/test.
+    # This is also can be used for the path that is used for the build directory
+    # structure of twister_out from Zephyr v4.2.0 onwards, so we can use it directly.
+    path = path[3:]
+
+    # But since Zephyr between v4.0.0 and v4.2.0 used a different structure for the
+    # build directory in twister_out, we return both kinds of paths.
+
+    # Nornalize the toolchain name. Zephyr often writes it as "zephyr/gnu" in
+    # twister.json, but the build directory uses "zephyr_gnu".
+    toolchain = toolchain.replace("/", "_")
+
+    # Determine which path in twister_out_paths exists and use it as src_dir.
+    path1 = os.path.join(board, toolchain, path, name)
+    path2 = os.path.join(board, toolchain, name)
+
+    if os.path.exists(os.path.join(twister_out_path, path1)):
+        return path1
+    else:
+        return path2
 
 
 class TSuite(NamedTuple):
